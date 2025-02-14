@@ -9,9 +9,9 @@
 - [x] Configure .gitattributes
 
 ## 2. Unity Project Setup
-- [x] Unity Version: 6000.0.38f1
+- Unity Version: 6000.0.38f1 (Unity 6)
 - [x] Configure for 2D
-- [x] URP Setup (17.0.3)
+- [x] URP Setup (17.0.3 for Unity 6)
 - [x] Set API compatibility to .NET Standard 2.1 ✓
 - [x] Switch to IL2CPP scripting backend ✓
 - [ ] Set target platforms (Windows, MacOS, Linux) (Need to verify location)

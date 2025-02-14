@@ -67,4 +67,9 @@ Thumbs.db
 
 # Unity auto-generated files
 *.log
-*.dwlt 
+*.dwlt
+
+# Unity 6 specific
+/[Uu]serSettings/
+/[Rr]ecordings/
+/[Cc]aptures/ 
