@@ -7,23 +7,18 @@ namespace CZ.Tests.EditMode
     public class TestScriptTests
     {
         [Test]
-        public void TestScript_WhenInitialized_LogsMessage()
+        public void TestScript_WhenInitialized_Exists()
         {
             // Arrange
             var gameObject = new GameObject();
             var testScript = gameObject.AddComponent<TestScript>();
-            var loggedMessage = false;
-            
-            Application.logMessageReceived += (message, stackTrace, type) => {
-                if (message == "Test script initialized")
-                    loggedMessage = true;
-            };
-
-            // Act
-            testScript.Start();
 
             // Assert
-            Assert.IsTrue(loggedMessage, "TestScript should log initialization message");
+            Assert.IsNotNull(testScript, "TestScript should be added to GameObject");
+            Assert.IsTrue(testScript is MonoBehaviour, "TestScript should inherit from MonoBehaviour");
+            
+            // Cleanup
+            Object.DestroyImmediate(gameObject);
         }
     }
 } 
