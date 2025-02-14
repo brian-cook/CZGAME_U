@@ -1,0 +1,189 @@
+# Performance Guidelines for CZ Game
+
+## 1. Core Performance Targets
+### Frame Rate
+- Target 60 FPS on mid-range devices
+- Minimum 30 FPS on low-end devices
+- Implement frame rate monitoring and adaptation
+
+### Memory Usage
+- Maximum 1GB RAM usage
+- Peak allocation < 100MB during gameplay
+- Garbage collection triggers < 1 per minute
+
+### Draw Calls
+- Maximum 100 draw calls per frame
+- Batch similar sprites and materials
+- Use sprite atlases for all 2D elements
+
+## 2. Entity Management
+### Object Pooling Requirements
+```csharp
+// Example pooling thresholds
+const int MAX_ENEMIES_POOLED = 200;
+const int MAX_PROJECTILES_POOLED = 500;
+const int MAX_EFFECTS_POOLED = 100;
+const int MAX_UI_ELEMENTS_POOLED = 50;
+```
+
+### Update Frequency
+- Use coroutines for non-critical updates
+- Implement time-slicing for heavy operations
+- Stagger entity updates across frames
+```csharp
+void Start() {
+    StartCoroutine(UpdateRoutine());
+}
+
+IEnumerator UpdateRoutine() {
+    while (true) {
+        // Update logic
+        yield return new WaitForSeconds(1f / updateFrequency);
+    }
+}
+```
+
+## 3. Comfort Zone Optimization
+### Zone Calculations
+- Maximum 10 active zones
+- Update zone effects every 0.1 seconds
+- Use spatial partitioning for entity checks
+- Implement zone effect culling
+
+### AI Considerations
+- Maximum 50 entities checking zones
+- Cache zone awareness results
+- Update pathfinding every 0.2 seconds
+- Use NavMesh obstacle carving sparingly
+
+## 4. Combat System Performance
+### Weapon Systems
+- Maximum 1000 active projectiles
+- Implement projectile culling
+- Pool all weapon effects
+- Batch similar weapon types
+
+### Damage Calculation
+- Cache damage multipliers
+- Batch damage applications
+- Use efficient collision layers
+- Implement hit registration pooling
+
+## 5. Resource Management
+### Asset Loading
+- Use addressables for non-critical assets
+- Implement asset bundles for level content
+- Preload common resources
+- Implement async loading for large assets
+
+### Memory Guidelines
+```csharp
+// Example memory budgets
+const int TEXTURE_MEMORY_BUDGET = 256; // MB
+const int AUDIO_MEMORY_BUDGET = 64;    // MB
+const int MESH_MEMORY_BUDGET = 32;     // MB
+```
+
+## 6. UI Performance
+### Canvas Optimization
+- Maximum 2 world space canvases
+- Single overlay canvas
+- Use canvas groups for batching
+- Implement UI element pooling
+
+### Text Handling
+- Pool TextMeshPro instances
+- Cache text components
+- Use sprite fonts for small text
+- Limit dynamic text updates
+
+## 7. Physics Optimization
+### Collision Detection
+- Use efficient collision layers
+- Implement trigger optimization
+- Cache physics results
+- Use physics materials efficiently
+
+### Raycasting Guidelines
+```csharp
+// Example raycast optimization
+const int MAX_RAYCASTS_PER_FRAME = 100;
+const float RAYCAST_CACHE_TIME = 0.1f;
+```
+
+## 8. Monitoring and Profiling
+### Key Metrics
+- Frame time breakdown
+- Memory allocation tracking
+- Draw call monitoring
+- Physics update time
+- Garbage collection frequency
+
+### Performance Budgets
+```csharp
+struct PerformanceBudget {
+    public const float MAX_FRAME_TIME = 16.6f;        // ms (60 FPS)
+    public const float MAX_PHYSICS_TIME = 4f;         // ms
+    public const float MAX_RENDER_TIME = 8f;          // ms
+    public const float MAX_SCRIPT_TIME = 4f;          // ms
+    public const float MAX_ANIMATION_TIME = 2f;       // ms
+}
+```
+
+## 9. Level Optimization
+### Scene Management
+- Implement scene streaming
+- Use occlusion culling
+- Optimize lighting calculations
+- Batch static objects
+
+### Level Guidelines
+- Maximum 1000 static colliders
+- Maximum 200 dynamic objects
+- Implement efficient quadtree
+- Use LOD systems for complex objects
+
+## 10. Debug Tools
+### Performance Monitoring
+```csharp
+public class PerformanceMonitor : MonoBehaviour {
+    private float[] frameTimes = new float[60];
+    private int frameIndex = 0;
+    
+    void Update() {
+        frameTimes[frameIndex] = Time.deltaTime;
+        frameIndex = (frameIndex + 1) % frameTimes.Length;
+        
+        if (frameIndex == 0) {
+            AnalyzePerformance();
+        }
+    }
+    
+    void AnalyzePerformance() {
+        float averageFrameTime = frameTimes.Average();
+        float fps = 1f / averageFrameTime;
+        
+        if (fps < 55f) {
+            Debug.LogWarning($"Low FPS detected: {fps}");
+        }
+    }
+}
+```
+
+## 11. Optimization Checklist
+### Pre-Release Verification
+- [ ] Profile memory usage patterns
+- [ ] Verify object pool efficiency
+- [ ] Check draw call batching
+- [ ] Analyze physics performance
+- [ ] Test UI optimization
+- [ ] Verify asset loading
+- [ ] Check garbage collection
+- [ ] Test on target platforms
+
+### Runtime Monitoring
+- [ ] Implement FPS counter
+- [ ] Add memory tracking
+- [ ] Monitor pool usage
+- [ ] Track physics performance
+- [ ] Log optimization warnings

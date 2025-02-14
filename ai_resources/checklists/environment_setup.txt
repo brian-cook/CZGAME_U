@@ -1,0 +1,133 @@
+# Development Environment Setup Checklist
+
+## 1. Required Software Installation
+- [ ] Unity 2022.3 LTS
+- [ ] Visual Studio 2022 or Rider 2023
+- [ ] Git + Git LFS
+- [ ] Unity Hub
+
+## 2. Unity Project Setup
+- [ ] Create new Unity project with 2022.3 LTS
+- [ ] Configure for 2D
+- [ ] Set API compatibility to .NET Standard 2.1
+- [ ] Switch to IL2CPP scripting backend
+- [ ] Enable visible meta files
+- [ ] Force text asset serialization
+- [ ] Set target platforms (Windows, MacOS, Linux)
+
+## 3. Version Control Setup
+- [ ] Initialize Git repository
+- [ ] Configure Git LFS
+- [ ] Set up .gitignore for Unity
+- [ ] Create development and main branches (GitFlow)
+- [ ] Set up remote repository
+
+## 4. Required Unity Packages
+### Core Packages
+- [ ] New Input System
+- [ ] TextMeshPro
+- [ ] Cinemachine
+- [ ] Universal RP
+- [ ] Shader Graph
+- [ ] Post Processing
+- [ ] 2D Sprite
+- [ ] 2D Tilemap Editor
+
+### Additional Packages
+- [ ] DOTween
+- [ ] Addressables
+- [ ] Unity UI Extensions
+- [ ] NavMeshComponents
+
+## 5. Project Structure Creation
+```
+Assets/
+├── _Project/
+│   ├── Art/
+│   │   ├── Materials/
+│   │   ├── Models/
+│   │   ├── Sprites/
+│   │   └── VFX/
+│   ├── Audio/
+│   ├── Prefabs/
+│   │   ├── Core/
+│   │   ├── Combat/
+│   │   ├── Zones/
+│   │   └── UI/
+│   ├── ScriptableObjects/
+│   │   ├── Weapons/
+│   │   ├── Enemies/
+│   │   └── Zones/
+│   ├── Scripts/
+│   │   ├── Core/
+│   │   ├── Combat/
+│   │   ├── ComfortZone/
+│   │   ├── UI/
+│   │   └── Utils/
+│   └── Scenes/
+├── Plugins/
+├── Resources/
+└── Tests/
+    ├── EditMode/
+    └── PlayMode/
+```
+
+## 6. Development Tools Setup
+- [ ] Configure IDE (VS Code/Rider)
+- [ ] Set up Unity Debugger
+- [ ] Enable Unity Cloud Build (if using)
+- [ ] Configure Unity Collaborate (if using)
+
+## 7. Testing Infrastructure
+- [ ] Set up Test Runner
+- [ ] Configure Edit Mode tests
+- [ ] Configure Play Mode tests
+- [ ] Set up Performance testing
+
+## 8. Performance Monitoring Setup
+- [ ] Unity Profiler configuration
+- [ ] Memory Profiler setup
+- [ ] Frame Debugger setup
+- [ ] Physics Debugger setup
+
+## 9. Documentation Setup
+- [ ] Create README.md
+- [ ] Set up documentation structure
+- [ ] Configure XML documentation
+- [ ] Create initial wiki pages
+
+## 10. Quality Assurance Setup
+- [ ] Configure Unity Code Analysis
+- [ ] Set up performance profiling
+- [ ] Enable memory leak detection
+- [ ] Configure draw call optimization tools
+
+## 11. Build Pipeline Setup
+- [ ] Configure build settings
+- [ ] Set up build automation
+- [ ] Configure platform-specific settings
+- [ ] Set up development builds
+
+## 12. Initial Core Systems
+- [ ] Create GameManager singleton
+- [ ] Set up EventManager
+- [ ] Configure ResourceManager
+- [ ] Initialize basic UI system
+
+## 13. Final Verification
+- [ ] Test build process
+- [ ] Verify source control
+- [ ] Check package dependencies
+- [ ] Validate folder structure
+- [ ] Test run performance tools
+- [ ] Verify testing framework
+
+## Additional Configuration
+1. Unity Project Settings
+   - Ensure .sln and .csproj files are generated
+   - Enable "Generate all .csproj files" in Unity preferences
+
+2. Cursor Settings
+   - Enable "Format on Save" for C# files
+   - Configure Unity-specific code style settings
+   - Set up Unity debugging configuration

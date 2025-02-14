@@ -1,0 +1,24 @@
+Assets/
+└── _Project/
+    ├── Art/
+    │   ├── Materials/
+    │   ├── Models/
+    │   ├── Sprites/
+    │   └── VFX/
+    ├── Audio/
+    ├── Input/
+    │   └── InputSystem_Actions.inputactions
+    ├── Prefabs/
+    │   ├── Combat/
+    │   ├── Core/
+    │   ├── UI/
+    │   └── Zones/
+    ├── Scenes/
+    ├── ScriptableObjects/
+    │   ├── Enemies/
+    │   ├── Weapons/
+    │   └── Zones/
+    └── Settings/
+        ├── DefaultVolumeProfile.asset
+        ├── UniversalRenderPipelineGlobalSettings.asset
+        └── URPSettings/ 

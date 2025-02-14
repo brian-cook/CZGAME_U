@@ -1,0 +1,186 @@
+# Unity Development Resources and Best Practices
+
+## 1. Project Setup
+### Version Control
+- Use .gitignore for Unity projects
+- Enable Git LFS for large assets
+- Use Asset Serialization Mode: Force Text
+- Enable Visible Meta Files
+
+### Project Structure
+```
+Assets/
+├── _Project                    # Main project folder
+│   ├── Art                     # All visual assets
+│   │   ├── Materials
+│   │   ├── Models
+│   │   ├── Sprites
+│   │   └── VFX
+│   ├── Audio                   # Sound effects and music
+│   ├── Prefabs                 # Reusable game objects
+│   ├── ScriptableObjects      # Data assets
+│   ├── Scripts                # C# code
+│   └── Scenes                 # Unity scenes
+├── Plugins                    # Third-party assets
+└── Resources                  # Runtime-loaded assets
+```
+
+## 2. Performance Best Practices
+### Object Pooling
+- Use Object Pooling for frequently spawned objects
+- Implement IObjectPool<T> interface
+- Pre-warm pools during loading screens
+- Use Unity's built-in ObjectPool when possible
+
+### Memory Management
+- Use Addressables for asset management
+- Implement proper object disposal
+- Profile memory usage regularly
+- Avoid GameObject.Find() in runtime code
+- Use caching for component references
+
+### Physics Optimization
+- Use composite colliders for static objects
+- Layer-based collision matrix
+- Implement physics time step management
+- Use 2D physics settings optimization
+
+## 3. Core Systems Implementation
+### Singleton Pattern
+```csharp
+public class GameManager : MonoBehaviour
+{
+    private static GameManager instance;
+    
+    public static GameManager Instance
+    {
+        get {
+            if (instance == null)
+            {
+                instance = FindObjectOfType<GameManager>();
+                if (instance == null)
+                {
+                    var go = new GameObject("GameManager");
+                    instance = go.AddComponent<GameManager>();
+                }
+            }
+            return instance;
+        }
+    }
+    
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+}
+```
+
+### Event System
+```csharp
+public static class EventManager
+{
+    private static readonly Dictionary<string, Action<object>> eventDictionary = 
+        new Dictionary<string, Action<object>>();
+
+    public static void Subscribe(string eventName, Action<object> listener)
+    {
+        if (!eventDictionary.ContainsKey(eventName))
+        {
+            eventDictionary[eventName] = listener;
+        }
+        else
+        {
+            eventDictionary[eventName] += listener;
+        }
+    }
+
+    public static void Unsubscribe(string eventName, Action<object> listener)
+    {
+        if (eventDictionary.ContainsKey(eventName))
+        {
+            eventDictionary[eventName] -= listener;
+        }
+    }
+
+    public static void Emit(string eventName, object data = null)
+    {
+        if (eventDictionary.ContainsKey(eventName))
+        {
+            eventDictionary[eventName]?.Invoke(data);
+        }
+    }
+}
+```
+
+## 4. Essential Unity Packages
+### Required Packages
+- New Input System
+- TextMeshPro
+- Cinemachine
+- Universal RP
+- Shader Graph
+- Post Processing
+- 2D Sprite
+- 2D Tilemap Editor
+
+### Recommended Packages
+- DOTween
+- Addressables
+- Unity UI Extensions
+- NavMeshComponents
+
+## 5. Development Tools
+### Unity Tools
+- Unity Profiler
+- Memory Profiler
+- Frame Debugger
+- Physics Debugger
+- Animation Debugger
+
+### External Tools
+- Visual Studio/Rider for C# development
+- Git for version control
+- Unity Asset Store
+
+## 6. Optimization Guidelines
+### Draw Call Optimization
+- Use sprite atlasing
+- Implement static batching
+- Enable dynamic batching for small meshes
+- Use GPU instancing when possible
+
+### UI Optimization
+- Use object pooling for UI elements
+- Implement UI element culling
+- Canvas rebuild optimization
+- Avoid nested layouts when possible
+
+### Asset Guidelines
+- Texture size guidelines
+- Audio compression settings
+- Model import settings
+- Sprite packing guidelines
+
+## 7. Useful Resources
+### Documentation
+- [Unity Manual](https://docs.unity3d.com/Manual/)
+- [Unity Scripting API](https://docs.unity3d.com/ScriptReference/)
+- [Unity Learn](https://learn.unity.com/)
+
+### Performance
+- [Unity Optimization Guide](https://docs.unity3d.com/Manual/OptimizingGraphicsPerformance.html)
+- [Best Practices Guide](https://docs.unity3d.com/Manual/BestPracticeGuide.html)
+- [Mobile Optimization Guide](https://docs.unity3d.com/Manual/MobileOptimizationPracticalGuide.html)
+
+### Community
+- Unity Forums
+- Unity Answer Hub
+- Unity Discord
+- Reddit r/Unity2D
