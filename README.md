@@ -5,6 +5,8 @@
 
 ## Development Environment
 - Unity 2022.3 LTS
+- Unity 2022.3.58f1 LTS
+- Unity 6000.0.38f1
 - Universal Render Pipeline (URP)
 - .NET Standard 2.1
 - IL2CPP Scripting Backend
