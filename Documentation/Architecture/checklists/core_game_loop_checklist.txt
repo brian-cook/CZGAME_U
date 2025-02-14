@@ -1,0 +1,173 @@
+# Core Game Loop Implementation Checklist
+
+## Phase 0: Setup & Infrastructure
+[ ] Version Verification
+    [ ] Unity 6000.0.38f1
+    [ ] URP 17.0.3
+    [ ] Input System 1.13.0
+    [ ] Verify all package versions
+
+[ ] Project Structure Setup
+    [ ] Implement folder structure from structure_checklist.txt
+    [ ] Setup performance monitoring
+    [ ] Configure version control
+    [ ] Initialize object pooling system
+
+[ ] Core Systems Infrastructure
+    [ ] GameManager singleton
+    [ ] EventManager for decoupled communication
+    [ ] ResourceManager with pooling
+    [ ] InputManager using new Input System
+    [ ] Performance monitoring system
+
+## Phase 1: Core Mechanics Implementation
+### Player Basics
+[ ] Movement System
+    [ ] Input handling using new Input System
+    [ ] Basic character controller
+    [ ] Movement feel adjustments
+    [ ] Collision handling
+    [ ] Performance metrics tracking
+
+[ ] Basic Combat
+    [ ] Auto-attack implementation
+    [ ] Simple projectile system with pooling
+    [ ] Hit detection using Physics2D
+    [ ] Basic damage system
+    [ ] Visual feedback system
+
+### Comfort Zone Core
+[ ] Basic Zone Implementation
+    [ ] Zone boundaries using Collider2D
+    [ ] Player state changes in zone
+    [ ] Resource denial system
+    [ ] Performance optimized zone checks
+    [ ] Zone visibility system
+
+[ ] Zone Interactions
+    [ ] Enemy awareness of zones
+    [ ] Resource distribution
+    [ ] Basic zone effects
+    [ ] Zone placement mechanics
+    [ ] Performance monitoring for zone systems
+
+### Enemy Basics
+[ ] Basic Enemy System
+    [ ] Enemy pooling system
+    [ ] Simple AI behavior
+    [ ] Path finding with NavMesh
+    [ ] Zone awareness
+    [ ] Performance optimized updates
+
+[ ] Spawn System
+    [ ] Basic wave management
+    [ ] Enemy pooling integration
+    [ ] Spawn point management
+    [ ] Performance monitoring
+    [ ] Density control
+
+## Phase 2: Core Systems Integration
+### Resource Management
+[ ] Basic Resource System
+    [ ] Health implementation
+    [ ] Resource collection
+    [ ] Zone denial mechanics
+    [ ] Resource UI elements
+    [ ] Performance optimization
+
+### Core UI Elements
+[ ] Essential UI
+    [ ] Health display
+    [ ] Resource indicators
+    [ ] Zone status
+    [ ] Performance stats (debug)
+    [ ] Basic menus
+
+### Core Loop Systems
+[ ] Game Flow
+    [ ] Start condition
+    [ ] Victory condition
+    [ ] Defeat condition
+    [ ] Restart system
+    [ ] State management
+
+## Phase 3: Performance Verification
+[ ] Performance Targets
+    [ ] FPS monitoring (target: 60)
+    [ ] Draw call optimization (max: 100)
+    [ ] Memory usage tracking (max: 1024MB)
+    [ ] Entity count management
+    [ ] Physics performance
+
+[ ] Optimization Systems
+    [ ] Object pooling verification
+    [ ] Update frequency management
+    [ ] Batch rendering setup
+    [ ] Memory management
+    [ ] Physics optimization
+
+## Phase 4: Testing & Validation
+[ ] Core Loop Testing
+    [ ] Movement feel
+    [ ] Combat responsiveness
+    [ ] Zone mechanics
+    [ ] Enemy behavior
+    [ ] Resource system
+
+[ ] Performance Testing
+    [ ] Stress tests
+    [ ] Memory leak checks
+    [ ] Frame time analysis
+    [ ] Physics performance
+    [ ] Draw call monitoring
+
+## Phase 5: Documentation & Review
+[ ] Technical Documentation
+    [ ] Core systems documentation
+    [ ] Performance guidelines
+    [ ] Implementation notes
+    [ ] Best practices
+    [ ] Future expansion points
+
+[ ] Review Points
+    [ ] Code quality review
+    [ ] Performance review
+    [ ] Scalability assessment
+    [ ] Feature completeness
+    [ ] Technical debt evaluation
+
+## Success Criteria
+1. Performance Metrics
+   - Stable 60 FPS
+   - Draw calls under 100
+   - Memory usage within 1024MB
+   - No performance spikes
+
+2. Gameplay Feel
+   - Responsive controls
+   - Clear feedback
+   - Intuitive zone mechanics
+   - Smooth enemy behavior
+
+3. Technical Quality
+   - Clean architecture
+   - Optimized systems
+   - Scalable design
+   - Well-documented code
+
+## Notes
+- Follow Unity best practices for all implementations
+- Maintain performance monitoring throughout development
+- Document all core systems for future expansion
+- Keep scalability in mind for future features
+- Regular performance profiling during development
+
+## References
+- @infrastructure.txt
+- @market_research.txt
+- @performance_guidelines.txt
+- @project_plan.txt
+- @unity_resources.md
+
+Last Updated: [Current Date]
+Status: Ready for Implementation
