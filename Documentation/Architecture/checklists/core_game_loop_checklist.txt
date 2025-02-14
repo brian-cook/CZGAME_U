@@ -1,24 +1,80 @@
 # Core Game Loop Implementation Checklist
 
-## Phase 0: Setup & Infrastructure
-[ ] Version Verification
-    [ ] Unity 6000.0.38f1
-    [ ] URP 17.0.3
-    [ ] Input System 1.13.0
-    [ ] Verify all package versions
+## Phase 0: Debug Infrastructure Setup
+[ ] Debug Framework
+    [ ] Unity Debug Configuration
+        [ ] Development Build setup
+        [ ] Debug symbols enabled
+        [ ] Logging system implementation
+        [ ] Performance monitoring hooks
+    [ ] Visual Debugging
+        [ ] Debug UI overlay
+        [ ] Physics visualization
+        [ ] Zone boundary visualization
+        [ ] Performance stats display
 
-[ ] Project Structure Setup
-    [ ] Implement folder structure from structure_checklist.txt
-    [ ] Setup performance monitoring
-    [ ] Configure version control
-    [ ] Initialize object pooling system
+[ ] Test Framework Setup (Moved Earlier)
+    [ ] Basic Test Infrastructure
+        [ ] Edit mode test setup
+        [ ] Play mode test setup
+        [ ] Test scene configuration
+        [ ] CI test pipeline setup
 
-[ ] Core Systems Infrastructure
-    [ ] GameManager singleton
-    [ ] EventManager for decoupled communication
-    [ ] ResourceManager with pooling
-    [ ] InputManager using new Input System
-    [ ] Performance monitoring system
+## Phase 1: Core Systems with Debug Points
+[ ] Input System (Testable)
+    [ ] Basic input handling
+    [ ] Input debugging display
+    [ ] Input recording system
+    [ ] Unit tests for input
+
+[ ] Movement System (Testable)
+    [ ] Basic movement
+    [ ] Movement debug visualization
+    [ ] Physics interaction tests
+    [ ] Movement unit tests
+
+[ ] Simple Zone System (Testable)
+    [ ] Basic zone boundaries
+    [ ] Zone visualization
+    [ ] Zone state debugging
+    [ ] Zone interaction tests
+
+## Phase 2: Iterative Feature Addition
+[ ] Combat System
+    [ ] TEST INTERVAL 1
+        [ ] Basic attack implementation
+        [ ] Attack debugging
+        [ ] Combat metrics
+        [ ] Unit tests
+    [ ] TEST INTERVAL 2
+        [ ] Projectile system
+        [ ] Visual feedback
+        [ ] Integration tests
+
+[ ] Zone Mechanics
+    [ ] TEST INTERVAL 1
+        [ ] Player state changes
+        [ ] Debug visualization
+        [ ] State tests
+    [ ] TEST INTERVAL 2
+        [ ] Resource denial
+        [ ] Enemy awareness
+        [ ] Integration tests
+
+## Phase 0.5: Technical Setup
+[ ] Unity Configuration
+    [ ] Input Action Asset Setup
+        [ ] Player controls
+        [ ] UI navigation
+        [ ] Debug controls
+    [ ] Physics Setup
+        [ ] Layer matrix configuration
+        [ ] Collision matrix setup
+        [ ] Physics performance settings
+    [ ] Scene Configuration
+        [ ] Build settings setup
+        [ ] Scene loading strategy
+        [ ] Scene references management
 
 ## Phase 1: Core Mechanics Implementation
 ### Player Basics
@@ -66,6 +122,14 @@
     [ ] Performance monitoring
     [ ] Density control
 
+## Phase 1.5: Asset Management
+[ ] Asset Pipeline Setup
+    [ ] Texture import settings
+    [ ] Audio compression settings
+    [ ] Model import settings
+    [ ] Sprite atlas configuration
+    [ ] Addressables setup
+
 ## Phase 2: Core Systems Integration
 ### Resource Management
 [ ] Basic Resource System
@@ -106,6 +170,17 @@
     [ ] Memory management
     [ ] Physics optimization
 
+## Phase 3.5: Platform-Specific Verification
+[ ] Platform Targets
+    [ ] Windows performance metrics
+        [ ] CPU usage targets
+        [ ] Memory limits
+        [ ] Storage requirements
+    [ ] Build pipeline setup
+        [ ] CI/CD integration
+        [ ] Build verification
+        [ ] Platform-specific settings
+
 ## Phase 4: Testing & Validation
 [ ] Core Loop Testing
     [ ] Movement feel
@@ -120,6 +195,14 @@
     [ ] Frame time analysis
     [ ] Physics performance
     [ ] Draw call monitoring
+
+## Phase 4.5: Automated Testing
+[ ] Test Framework Setup
+    [ ] Edit mode tests
+    [ ] Play mode tests
+    [ ] Performance tests
+    [ ] Integration tests
+    [ ] Regression test suite
 
 ## Phase 5: Documentation & Review
 [ ] Technical Documentation
@@ -163,11 +246,26 @@
 - Regular performance profiling during development
 
 ## References
+- @environment_setup.txt
 - @infrastructure.txt
 - @market_research.txt
 - @performance_guidelines.txt
 - @project_plan.txt
 - @unity_resources.md
+- @ai_rules.json
 
-Last Updated: [Current Date]
-Status: Ready for Implementation
+Last Updated: 2025-02-14
+Status: Updated with Extended Requirements
+
+## Debug Verification Points
+[ ] Each Feature Implementation
+    [ ] Debug visualization added
+    [ ] Performance metrics captured
+    [ ] State validation
+    [ ] Test coverage verified
+
+[ ] Integration Points
+    [ ] System interaction debugging
+    [ ] Performance impact monitoring
+    [ ] Error logging verification
+    [ ] Test suite execution
