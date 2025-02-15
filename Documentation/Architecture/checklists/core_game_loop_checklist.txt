@@ -1,45 +1,57 @@
 # Core Game Loop Implementation Checklist
 
-## Phase 0: Debug Infrastructure Setup
-[ ] Debug Framework
-    [ ] Unity Debug Configuration
-        [ ] Development Build setup
-        [ ] Debug symbols enabled
-        [ ] Logging system implementation
-        [ ] Performance monitoring hooks
-    [ ] Visual Debugging
-        [ ] Debug UI overlay
-        [ ] Physics visualization
-        [ ] Zone boundary visualization
-        [ ] Performance stats display
+## Phase 0: Minimal Playable Build (MVP)
+[ ] Basic Scene Setup
+    [ ] Empty scene with essential GameObjects
+    [ ] Main Camera setup
+    [ ] Basic lighting
+    [ ] Test player placeholder
 
-[ ] Test Framework Setup (Moved Earlier)
-    [ ] Basic Test Infrastructure
-        [ ] Edit mode test setup
-        [ ] Play mode test setup
-        [ ] Test scene configuration
-        [ ] CI test pipeline setup
+[ ] Essential Player Setup
+    [ ] Basic Player GameObject
+        [ ] Simple sprite/primitive
+        [ ] Rigidbody2D
+        [ ] Collider2D
+    [ ] Minimal Movement Script
+        [ ] Basic WASD/Arrow movement
+        [ ] Simple physics-based movement
+    [ ] Player Camera Follow
 
-## Phase 1: Core Systems with Debug Points
-[ ] Input System (Testable)
-    [ ] Basic input handling
-    [ ] Input debugging display
-    [ ] Input recording system
-    [ ] Unit tests for input
+[ ] Basic Game Management
+    [ ] GameManager script
+    [ ] Scene loading
+    [ ] Simple game state (play/pause)
+    [ ] Debug restart capability
 
-[ ] Movement System (Testable)
-    [ ] Basic movement
-    [ ] Movement debug visualization
-    [ ] Physics interaction tests
-    [ ] Movement unit tests
+[ ] Minimal Test Environment
+    [ ] Simple ground/boundaries
+    [ ] Basic collision setup
+    [ ] Test spawn point
+    [ ] FPS counter for performance
 
-[ ] Simple Zone System (Testable)
-    [ ] Basic zone boundaries
-    [ ] Zone visualization
-    [ ] Zone state debugging
-    [ ] Zone interaction tests
+## Phase 1: Core Systems Integration
+[ ] Input System Implementation
+    [ ] Input Action Asset setup
+    [ ] Basic control scheme
+    [ ] Input debugging
 
-## Phase 2: Iterative Feature Addition
+[ ] Enhanced Player Control
+    [ ] Refined movement
+    [ ] Basic attack capability
+    [ ] Simple health system
+
+[ ] Basic Zone System
+    [ ] Zone boundaries
+    [ ] Player state tracking
+    [ ] Simple visualization
+
+[ ] Enemy Prototype
+    [ ] Basic enemy prefab
+    [ ] Simple follow behavior
+    [ ] Collision detection
+    [ ] Health system
+
+## Phase 2: Feature Implementation
 [ ] Combat System
     [ ] TEST INTERVAL 1
         [ ] Basic attack implementation
@@ -219,31 +231,24 @@
     [ ] Feature completeness
     [ ] Technical debt evaluation
 
-## Success Criteria
-1. Performance Metrics
-   - Stable 60 FPS
-   - Draw calls under 100
-   - Memory usage within 1024MB
-   - No performance spikes
+## Success Criteria for MVP
+1. Basic Functionality
+   - Player can move
+   - Game can start/restart
+   - No critical errors
+   - Stable framerate
 
-2. Gameplay Feel
-   - Responsive controls
-   - Clear feedback
-   - Intuitive zone mechanics
-   - Smooth enemy behavior
-
-3. Technical Quality
-   - Clean architecture
-   - Optimized systems
-   - Scalable design
-   - Well-documented code
+2. Development Ready
+   - Debug tools functional
+   - Quick iteration possible
+   - Basic logging working
+   - Test framework operational
 
 ## Notes
-- Follow Unity best practices for all implementations
-- Maintain performance monitoring throughout development
-- Document all core systems for future expansion
-- Keep scalability in mind for future features
-- Regular performance profiling during development
+- Focus on IDE-completable tasks first
+- Clearly mark Unity Editor requirements
+- Maintain continuous testing capability
+- Keep initial systems simple but expandable
 
 ## References
 - @environment_setup.txt
@@ -269,3 +274,23 @@ Status: Updated with Extended Requirements
     [ ] Performance impact monitoring
     [ ] Error logging verification
     [ ] Test suite execution
+
+## Debug Infrastructure
+[ ] Essential Debug Tools
+    [ ] FPS display
+    [ ] Basic logging
+    [ ] Simple debug UI
+    [ ] State visualization
+
+[ ] Performance Monitoring
+    [ ] Frame time tracking
+    [ ] Basic profiling hooks
+    [ ] Memory usage display
+    [ ] Physics debug view
+
+## Testing Framework
+[ ] Basic Test Setup
+    [ ] Play mode test foundation
+    [ ] Simple test scene
+    [ ] Core system tests
+    [ ] Performance benchmarks

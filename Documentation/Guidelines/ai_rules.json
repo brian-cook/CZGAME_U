@@ -169,5 +169,34 @@
         "user_name": "Brian",
         "use_name": true,
         "frequency": "every_response"
+    },
+    "task_completion_rules": {
+        "priority": {
+            "ide_tasks": "highest",
+            "cursor_tasks": "highest",
+            "editor_tasks": "medium"
+        },
+        "completion_requirements": {
+            "verify_ide_capability": true,
+            "identify_editor_only_tasks": true,
+            "document_limitations": true
+        },
+        "task_handling": {
+            "ide_tasks": {
+                "complete_immediately": true,
+                "provide_full_code": true,
+                "include_file_paths": true
+            },
+            "editor_tasks": {
+                "mark_clearly": true,
+                "provide_detailed_steps": true,
+                "explain_editor_requirement": true
+            }
+        },
+        "documentation": {
+            "specify_environment": true,
+            "note_prerequisites": true,
+            "track_completion_status": true
+        }
     }
 } 
