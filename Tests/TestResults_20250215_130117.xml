@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="6" result="Failed(Child)" total="6" passed="3" failed="3" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:12Z" duration="0.5011812">
+  <test-suite type="TestSuite" id="1017" name="CZGAME_U" fullname="CZGAME_U" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:12Z" duration="0.501181" total="6" passed="3" failed="3" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1010" name="CZ.Tests.PlayMode.dll" fullname="C:/Users/wiggl/Documents/Unity/CZGAME_U/Library/ScriptAssemblies/CZ.Tests.PlayMode.dll" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:12Z" duration="0.490847" total="6" passed="3" failed="3" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21796" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1011" name="CZ" fullname="CZ" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:12Z" duration="0.487907" total="6" passed="3" failed="3" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1012" name="Tests" fullname="CZ.Tests" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:12Z" duration="0.485422" total="6" passed="3" failed="3" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1013" name="PlayMode" fullname="CZ.Tests.PlayMode" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:12Z" duration="0.482783" total="6" passed="3" failed="3" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1001" name="GameManagerTests" fullname="CZ.Tests.PlayMode.GameManagerTests" classname="CZ.Tests.PlayMode.GameManagerTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:11Z" duration="0.325755" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1002" name="GameManager_Initialization_CreatesInstance" fullname="CZ.Tests.PlayMode.GameManagerTests.GameManager_Initialization_CreatesInstance" methodname="GameManager_Initialization_CreatesInstance" classname="CZ.Tests.PlayMode.GameManagerTests" runstate="Runnable" seed="1137506368" result="Passed" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:11Z" duration="0.070403" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1004" name="GameManager_PerformanceMonitoring_IsActive" fullname="CZ.Tests.PlayMode.GameManagerTests.GameManager_PerformanceMonitoring_IsActive" methodname="GameManager_PerformanceMonitoring_IsActive" classname="CZ.Tests.PlayMode.GameManagerTests" runstate="Runnable" seed="1921510486" result="Failed" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:11Z" duration="0.174607" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: No Exception to be thrown
+  But was:  <UnityEngine.MissingReferenceException: The object of type 'CZ.Core.GameManager' has been destroyed but you are still trying to access it.
+Your script should either check if it is null or you should not destroy the object.
+  at UnityEngine.Object+MarshalledUnityObject.TryThrowEditorNullExceptionObject (UnityEngine.Object unityObj, System.String parameterName) [0x0006a] in <8e5a634840fd4c6b9a0a867163b727ec>:0 
+  at UnityEngine.Bindings.ThrowHelper.ThrowNullReferenceException (System.Object obj) [0x00010] in <8e5a634840fd4c6b9a0a867163b727ec>:0 
+  at UnityEngine.Behaviour.set_enabled (System.Boolean value) [0x00006] in <8e5a634840fd4c6b9a0a867163b727ec>:0 
+  at CZ.Tests.PlayMode.GameManagerTests.<GameManager_PerformanceMonitoring_IsActive>b__5_0 () [0x00004] in C:\Users\wiggl\Documents\Unity\CZGAME_U\Assets\_Project\Tests\PlayMode\Core\GameManagerTests.cs:71 
+  at NUnit.Framework.Constraints.ThrowsConstraint+VoidInvocationDescriptor.Invoke () [0x00000] in <f577cd9686154d6ab10efd7e65e64366>:0 
+  at NUnit.Framework.Constraints.ThrowsConstraint+ExceptionInterceptor.Intercept (System.Object invocation) [0x00041] in <f577cd9686154d6ab10efd7e65e64366>:0 >
+]]></message>
+                  <stack-trace><![CDATA[at CZ.Tests.PlayMode.GameManagerTests+<GameManager_PerformanceMonitoring_IsActive>d__5.MoveNext () [0x0003e] in C:\Users\wiggl\Documents\Unity\CZGAME_U\Assets\_Project\Tests\PlayMode\Core\GameManagerTests.cs:67
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@5ac417e07314\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1003" name="GameManager_StateTransitions_WorkCorrectly" fullname="CZ.Tests.PlayMode.GameManagerTests.GameManager_StateTransitions_WorkCorrectly" methodname="GameManager_StateTransitions_WorkCorrectly" classname="CZ.Tests.PlayMode.GameManagerTests" runstate="Runnable" seed="9757045" result="Passed" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:11Z" duration="0.067007" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1005" name="PlayerControllerTests" fullname="CZ.Tests.PlayMode.PlayerControllerTests" classname="CZ.Tests.PlayMode.PlayerControllerTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:11Z" duration="0.099280" total="2" passed="0" failed="2" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1006" name="PlayerController_Movement_RespondsToInput" fullname="CZ.Tests.PlayMode.PlayerControllerTests.PlayerController_Movement_RespondsToInput" methodname="PlayerController_Movement_RespondsToInput" classname="CZ.Tests.PlayMode.PlayerControllerTests" runstate="Runnable" seed="630852850" result="Failed" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:11Z" duration="0.062058" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[SetUp : Expected log did not appear: [Error] PlayerInput or its actions are null]]></message>
+                </failure>
+              </test-case>
+              <test-case id="1007" name="PlayerController_Velocity_RespectsMaxSpeed" fullname="CZ.Tests.PlayMode.PlayerControllerTests.PlayerController_Velocity_RespectsMaxSpeed" methodname="PlayerController_Velocity_RespectsMaxSpeed" classname="CZ.Tests.PlayMode.PlayerControllerTests" runstate="Runnable" seed="2097040070" result="Failed" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:11Z" duration="0.022019" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[SetUp : Expected log did not appear: [Error] PlayerInput or its actions are null]]></message>
+                </failure>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1008" name="TestScriptPlayModeTests" fullname="CZ.Tests.PlayMode.TestScriptPlayModeTests" classname="CZ.Tests.PlayMode.TestScriptPlayModeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:12Z" duration="0.054055" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1009" name="TestScript_InPlayMode_LogsMessageOnStart" fullname="CZ.Tests.PlayMode.TestScriptPlayModeTests.TestScript_InPlayMode_LogsMessageOnStart" methodname="TestScript_InPlayMode_LogsMessageOnStart" classname="CZ.Tests.PlayMode.TestScriptPlayModeTests" runstate="Runnable" seed="106229193" result="Passed" start-time="2025-02-15 21:01:11Z" end-time="2025-02-15 21:01:12Z" duration="0.050136" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Test script initialized
+Saving results to: C:/Users/wiggl/AppData/LocalLow/Bobbert Games/CZGAME_U\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
