@@ -1,202 +1,133 @@
 {
-    "version_verification": {
-        "check_before_suggestions": true,
-        "required_checks": {
-            "unity_version": "Check Unity Editor version",
-            "package_versions": "Review Package Manager versions",
-            "tool_versions": "Verify external tool versions",
-            "api_versions": "Confirm API compatibility"
+    "file_verification": {
+        "priority": "critical",
+        "checks": {
+            "review_existing_files": true,
+            "check_file_structure": true,
+            "prevent_duplicates": true,
+            "verify_dependencies": true
         },
-        "documentation": {
-            "record_versions": "Document all version numbers",
-            "track_dependencies": "Note version dependencies",
-            "compatibility_matrix": "Maintain version compatibility"
+        "requirements": {
+            "analyze_before_changes": true,
+            "document_file_access": true,
+            "track_dependencies": true
         }
     },
-    "repository_access_rules": {
-        "git_navigation": {
-            "access_through_repository": true,
-            "verify_correct_branch": true,
-            "navigate_full_path": true,
-            "branch_preferences": {
-                "default_branch": "develop",
-                "check_all_branches": true,
-                "reference_branch_explicitly": true
-            }
+    "cursor_integration": {
+        "priority": "critical",
+        "ide_specific": {
+            "respect_workspace": true,
+            "use_relative_paths": true,
+            "handle_open_files": true,
+            "track_cursor_position": true
         },
-        "file_access": {
-            "view_all_project_files": true,
-            "follow_file_references": true,
-            "check_file_history": true,
-            "track_accessed_paths": {
-                "record_full_path": true,
-                "note_branch": true,
-                "verify_latest_version": true
-            }
-        }
-    },
-    "project_context_rules": {
-        "file_access": {
-            "verify_file_existence": true,
-            "request_missing_files": true,
-            "check_file_relevance": true,
-            "track_accessed_files": {
-                "enabled": true,
-                "list_accessed": true,
-                "list_needed": true
-            }
-        },
-        "documentation_requirements": {
-            "read_before_suggestions": true,
-            "verify_documentation_exists": true,
-            "reference_specific_sections": true
-        },
-        "assumption_handling": {
-            "no_implicit_assumptions": true,
-            "list_required_information": true,
-            "verify_before_proceeding": true
-        }
-    },
-    "code_generation_rules": {
-        "file_structure": {
-            "always_specify_path": true,
-            "maintain_unity_structure": true,
-            "follow_project_conventions": true
-        },
-        "code_quality": {
-            "performance_first": true,
-            "follow_guidelines": true,
-            "include_comments": true,
-            "respect_naming_conventions": true
-        },
-        "project_consistency": {
-            "check_existing_implementations": true,
-            "verify_dependencies": true,
-            "maintain_scalability": true
-        },
-        "documentation": {
-            "reference_source_files": true,
-            "explain_changes": true,
-            "link_to_requirements": true
-        }
-    },
-    "documentation_improvement_rules": {
-        "update_triggers": {
-            "on_conflict": "Document resolution steps and prevention",
-            "on_error": "Document error details and solution",
-            "on_new_information": "Document learnings and improvements",
-            "on_version_changes": "Document compatibility updates"
-        },
-        "update_requirements": {
-            "reference_original": true,
-            "explain_changes": true,
-            "provide_examples": true,
-            "link_related_docs": true
-        },
-        "documentation_types": {
-            "setup_guides": "Update environment_setup.txt",
-            "troubleshooting": "Add to relevant guides",
-            "best_practices": "Update infrastructure.txt",
-            "implementation": "Update relevant impl_plans"
-        },
-        "maintenance": {
-            "track_changes": true,
-            "version_history": true,
-            "review_periodically": true,
-            "cross_reference": true
-        }
-    },
-    "interaction_rules": {
-        "clarification_requests": {
-            "ask_before_assuming": true,
-            "list_missing_information": true,
-            "provide_context_for_questions": true
-        },
-        "progress_tracking": {
-            "acknowledge_current_state": true,
-            "list_completed_steps": true,
-            "identify_next_steps": true
-        },
-        "error_handling": {
-            "acknowledge_mistakes": true,
-            "explain_corrections": true,
-            "track_correction_history": true
-        }
-    },
-    "file_handling": {
-        "meta_files": {
-            "check_unity_meta_requirements": true,
-            "verify_meta_file_pairs": true
+        "tool_usage": {
+            "prefer_available_tools": true,
+            "verify_tool_access": true,
+            "respect_tool_limitations": true
         },
         "file_operations": {
-            "verify_before_changes": true,
-            "backup_suggestions": true,
-            "track_file_dependencies": true
+            "use_workspace_root": true,
+            "maintain_file_structure": true,
+            "respect_gitignore": true
         }
     },
-    "context_preservation": {
-        "conversation_history": {
-            "reference_previous_decisions": true,
-            "maintain_context_continuity": true,
-            "track_requirement_changes": true
-        },
-        "project_state": {
-            "track_current_phase": true,
-            "verify_prerequisites": true,
-            "check_dependencies": true
+    "unity_compliance": {
+        "priority": "highest",
+        "source": "unity_resources.md",
+        "version": "6.0",
+        "checks": {
+            "verify_best_practices": true,
+            "check_api_compatibility": true,
+            "validate_patterns": true,
+            "verify_meta_files": true
         }
     },
-    "response_format": {
-        "1_version_check": "Verify all relevant versions and compatibility",
-        "2_context_review": "Review relevant existing files and requirements",
-        "3_implementation_plan": "Outline the specific changes/additions",
-        "4_code_changes": "Provide code with clear file paths and context",
-        "5_verification": "Explain how changes align with project goals"
+    "technical_standards": {
+        "priority": "high",
+        "sources": [
+            "performance_guidelines.txt",
+            "infrastructure.txt"
+        ],
+        "requirements": {
+            "performance": {
+                "max_draw_calls": 100,
+                "target_fps": 60,
+                "max_memory": 1024,
+                "respect_pooling": true
+            },
+            "infrastructure": {
+                "follow_patterns": true,
+                "maintain_scalability": true,
+                "ensure_testability": true
+            }
+        }
     },
-    "performance_requirements": {
-        "max_draw_calls": 100,
-        "target_fps": 60,
-        "max_memory_usage": 1024,
-        "respect_pooling": true
+    "project_alignment": {
+        "priority": "medium",
+        "sources": [
+            "project_plan",
+            "core_game_loop_checklist.txt"
+        ],
+        "checks": {
+            "verify_architecture": true,
+            "check_roadmap": true,
+            "maintain_consistency": true
+        }
     },
-    "project_guidelines": {
-        "follow_unity_best_practices": true,
-        "maintain_code_style": true,
-        "ensure_testability": true,
-        "consider_scalability": true
+    "implementation_tracking": {
+        "priority": "ongoing",
+        "use_checklists": true,
+        "track_progress": true,
+        "document_changes": true,
+        "verify_completion": true
+    },
+    "error_handling": {
+        "priority": "high",
+        "requirements": {
+            "log_errors": true,
+            "provide_context": true,
+            "suggest_solutions": true,
+            "track_resolution": true
+        }
+    },
+    "documentation": {
+        "priority": "medium",
+        "requirements": {
+            "update_docs": true,
+            "maintain_comments": true,
+            "track_changes": true
+        }
     },
     "interaction_personalization": {
+        "priority": "high",
         "user_name": "Brian",
         "use_name": true,
         "frequency": "every_response"
     },
-    "task_completion_rules": {
-        "priority": {
-            "ide_tasks": "highest",
-            "cursor_tasks": "highest",
-            "editor_tasks": "medium"
+    "response_format": {
+        "1_file_review": "Review and verify all relevant files and structure",
+        "2_unity_compliance": "Verify Unity 6.0 best practices and requirements",
+        "3_technical_review": "Check performance and infrastructure requirements",
+        "4_implementation": "Execute changes with proper error handling",
+        "5_verification": "Verify changes against project requirements"
+    },
+    "workspace_settings": {
+        "priority": "critical",
+        "environment": {
+            "os": "win32",
+            "version": "10.0.26100",
+            "shell": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
         },
-        "completion_requirements": {
-            "verify_ide_capability": true,
-            "identify_editor_only_tasks": true,
-            "document_limitations": true
+        "paths": {
+            "workspace_root": "/c%3A/Users/wiggl/Documents/Unity/CZGAME_U",
+            "use_relative_paths": true,
+            "respect_workspace_structure": true
         },
-        "task_handling": {
-            "ide_tasks": {
-                "complete_immediately": true,
-                "provide_full_code": true,
-                "include_file_paths": true
-            },
-            "editor_tasks": {
-                "mark_clearly": true,
-                "provide_detailed_steps": true,
-                "explain_editor_requirement": true
-            }
-        },
-        "documentation": {
-            "specify_environment": true,
-            "note_prerequisites": true,
-            "track_completion_status": true
+        "tool_execution": {
+            "require_approval": true,
+            "respect_shell_state": true,
+            "maintain_context": true
         }
     }
 } 
