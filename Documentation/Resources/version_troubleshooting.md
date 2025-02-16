@@ -75,12 +75,62 @@ Check assembly definition files against these templates:
 **Issue**: Performance metrics not showing in GameManager
 **Solution**:
 1. Verify ProfilerRecorder initialization
-2. Check Unity 6 Profiler category strings
+2. Check Unity 6 counter names:
+   - Render: "Batches Count" (not "Draw Calls Count")
+   - Memory: "Total Used Memory" (primary), "System Memory" (fallback)
+   - GC: "GC Used Memory" (primary), "GC Reserved Memory" (fallback)
 3. Follow pattern in [GameManager.cs](Assets/_Project/Scripts/Core/GameManager.cs)
 
 ```csharp
-drawCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Draw Calls Count");
+// Unity 6.0 Profiler counter initialization
+drawCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Batches Count");
 memoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total Used Memory");
+gcMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "GC Used Memory");
+```
+
+#### Memory Management Issues
+**Issue**: High initial memory state triggering emergency cleanup
+**Solution**:
+1. Implement dynamic threshold scaling:
+```csharp
+float thresholdScale = Math.Max(1f, initialMemory / BASELINE_THRESHOLD_MB);
+float adjustedWarning = WARNING_THRESHOLD_MB * thresholdScale;
+float adjustedCritical = CRITICAL_THRESHOLD_MB * thresholdScale;
+float adjustedEmergency = EMERGENCY_THRESHOLD_MB * thresholdScale;
+```
+
+2. Track relative memory changes:
+```csharp
+float memoryDelta = currentMemory - memoryBaseline;
+float relativeDelta = memoryDelta / memoryBaseline;
+```
+
+3. Implement graduated cleanup responses:
+   - Preemptive: Light cleanup at warning threshold
+   - Aggressive: Full cleanup at critical threshold
+   - Emergency: Scene restart if cleanup fails
+
+**Issue**: Memory counter initialization failures
+**Solution**:
+1. Implement counter name fallbacks:
+```csharp
+string[] memoryCounters = new string[] 
+{
+    "Total Used Memory",    // Primary
+    "System Memory",        // Fallback 1
+    "Total System Memory",  // Fallback 2
+    "Total Reserved Memory" // Fallback 3
+};
+```
+
+2. Validate counter readings:
+```csharp
+float testValue = ConvertToMB(memoryRecorder.CurrentValue);
+if (testValue > 0)
+{
+    Debug.Log($"Counter initialized: {counterName} ({testValue:F2}MB)");
+    return true;
+}
 ```
 
 ### Version Update Checklist

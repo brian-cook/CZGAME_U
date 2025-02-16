@@ -110,7 +110,21 @@ public class PerformanceMonitor : MonoBehaviour
 
 ## Memory Management Strategy
 ### Core Principles
-1. Pooling Strategy (HIGH PRIORITY)
+1. Dynamic Memory Management (HIGH PRIORITY)
+   - Implement adaptive thresholds based on startup conditions:
+     * Base thresholds: Warning (768MB), Critical (896MB), Emergency (1024MB)
+     * Dynamic scaling based on initial memory state
+     * Relative threshold calculation for high-memory environments
+   - Memory Monitoring:
+     * Track absolute and relative memory changes
+     * Monitor memory delta against baseline
+     * Implement graduated cleanup responses
+   - Cleanup Strategy:
+     * Preemptive: Light cleanup at warning threshold
+     * Aggressive: Full cleanup at critical threshold
+     * Emergency: Scene restart if cleanup fails
+
+2. Pooling Strategy (HIGH PRIORITY)
    - Implement pooling for all frequently spawned objects:
      * Enemies (100+ instances)
      * Projectiles (200+ instances)
@@ -124,7 +138,7 @@ public class PerformanceMonitor : MonoBehaviour
      * Log pool expansion events
      * Monitor memory impact
 
-2. Asset Loading (HIGH PRIORITY)
+3. Asset Loading (HIGH PRIORITY)
    - Use Addressables for:
      * Character variants
      * Weapon prefabs
@@ -136,7 +150,7 @@ public class PerformanceMonitor : MonoBehaviour
      * Track reference counts
      * Monitor memory footprint
 
-3. Scene Management
+4. Scene Management
    - Single scene approach:
      * Main gameplay scene
      * Additive UI scene
@@ -172,6 +186,8 @@ public class MemoryMonitor : MonoBehaviour
     private ProfilerRecorder totalMemoryRecorder;
     private ProfilerRecorder managedMemoryRecorder;
     private ProfilerRecorder gcMemoryRecorder;
+    private float startupBaseline;
+    private float memoryBaseline;
     
     private void OnEnable()
     {
@@ -179,10 +195,15 @@ public class MemoryMonitor : MonoBehaviour
         managedMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Managed Memory");
         gcMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "GC Reserved Memory");
         
-        StartCoroutine(MonitorMemory());
+        // Initialize with dynamic thresholds
+        startupBaseline = totalMemoryRecorder.LastValue / (1024 * 1024);
+        memoryBaseline = startupBaseline;
+        float thresholdScale = Math.Max(1f, startupBaseline / 512f);
+        
+        StartCoroutine(MonitorMemory(thresholdScale));
     }
     
-    private IEnumerator MonitorMemory()
+    private IEnumerator MonitorMemory(float thresholdScale)
     {
         while (enabled)
         {
@@ -190,15 +211,22 @@ public class MemoryMonitor : MonoBehaviour
             var managedMemory = managedMemoryRecorder.LastValue / (1024 * 1024);
             var gcMemory = gcMemoryRecorder.LastValue / (1024 * 1024);
             
-            // Log warnings for memory thresholds
-            if (totalMemory > 1024)
-                Debug.LogWarning($"Total memory exceeded: {totalMemory}MB");
-            if (managedMemory > 512)
-                Debug.LogWarning($"Managed memory exceeded: {managedMemory}MB");
-            if (gcMemory > 256)
-                Debug.LogWarning($"GC Reserved memory high: {gcMemory}MB");
+            // Calculate relative thresholds
+            float adjustedWarning = 768f * thresholdScale;
+            float adjustedCritical = 896f * thresholdScale;
+            float adjustedEmergency = 1024f * thresholdScale;
+            
+            // Calculate relative changes
+            float memoryDelta = totalMemory - memoryBaseline;
+            float relativeDelta = memoryDelta / memoryBaseline;
+            
+            // Log warnings with relative context
+            if (totalMemory > adjustedWarning)
+                Debug.LogWarning($"Memory usage high: {totalMemory:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})");
+            if (totalMemory > adjustedCritical)
+                Debug.LogError($"Memory usage critical: {totalMemory:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})");
                 
-            yield return new WaitForSeconds(0.5f); // Check every 500ms
+            yield return new WaitForSeconds(0.5f);
         }
     }
     
