@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "CZ.Core",
         "Unity.InputSystem",
-        "Unity.InputSystem.TestFramework"
+        "Unity.InputSystem.TestFramework",
+        "CZ.Core.Pooling"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

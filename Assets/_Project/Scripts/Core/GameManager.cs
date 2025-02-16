@@ -4,6 +4,7 @@ using Unity.Profiling;
 using UnityEngine.SceneManagement;
 using NaughtyAttributes;
 using System.Collections;
+using CZ.Core.Pooling;
 
 namespace CZ.Core
 {
@@ -116,9 +117,6 @@ namespace CZ.Core
         #region Initialization
         private void InitializeManager()
         {
-            InitializePerformanceMonitoring();
-            StartCoroutine(CaptureMemoryBaseline());
-            
             // Set initial game state
             CurrentGameState = GameState.MainMenu;
             
@@ -127,75 +125,299 @@ namespace CZ.Core
             isCleaningUp = false;
             consecutiveCleanupAttempts = 0;
             lastCleanupTime = -CLEANUP_COOLDOWN; // Allow immediate first cleanup
-        }
-
-        private IEnumerator CaptureMemoryBaseline()
-        {
-            // Wait for initial load to settle
-            yield return new WaitForSeconds(2f);
             
-            if (memoryRecorder.Valid)
+            // Initialize monitoring
+            if (InitializePerformanceMonitoring())
             {
-                // More aggressive initial cleanup
-                Resources.UnloadUnusedAssets();
-                
-                #if UNITY_EDITOR
-                UnityEditor.EditorUtility.UnloadUnusedAssetsImmediate();
-                #endif
-                
-                // Multiple GC passes to ensure clean baseline
-                for (int i = 0; i < 3; i++)
-                {
-                    GC.Collect(i, GCCollectionMode.Forced, true, true);
-                    yield return new WaitForSeconds(0.1f);
-                }
-                
-                yield return new WaitForSeconds(0.5f);
-                
-                float currentMemory = memoryRecorder.LastValue / (1024f * 1024f);
-                startupMemoryBaseline = currentMemory;
-                memoryBaseline = currentMemory;
-                Debug.Log($"[GameManager] Initial memory baseline captured: {memoryBaseline:F2}MB");
-
-                if (memoryBaseline > BASELINE_THRESHOLD_MB)
-                {
-                    Debug.Log($"[GameManager] High initial memory usage detected: {memoryBaseline:F2}MB > {BASELINE_THRESHOLD_MB}MB");
-                    yield return StartCoroutine(PerformAggressiveCleanup());
-                    
-                    // Update baseline after cleanup
-                    currentMemory = memoryRecorder.LastValue / (1024f * 1024f);
-                    if (currentMemory < memoryBaseline)
-                    {
-                        memoryBaseline = currentMemory;
-                        Debug.Log($"[GameManager] Memory baseline adjusted after cleanup: {memoryBaseline:F2}MB");
-                    }
-                }
+                // Only start monitoring after initialization
+                enabled = true;
+            }
+            else
+            {
+                Debug.LogError("[GameManager] Failed to initialize performance monitoring. Memory management disabled.");
+                enabled = false;
             }
         }
 
-        private void InitializePerformanceMonitoring()
+        private float ConvertToMB(long bytes)
+        {
+            return bytes / (1024f * 1024f);
+        }
+
+        private bool InitializePerformanceMonitoring()
         {
             try
             {
+                // Dispose any existing recorders
+                CleanupRecorders();
+                
+                // Initialize with Unity 6.0 specific profiler categories and sampling
+                drawCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Batches Count");
+                
                 if (!drawCallsRecorder.Valid)
                 {
-                    drawCallsRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Draw Calls Count");
+                    Debug.LogError("[GameManager] Failed to initialize draw calls recorder");
+                    return false;
                 }
                 
-                if (!memoryRecorder.Valid)
+                // Use Unity 6.0 specific memory counter with fallbacks
+                try
                 {
-                    memoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total Used Memory");
+                    // Try each known memory counter name in order with proper category
+                    string[] memoryCounters = new string[] 
+                    {
+                        "Total Used Memory",       // Primary counter
+                        "System Memory",           // Fallback 1
+                        "Total System Memory",     // Fallback 2
+                        "Total Reserved Memory"    // Fallback 3
+                    };
+                    
+                    bool memoryInitialized = false;
+                    foreach (string counterName in memoryCounters)
+                    {
+                        try
+                        {
+                            memoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, counterName, 15);
+                            if (memoryRecorder.Valid)
+                            {
+                                // Wait for valid reading
+                                float testValue = 0f;
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    testValue = ConvertToMB(memoryRecorder.CurrentValue);
+                                    if (testValue > 0)
+                                    {
+                                        Debug.Log($"[GameManager] Successfully initialized memory recorder with counter: {counterName} (Current: {testValue:F2}MB)");
+                                        memoryInitialized = true;
+                                        // Cache the initial valid reading
+                                        currentMemoryUsageMB = testValue;
+                                        break;
+                                    }
+                                    System.Threading.Thread.Sleep(50); // Short delay between checks
+                                }
+                                
+                                if (!memoryInitialized)
+                                {
+                                    Debug.LogWarning($"[GameManager] Counter '{counterName}' failed to provide valid reading after initialization");
+                                    memoryRecorder.Dispose();
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                memoryRecorder.Dispose();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogWarning($"[GameManager] Failed to initialize counter '{counterName}': {e.Message}");
+                            continue;
+                        }
+                    }
+                    
+                    if (!memoryInitialized)
+                    {
+                        Debug.LogError("[GameManager] Failed to initialize memory recorder - No valid Unity 6.0 memory counters found");
+                        CleanupRecorders();
+                        return false;
+                    }
+                }
+                catch (Exception memEx)
+                {
+                    Debug.LogError($"[GameManager] Error initializing memory recorder: {memEx.Message}");
+                    CleanupRecorders();
+                    return false;
                 }
                 
-                if (!gcMemoryRecorder.Valid)
+                // Use Unity 6.0 GC specific counter with fallbacks
+                try
                 {
-                    gcMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "GC Reserved Memory");
+                    string[] gcCounters = new string[] 
+                    {
+                        "GC Used Memory",     // Primary counter
+                        "GC Memory",          // Fallback 1
+                        "GC Reserved Memory", // Fallback 2
+                        "GC Heap Size"       // Fallback 3
+                    };
+                    
+                    bool gcInitialized = false;
+                    foreach (string counterName in gcCounters)
+                    {
+                        try
+                        {
+                            gcMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, counterName, 15);
+                            if (gcMemoryRecorder.Valid)
+                            {
+                                // Wait for valid reading
+                                float testValue = 0f;
+                                for (int i = 0; i < 10; i++)
+                                {
+                                    testValue = ConvertToMB(gcMemoryRecorder.CurrentValue);
+                                    if (testValue > 0)
+                                    {
+                                        Debug.Log($"[GameManager] Successfully initialized GC recorder with counter: {counterName} (Current: {testValue:F2}MB)");
+                                        gcInitialized = true;
+                                        break;
+                                    }
+                                    System.Threading.Thread.Sleep(50); // Short delay between checks
+                                }
+                                
+                                if (!gcInitialized)
+                                {
+                                    Debug.LogWarning($"[GameManager] GC Counter '{counterName}' failed to provide valid reading after initialization");
+                                    gcMemoryRecorder.Dispose();
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                gcMemoryRecorder.Dispose();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogWarning($"[GameManager] Failed to initialize GC counter '{counterName}': {e.Message}");
+                            continue;
+                        }
+                    }
+                    
+                    if (!gcInitialized)
+                    {
+                        Debug.LogError("[GameManager] Failed to initialize GC memory recorder - No valid Unity 6.0 GC counters found");
+                        CleanupRecorders();
+                        return false;
+                    }
                 }
+                catch (Exception gcEx)
+                {
+                    Debug.LogError($"[GameManager] Error initializing GC memory recorder: {gcEx.Message}");
+                    CleanupRecorders();
+                    return false;
+                }
+                
+                // Use cached initial memory reading
+                Debug.Log($"[GameManager] Initial memory reading: {currentMemoryUsageMB:F2}MB");
+                
+                // Set initial baseline - this will be our starting point regardless of current usage
+                memoryBaseline = currentMemoryUsageMB;
+                startupMemoryBaseline = currentMemoryUsageMB; // Cache startup baseline
+                
+                // Adjust thresholds based on initial memory state if above baseline
+                if (currentMemoryUsageMB > BASELINE_THRESHOLD_MB)
+                {
+                    float thresholdScale = currentMemoryUsageMB / BASELINE_THRESHOLD_MB;
+                    float adjustedBaseline = BASELINE_THRESHOLD_MB * thresholdScale;
+                    
+                    Debug.Log($"[GameManager] Adjusting memory thresholds for high initial state (Scale: {thresholdScale:F2})");
+                    Debug.Log($"[GameManager] Setting initial memory baseline to: {memoryBaseline:F2}MB (Adjusted threshold: {adjustedBaseline:F2}MB)");
+                    
+                    // Start with a preemptive cleanup to try to reduce memory
+                    StartCoroutine(PerformInitialCleanup(adjustedBaseline));
+                }
+                else
+                {
+                    Debug.Log($"[GameManager] Setting initial memory baseline to: {memoryBaseline:F2}MB");
+                    // Start with a preemptive cleanup to try to reduce memory
+                    StartCoroutine(PerformInitialCleanup(BASELINE_THRESHOLD_MB));
+                }
+                
+                Debug.Log("[GameManager] Performance monitoring initialized successfully");
+                return true;
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to initialize performance monitoring: {e.Message}");
+                Debug.LogError($"[GameManager] Failed to initialize performance monitoring: {e.Message}");
+                CleanupRecorders();
+                return false;
             }
+        }
+
+        private IEnumerator PerformInitialCleanup(float adjustedBaseline)
+        {
+            if (isCleaningUp) yield break;
+            
+            isCleaningUp = true;
+            Debug.Log("[GameManager] Performing initial memory cleanup...");
+            
+            // Wait for initial load to settle
+            yield return new WaitForSeconds(1f);
+            
+            // Verify recorder is still valid
+            if (!memoryRecorder.Valid || !gcMemoryRecorder.Valid)
+            {
+                Debug.LogError("[GameManager] Memory recorders not valid during initial cleanup");
+                enabled = false;
+                yield break;
+            }
+            
+            // Unload all unused assets
+            yield return Resources.UnloadUnusedAssets();
+            
+            #if UNITY_EDITOR
+            UnityEditor.EditorUtility.UnloadUnusedAssetsImmediate();
+            #endif
+            
+            // Multiple targeted GC passes
+            for (int i = 0; i < 3; i++)
+            {
+                GC.Collect(i, GCCollectionMode.Forced, true, true);
+                GC.WaitForPendingFinalizers();
+                yield return new WaitForSeconds(0.1f);
+            }
+            
+            // Clear pools
+            var poolManager = PoolManager.Instance;
+            if (poolManager != null)
+            {
+                var pools = poolManager.GetAllPoolStats();
+                foreach (var pool in pools)
+                {
+                    var poolType = Type.GetType(pool.Key);
+                    if (poolType != null && typeof(IPoolable).IsAssignableFrom(poolType))
+                    {
+                        var getPoolMethod = typeof(PoolManager).GetMethod("GetPool").MakeGenericMethod(poolType);
+                        var poolObj = getPoolMethod.Invoke(poolManager, null);
+                        if (poolObj != null)
+                        {
+                            var clearMethod = poolObj.GetType().GetMethod("Clear");
+                            clearMethod?.Invoke(poolObj, null);
+                        }
+                    }
+                }
+            }
+            
+            yield return new WaitForSeconds(0.5f);
+            
+            // Check memory after cleanup
+            if (memoryRecorder.Valid)
+            {
+                float newMemoryUsage = ConvertToMB(memoryRecorder.CurrentValue);
+                float delta = newMemoryUsage - startupMemoryBaseline;
+                
+                Debug.Log($"[GameManager] Initial cleanup completed. Memory: {newMemoryUsage:F2}MB (Delta: {delta:F2}MB)");
+                
+                // Calculate relative thresholds based on adjusted baseline
+                float relativeWarning = (WARNING_THRESHOLD_MB / BASELINE_THRESHOLD_MB) * adjustedBaseline;
+                float relativeCritical = (CRITICAL_THRESHOLD_MB / BASELINE_THRESHOLD_MB) * adjustedBaseline;
+                float relativeEmergency = (EMERGENCY_THRESHOLD_MB / BASELINE_THRESHOLD_MB) * adjustedBaseline;
+                
+                Debug.Log($"[GameManager] Adjusted thresholds - Warning: {relativeWarning:F2}MB, Critical: {relativeCritical:F2}MB, Emergency: {relativeEmergency:F2}MB");
+                
+                // Update baseline if we achieved reduction
+                if (newMemoryUsage < memoryBaseline)
+                {
+                    memoryBaseline = newMemoryUsage;
+                    Debug.Log($"[GameManager] Memory baseline adjusted after cleanup: {memoryBaseline:F2}MB");
+                }
+            }
+            
+            isCleaningUp = false;
         }
         #endregion
 
@@ -256,10 +478,7 @@ namespace CZ.Core
 
         private void MonitorPerformance()
         {
-            if (Time.time < 5f) // Skip monitoring for first 5 seconds during initialization
-            {
-                return;
-            }
+            if (Time.time < 5f) return;
 
             if (drawCallsRecorder.Valid)
             {
@@ -273,32 +492,41 @@ namespace CZ.Core
 
             if (memoryRecorder.Valid && !isCleaningUp)
             {
-                currentMemoryUsageMB = memoryRecorder.LastValue / (1024f * 1024f);
+                currentMemoryUsageMB = ConvertToMB(memoryRecorder.LastValue);
+                
+                // Calculate adjusted thresholds based on startup baseline
+                float thresholdScale = Math.Max(1f, startupMemoryBaseline / BASELINE_THRESHOLD_MB);
+                float adjustedWarning = WARNING_THRESHOLD_MB * thresholdScale;
+                float adjustedCritical = CRITICAL_THRESHOLD_MB * thresholdScale;
+                float adjustedEmergency = EMERGENCY_THRESHOLD_MB * thresholdScale;
+                
+                // Calculate memory delta relative to baseline
                 memoryDelta = currentMemoryUsageMB - memoryBaseline;
+                float relativeDelta = memoryDelta / memoryBaseline;
                 
                 // Preemptive cleanup at warning threshold
-                if (currentMemoryUsageMB > WARNING_THRESHOLD_MB && currentMemoryUsageMB <= CRITICAL_THRESHOLD_MB)
+                if (currentMemoryUsageMB > adjustedWarning && currentMemoryUsageMB <= adjustedCritical)
                 {
                     if (Time.time - lastCleanupTime >= CLEANUP_COOLDOWN)
                     {
-                        Debug.Log($"Preemptive cleanup at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB)");
+                        Debug.Log($"Preemptive cleanup at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})");
                         StartCoroutine(PerformPreemptiveCleanup());
                     }
                 }
                 // Critical cleanup
-                else if (currentMemoryUsageMB > CRITICAL_THRESHOLD_MB && currentMemoryUsageMB <= EMERGENCY_THRESHOLD_MB)
+                else if (currentMemoryUsageMB > adjustedCritical && currentMemoryUsageMB <= adjustedEmergency)
                 {
                     if (Time.time - lastCleanupTime >= CLEANUP_COOLDOWN/2)
                     {
-                        Debug.LogWarning($"Critical cleanup at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB)");
+                        Debug.LogWarning($"Critical cleanup at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})");
                         StartCoroutine(PerformAggressiveCleanup());
                     }
                 }
                 // Emergency cleanup
-                else if (currentMemoryUsageMB > EMERGENCY_THRESHOLD_MB && !emergencyCleanupRequired)
+                else if (currentMemoryUsageMB > adjustedEmergency && !emergencyCleanupRequired)
                 {
                     emergencyCleanupRequired = true;
-                    Debug.LogError($"EMERGENCY: Memory usage critical at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB)");
+                    Debug.LogError($"EMERGENCY: Memory usage critical at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})");
                     StartCoroutine(PerformEmergencyCleanup());
                 }
             }
@@ -339,29 +567,51 @@ namespace CZ.Core
             lastCleanupTime = Time.time;
             consecutiveCleanupAttempts++;
             
-            Debug.LogWarning($"Aggressive cleanup initiated. Memory: {currentMemoryUsageMB:F2}MB - Attempt {consecutiveCleanupAttempts}/{MAX_CLEANUP_ATTEMPTS}");
+            float initialMemory = currentMemoryUsageMB;
+            Debug.LogWarning($"Aggressive cleanup initiated. Memory: {initialMemory:F2}MB - Attempt {consecutiveCleanupAttempts}/{MAX_CLEANUP_ATTEMPTS}");
             
-            // More aggressive cleanup sequence
+            // Stop all coroutines except essential ones
+            StopAllCoroutines();
+            this.StartCoroutine(PerformAggressiveCleanup());
+            
+            // Clear pools first
+            var poolManager = PoolManager.Instance;
+            if (poolManager != null)
+            {
+                var pools = poolManager.GetAllPoolStats();
+                foreach (var pool in pools)
+                {
+                    var poolType = Type.GetType(pool.Key);
+                    if (poolType != null && typeof(IPoolable).IsAssignableFrom(poolType))
+                    {
+                        var getPoolMethod = typeof(PoolManager).GetMethod("GetPool").MakeGenericMethod(poolType);
+                        var poolObj = getPoolMethod.Invoke(poolManager, null);
+                        if (poolObj != null)
+                        {
+                            var clearMethod = poolObj.GetType().GetMethod("Clear");
+                            clearMethod?.Invoke(poolObj, null);
+                        }
+                    }
+                }
+            }
+            
+            // Unload unused assets
             yield return Resources.UnloadUnusedAssets();
             
             #if UNITY_EDITOR
             UnityEditor.EditorUtility.UnloadUnusedAssetsImmediate();
             #endif
             
-            // Force full GC collection
-            GC.Collect(2, GCCollectionMode.Forced, true, true);
-            yield return new WaitForSeconds(0.1f);
-            
-            // Second pass with more aggressive settings
-            GC.Collect(2, GCCollectionMode.Forced, true, true);
-            yield return new WaitForSeconds(0.1f);
-            
-            // Final pass targeting large objects
-            GC.Collect(2, GCCollectionMode.Forced, true, true);
-            GC.WaitForPendingFinalizers();
+            // Multiple targeted GC passes
+            for (int i = 0; i < 3; i++)
+            {
+                GC.Collect(i, GCCollectionMode.Forced, true, true);
+                GC.WaitForPendingFinalizers();
+                yield return new WaitForSeconds(0.1f);
+            }
             
             float newMemoryUsage = memoryRecorder.Valid ? memoryRecorder.LastValue / (1024f * 1024f) : 0f;
-            Debug.Log($"Aggressive cleanup completed. Memory reduced from {currentMemoryUsageMB:F2}MB to {newMemoryUsage:F2}MB");
+            Debug.Log($"Aggressive cleanup completed. Memory reduced from {initialMemory:F2}MB to {newMemoryUsage:F2}MB");
             
             if (consecutiveCleanupAttempts >= MAX_CLEANUP_ATTEMPTS && newMemoryUsage > CRITICAL_THRESHOLD_MB)
             {
@@ -421,7 +671,31 @@ namespace CZ.Core
 
         private void OnEnable()
         {
-            InitializePerformanceMonitoring();
+            // Only initialize if we don't have valid recorders
+            bool needsInitialization = true;
+            
+            try
+            {
+                needsInitialization = memoryRecorder.Equals(default(ProfilerRecorder)) || 
+                                    !memoryRecorder.Valid || 
+                                    gcMemoryRecorder.Equals(default(ProfilerRecorder)) || 
+                                    !gcMemoryRecorder.Valid;
+            }
+            catch
+            {
+                // If we get an exception during checks, we definitely need initialization
+                needsInitialization = true;
+            }
+            
+            if (needsInitialization)
+            {
+                if (!InitializePerformanceMonitoring())
+                {
+                    Debug.LogError("[GameManager] Failed to initialize performance monitoring in OnEnable. Memory management will be disabled.");
+                    enabled = false; // Disable the component if initialization fails
+                    return;
+                }
+            }
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
@@ -447,16 +721,23 @@ namespace CZ.Core
                 {
                     drawCallsRecorder.Dispose();
                 }
+                drawCallsRecorder = default;
                 
                 if (memoryRecorder.Valid)
                 {
                     memoryRecorder.Dispose();
                 }
+                memoryRecorder = default;
                 
                 if (gcMemoryRecorder.Valid)
                 {
                     gcMemoryRecorder.Dispose();
                 }
+                gcMemoryRecorder = default;
+                
+                // Force a GC collection after disposing recorders
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
             catch (Exception e)
             {

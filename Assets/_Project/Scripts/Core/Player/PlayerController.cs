@@ -15,6 +15,7 @@ namespace CZ.Core.Player
         private InputAction moveAction;
         private CircleCollider2D circleCollider;
         private TrailRenderer movementTrail;
+        private static Material sharedTrailMaterial;
         #endregion
 
         #region Configuration
@@ -32,11 +33,16 @@ namespace CZ.Core.Player
         [SerializeField, MinValue(0f)]
         [InfoBox("Linear drag applied to slow down movement", EInfoBoxType.Normal)]
         private float linearDrag = 3f;
+
+        [BoxGroup("Debug Settings")]
+        [SerializeField]
+        private bool enableDebugLogs = false;
         #endregion
 
         #region State
         private Vector2 moveInput;
         private bool isMoving;
+        private bool isInitialized;
         #endregion
 
         #region Unity Lifecycle
@@ -47,6 +53,8 @@ namespace CZ.Core.Player
 
         private void SetupComponents()
         {
+            if (isInitialized) return;
+            
             // Get and configure Rigidbody2D
             rb = GetComponent<Rigidbody2D>();
             if (rb != null)
@@ -62,8 +70,35 @@ namespace CZ.Core.Player
             playerInput = GetComponent<PlayerInput>();
             if (playerInput != null)
             {
+                if (enableDebugLogs) Debug.Log("[PlayerController] Setting up PlayerInput");
                 playerInput.defaultActionMap = "Player";
                 playerInput.notificationBehavior = PlayerNotifications.InvokeCSharpEvents;
+                
+                // Ensure actions asset is assigned
+                if (playerInput.actions == null)
+                {
+                    Debug.LogError("[PlayerController] No input actions asset assigned");
+                    return;
+                }
+
+                var actionMap = playerInput.actions.FindActionMap("Player", true);
+                if (actionMap != null)
+                {
+                    actionMap.Enable();
+                    moveAction = actionMap.FindAction("Move");
+                    if (moveAction != null)
+                    {
+                        moveAction.performed += OnMovePerformed;
+                        moveAction.canceled += OnMoveCanceled;
+                        moveAction.Enable();
+                        if (enableDebugLogs) Debug.Log("[PlayerController] Move action enabled");
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogError("[PlayerController] PlayerInput component missing");
+                return;
             }
             
             // Get and configure CircleCollider2D
@@ -74,67 +109,96 @@ namespace CZ.Core.Player
                 circleCollider.isTrigger = false;
             }
 
-            // Setup minimal trail
-            movementTrail = gameObject.AddComponent<TrailRenderer>();
-            if (movementTrail != null)
+            // Setup minimal trail with shared material
+            if (movementTrail == null)
             {
-                movementTrail.time = 0.1f;
-                movementTrail.startWidth = 0.1f;
-                movementTrail.endWidth = 0f;
-                movementTrail.material = new Material(Shader.Find("Sprites/Default"));
+                movementTrail = gameObject.AddComponent<TrailRenderer>();
+                if (movementTrail != null)
+                {
+                    movementTrail.time = 0.1f;
+                    movementTrail.startWidth = 0.1f;
+                    movementTrail.endWidth = 0f;
+                    movementTrail.emitting = false; // Start with trail disabled
+                    
+                    // Use shared material
+                    if (sharedTrailMaterial == null)
+                    {
+                        sharedTrailMaterial = new Material(Shader.Find("Sprites/Default"))
+                        {
+                            hideFlags = HideFlags.DontSave
+                        };
+                    }
+                    movementTrail.material = sharedTrailMaterial;
+                }
             }
-        }
-
-        private void Start()
-        {
-            VerifyComponents();
-        }
-
-        private void VerifyComponents()
-        {
-            if (playerInput == null)
-            {
-                Debug.LogError($"[PlayerController] PlayerInput component missing on {gameObject.name}");
-                return;
-            }
-
-            moveAction = playerInput.actions?.FindAction("Move");
-            if (moveAction != null)
-            {
-                moveAction.performed += OnMovePerformed;
-                moveAction.canceled += OnMoveCanceled;
-            }
-            else
-            {
-                Debug.LogError($"[PlayerController] Move action not found in input actions asset");
-            }
+            
+            isInitialized = true;
         }
 
         public void OnMovePerformed(InputAction.CallbackContext context)
         {
             moveInput = context.ReadValue<Vector2>();
             isMoving = moveInput.sqrMagnitude > 0.01f;
+            
+            // Only enable trail when moving
+            if (movementTrail != null)
+            {
+                movementTrail.emitting = isMoving;
+            }
+            
+            if (enableDebugLogs && isMoving)
+            {
+                Debug.Log($"[PlayerController] Move: {moveInput:F2}");
+            }
         }
 
         public void OnMoveCanceled(InputAction.CallbackContext context)
         {
             moveInput = Vector2.zero;
             isMoving = false;
+            
+            if (movementTrail != null)
+            {
+                movementTrail.emitting = false;
+            }
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log("[PlayerController] Move canceled");
+            }
         }
 
         private void OnEnable()
         {
-            if (playerInput == null) playerInput = GetComponent<PlayerInput>();
-            
-            if (playerInput?.actions != null)
+            if (!isInitialized)
             {
-                playerInput.currentActionMap = playerInput.actions.FindActionMap("Player");
-                moveAction = playerInput.actions.FindAction("Move");
-                if (moveAction != null) moveAction.Enable();
+                SetupComponents();
+            }
+            else if (moveAction != null)
+            {
+                moveAction.Enable();
             }
         }
 
         private void OnDisable()
+        {
+            if (moveAction != null)
+            {
+                moveAction.Disable();
+            }
+            
+            if (movementTrail != null)
+            {
+                movementTrail.emitting = false;
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            HandleMovement();
+        }
+
+        private void OnDestroy()
         {
             if (moveAction != null)
             {
@@ -143,11 +207,6 @@ namespace CZ.Core.Player
                 moveAction.Disable();
             }
         }
-
-        private void FixedUpdate()
-        {
-            HandleMovement();
-        }
         #endregion
 
         #region Movement
@@ -155,7 +214,16 @@ namespace CZ.Core.Player
         {
             if (!isMoving)
             {
-                rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, Vector2.zero, linearDrag * Time.fixedDeltaTime);
+                // Apply stronger deceleration when stopping
+                float stopThreshold = 0.01f;
+                if (rb.linearVelocity.sqrMagnitude < stopThreshold)
+                {
+                    rb.linearVelocity = Vector2.zero;
+                }
+                else
+                {
+                    rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, Vector2.zero, linearDrag * 2f * Time.fixedDeltaTime);
+                }
                 return;
             }
 
