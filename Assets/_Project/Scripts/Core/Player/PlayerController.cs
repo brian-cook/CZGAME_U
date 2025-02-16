@@ -1,24 +1,37 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using NaughtyAttributes;
 
 namespace CZ.Core.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(PlayerInput))]
+    [RequireComponent(typeof(CircleCollider2D))]
     public class PlayerController : MonoBehaviour
     {
         #region Components
         private Rigidbody2D rb;
         private PlayerInput playerInput;
         private InputAction moveAction;
+        private CircleCollider2D circleCollider;
+        private TrailRenderer movementTrail;
         #endregion
 
         #region Configuration
-        [Header("Movement")]
-        [SerializeField] private float moveSpeed = 5f;
-        [SerializeField] private float maxVelocity = 10f;
+        [BoxGroup("Movement Settings")]
+        [SerializeField, MinValue(0f), MaxValue(20f)]
+        [InfoBox("Base movement speed of the player", EInfoBoxType.Normal)]
+        private float moveSpeed = 5f;
+
+        [BoxGroup("Movement Settings")]
+        [SerializeField, MinValue(0f), MaxValue(20f)]
+        [InfoBox("Maximum velocity the player can reach", EInfoBoxType.Normal)]
+        private float maxVelocity = 8f;
         
-        [Header("Physics")]
-        [SerializeField] private float linearDrag = 5f;
+        [BoxGroup("Physics Settings")]
+        [SerializeField, MinValue(0f)]
+        [InfoBox("Linear drag applied to slow down movement", EInfoBoxType.Normal)]
+        private float linearDrag = 3f;
         #endregion
 
         #region State
@@ -29,39 +42,106 @@ namespace CZ.Core.Player
         #region Unity Lifecycle
         private void Awake()
         {
+            SetupComponents();
+        }
+
+        private void SetupComponents()
+        {
+            // Get and configure Rigidbody2D
             rb = GetComponent<Rigidbody2D>();
-            playerInput = GetComponent<PlayerInput>();
+            if (rb != null)
+            {
+                rb.gravityScale = 0f;
+                rb.linearDamping = linearDrag;
+                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+                rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+                rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            }
             
-            // Configure Rigidbody
-            rb.gravityScale = 0f;
-            rb.linearDamping = linearDrag;
-            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            // Get PlayerInput
+            playerInput = GetComponent<PlayerInput>();
+            if (playerInput != null)
+            {
+                playerInput.defaultActionMap = "Player";
+                playerInput.notificationBehavior = PlayerNotifications.InvokeCSharpEvents;
+            }
+            
+            // Get and configure CircleCollider2D
+            circleCollider = GetComponent<CircleCollider2D>();
+            if (circleCollider != null)
+            {
+                circleCollider.radius = 0.5f;
+                circleCollider.isTrigger = false;
+            }
+
+            // Setup minimal trail
+            movementTrail = gameObject.AddComponent<TrailRenderer>();
+            if (movementTrail != null)
+            {
+                movementTrail.time = 0.1f;
+                movementTrail.startWidth = 0.1f;
+                movementTrail.endWidth = 0f;
+                movementTrail.material = new Material(Shader.Find("Sprites/Default"));
+            }
+        }
+
+        private void Start()
+        {
+            VerifyComponents();
+        }
+
+        private void VerifyComponents()
+        {
+            if (playerInput == null)
+            {
+                Debug.LogError($"[PlayerController] PlayerInput component missing on {gameObject.name}");
+                return;
+            }
+
+            moveAction = playerInput.actions?.FindAction("Move");
+            if (moveAction != null)
+            {
+                moveAction.performed += OnMovePerformed;
+                moveAction.canceled += OnMoveCanceled;
+            }
+            else
+            {
+                Debug.LogError($"[PlayerController] Move action not found in input actions asset");
+            }
+        }
+
+        public void OnMovePerformed(InputAction.CallbackContext context)
+        {
+            moveInput = context.ReadValue<Vector2>();
+            isMoving = moveInput.sqrMagnitude > 0.01f;
+        }
+
+        public void OnMoveCanceled(InputAction.CallbackContext context)
+        {
+            moveInput = Vector2.zero;
+            isMoving = false;
         }
 
         private void OnEnable()
         {
-            // Get reference to move action
-            if (playerInput != null && playerInput.actions != null)
+            if (playerInput == null) playerInput = GetComponent<PlayerInput>();
+            
+            if (playerInput?.actions != null)
             {
-                moveAction = playerInput.actions["Move"];
-                if (moveAction != null)
-                {
-                    moveAction.Enable();
-                }
-                else
-                {
-                    Debug.LogError("Move action not found in Input Actions asset");
-                }
-            }
-            else
-            {
-                Debug.LogError("PlayerInput or its actions are null");
+                playerInput.currentActionMap = playerInput.actions.FindActionMap("Player");
+                moveAction = playerInput.actions.FindAction("Move");
+                if (moveAction != null) moveAction.Enable();
             }
         }
 
         private void OnDisable()
         {
-            moveAction?.Disable();
+            if (moveAction != null)
+            {
+                moveAction.performed -= OnMovePerformed;
+                moveAction.canceled -= OnMoveCanceled;
+                moveAction.Disable();
+            }
         }
 
         private void FixedUpdate()
@@ -70,27 +150,29 @@ namespace CZ.Core.Player
         }
         #endregion
 
-        #region Input Handling
-        public void OnMove(InputAction.CallbackContext context)
-        {
-            moveInput = context.ReadValue<Vector2>();
-            isMoving = moveInput.sqrMagnitude > 0.01f;
-        }
-        #endregion
-
         #region Movement
         private void HandleMovement()
         {
-            if (isMoving)
+            if (!isMoving)
             {
-                // Apply movement force
-                Vector2 moveForce = moveInput * moveSpeed;
-                rb.AddForce(moveForce, ForceMode2D.Force);
+                rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, Vector2.zero, linearDrag * Time.fixedDeltaTime);
+                return;
+            }
 
-                // Clamp velocity
-                rb.linearVelocity = Vector2.ClampMagnitude(rb.linearVelocity, maxVelocity);
+            Vector2 targetVelocity = moveInput.normalized * moveSpeed;
+            rb.linearVelocity = Vector2.ClampMagnitude(targetVelocity, maxVelocity);
+        }
+        #endregion
+
+        #region Debug Methods
+        [Button("Reset Velocity")]
+        private void ResetVelocity()
+        {
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
             }
         }
         #endregion
     }
-} 
+}

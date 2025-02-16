@@ -11,7 +11,40 @@
             "analyze_before_changes": true,
             "document_file_access": true,
             "track_dependencies": true
-        }
+        },
+        "reference_files": [
+            "Documentation/Resources/project_dependencies.md",
+            "Documentation/Resources/version_troubleshooting.md",
+            "Documentation/Guidelines/infrastructure.txt",
+            "Documentation/Guidelines/performance_guidelines.txt"
+        ]
+    },
+    "cursor_first_operations": {
+        "priority": "critical",
+        "description": "All changes should be implemented through Cursor when possible",
+        "requirements": {
+            "prefer_cursor_edits": true,
+            "unity_instructions_fallback": true,
+            "documentation_required": true
+        },
+        "implementation_rules": {
+            "cursor_operations": {
+                "use_edit_tools": true,
+                "verify_changes": true,
+                "track_modifications": true,
+                "respect_file_structure": true
+            },
+            "unity_fallback": {
+                "provide_step_by_step": true,
+                "include_screenshots": true,
+                "verify_completion": true,
+                "document_manual_steps": true
+            }
+        },
+        "reference_files": [
+            "Documentation/Guidelines/infrastructure.txt",
+            "Documentation/Guidelines/performance_guidelines.txt"
+        ]
     },
     "cursor_integration": {
         "priority": "critical",
@@ -34,40 +67,67 @@
     },
     "unity_compliance": {
         "priority": "highest",
-        "source": "unity_resources.md",
-        "version": "6.0",
+        "source": "Documentation/Resources/unity_resources.md",
+        "version": "6000.0.38f1",
         "checks": {
             "verify_best_practices": true,
             "check_api_compatibility": true,
             "validate_patterns": true,
             "verify_meta_files": true
+        },
+        "reference_files": [
+            "Documentation/Resources/project_dependencies.md",
+            "Documentation/Resources/version_troubleshooting.md",
+            "Documentation/Guidelines/infrastructure.txt",
+            "Packages/manifest.json"
+        ],
+        "package_versions": {
+            "universal_rp": "17.0.3",
+            "input_system": "1.13.0",
+            "test_framework": "1.4.6",
+            "timeline": "1.8.7",
+            "multiplayer_center": "1.0.0",
+            "naughty_attributes": "2.1.4"
         }
     },
     "technical_standards": {
         "priority": "high",
         "sources": [
-            "performance_guidelines.txt",
-            "infrastructure.txt"
+            "Documentation/Guidelines/performance_guidelines.txt",
+            "Documentation/Guidelines/infrastructure.txt"
         ],
         "requirements": {
             "performance": {
                 "max_draw_calls": 100,
                 "target_fps": 60,
                 "max_memory": 1024,
-                "respect_pooling": true
+                "respect_pooling": true,
+                "reference_file": "Documentation/Guidelines/performance_guidelines.txt",
+                "monitoring": {
+                    "use_profiler_recorder": true,
+                    "check_interval": 0.5,
+                    "track_metrics": ["drawCalls", "memory", "fps"]
+                }
             },
             "infrastructure": {
                 "follow_patterns": true,
                 "maintain_scalability": true,
-                "ensure_testability": true
+                "ensure_testability": true,
+                "reference_file": "Documentation/Guidelines/infrastructure.txt",
+                "testing": {
+                    "use_performance_testing": true,
+                    "implement_play_mode_tests": true,
+                    "verify_multiplayer": true
+                }
             }
         }
     },
     "project_alignment": {
         "priority": "medium",
         "sources": [
-            "project_plan",
-            "core_game_loop_checklist.txt"
+            "Documentation/Architecture/checklists/core_game_loop_checklist.txt",
+            "Documentation/Resources/project_dependencies.md",
+            "Documentation/Guidelines/infrastructure.txt"
         ],
         "checks": {
             "verify_architecture": true,
@@ -80,7 +140,12 @@
         "use_checklists": true,
         "track_progress": true,
         "document_changes": true,
-        "verify_completion": true
+        "verify_completion": true,
+        "reference_files": [
+            "Documentation/Architecture/checklists/core_game_loop_checklist.txt",
+            "Documentation/Resources/version_troubleshooting.md#version-update-checklist",
+            "Documentation/Guidelines/performance_guidelines.txt"
+        ]
     },
     "error_handling": {
         "priority": "high",
@@ -89,15 +154,26 @@
             "provide_context": true,
             "suggest_solutions": true,
             "track_resolution": true
-        }
+        },
+        "reference_files": [
+            "Documentation/Resources/version_troubleshooting.md#unity-6-console-error-codes",
+            "Documentation/Guidelines/infrastructure.txt"
+        ]
     },
     "documentation": {
         "priority": "medium",
         "requirements": {
             "update_docs": true,
             "maintain_comments": true,
-            "track_changes": true
-        }
+            "track_changes": true,
+            "verify_guidelines": true
+        },
+        "reference_files": [
+            "Documentation/Resources/project_dependencies.md",
+            "Documentation/Resources/version_troubleshooting.md",
+            "Documentation/Guidelines/infrastructure.txt",
+            "Documentation/Guidelines/performance_guidelines.txt"
+        ]
     },
     "interaction_personalization": {
         "priority": "high",

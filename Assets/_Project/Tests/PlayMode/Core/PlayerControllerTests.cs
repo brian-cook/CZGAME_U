@@ -129,8 +129,8 @@ namespace CZ.Tests.PlayMode
                 Assert.That(actionMap, Is.Not.Null, "Player action map should exist");
                 var moveAction = actionMap.FindAction("Move");
                 Assert.That(moveAction, Is.Not.Null, "Move action should exist");
-                moveAction.performed += ctx => playerController.OnMove(ctx);
-                moveAction.canceled += ctx => playerController.OnMove(ctx);
+                moveAction.performed += ctx => playerController.OnMovePerformed(ctx);
+                moveAction.canceled += ctx => playerController.OnMoveCanceled(ctx);
                 actionMap.Enable();
                 
                 // Final verification of setup

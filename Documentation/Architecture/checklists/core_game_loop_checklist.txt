@@ -1,101 +1,139 @@
 # Core Game Loop Implementation Checklist
 
 ## Phase 0: Minimal Playable Build (MVP)
-[ ] Basic Scene Setup
-    [ ] Empty scene with essential GameObjects
-    [ ] Main Camera setup
-    [ ] Basic lighting
-    [ ] Test player placeholder
+[✓] Basic Scene Setup
+    [✓] Empty scene with essential GameObjects
+    [✓] Main Camera setup
+    [✓] Basic lighting
+    [✓] Test player placeholder
 
-[ ] Essential Player Setup
-    [ ] Basic Player GameObject
-        [ ] Simple sprite/primitive
-        [ ] Rigidbody2D
-        [ ] Collider2D
-    [ ] Minimal Movement Script
-        [ ] Basic WASD/Arrow movement
-        [ ] Simple physics-based movement
-    [ ] Player Camera Follow
+[~] Essential Player Movement (HIGH PRIORITY)
+    [✓] Basic Player GameObject
+        [✓] Simple sprite/primitive
+        [✓] Rigidbody2D
+        [✓] Collider2D
+    [~] Enhanced Movement System
+        [✓] Basic WASD/Arrow movement
+        [ ] Smooth acceleration/deceleration
+        [ ] Jump mechanics
+        [ ] Movement animation states
+        [ ] Movement sound effects
+    [ ] Player Feedback
+        [ ] Visual movement feedback
+        [ ] Physics-based particle effects
+        [ ] Audio feedback system
+        [ ] State indicators
 
-[ ] Basic Game Management
-    [ ] GameManager script
-    [ ] Scene loading
-    [ ] Simple game state (play/pause)
-    [ ] Debug restart capability
+[✓] Basic Game Management
+    [✓] GameManager script
+    [✓] Scene loading
+    [✓] Simple game state (play/pause)
+    [✓] Debug restart capability
 
-[ ] Minimal Test Environment
-    [ ] Simple ground/boundaries
-    [ ] Basic collision setup
-    [ ] Test spawn point
-    [ ] FPS counter for performance
+[✓] Minimal Test Environment
+    [✓] Simple ground/boundaries
+    [✓] Basic collision setup
+    [✓] Test spawn point
+    [✓] FPS counter for performance
 
 ## Phase 1: Core Systems Integration
-[ ] Input System Implementation
-    [ ] Input Action Asset setup
-    [ ] Basic control scheme
-    [ ] Input debugging
+[✓] Input System Implementation
+    [✓] Input Action Asset setup
+    [✓] Basic control scheme
+    [✓] Input debugging
 
-[ ] Enhanced Player Control
-    [ ] Refined movement
-    [ ] Basic attack capability
-    [ ] Simple health system
+[ ] Enemy System (HIGH PRIORITY)
+    [ ] Basic Enemy Types
+        [ ] Melee enemy prefab
+        [ ] Ranged enemy prefab
+        [ ] Enemy spawning system
+    [ ] Enemy AI Movement
+        [ ] Pathfinding implementation
+        [ ] Obstacle avoidance
+        [ ] Target tracking
+        [ ] Formation movement
+    [ ] Enemy Behavior
+        [ ] State machine system
+        [ ] Attack patterns
+        [ ] Group behavior
+        [ ] Difficulty scaling
+    [ ] Enemy Feedback
+        [ ] Visual indicators
+        [ ] Sound effects
+        [ ] Hit reactions
+        [ ] Death effects
 
-[ ] Basic Zone System
-    [ ] Zone boundaries
-    [ ] Player state tracking
-    [ ] Simple visualization
+[ ] Resource System (HIGH PRIORITY)
+    [ ] Resource Types
+        [ ] Health pickups
+        [ ] Power-ups
+        [ ] Score items
+        [ ] Special abilities
+    [ ] Resource Generation
+        [ ] Spawn system
+        [ ] Distribution patterns
+        [ ] Spawn rate control
+        [ ] Location strategy
+    [ ] Collection Mechanics
+        [ ] Pickup detection
+        [ ] Effect application
+        [ ] Visual feedback
+        [ ] Audio feedback
+    [ ] Resource UI
+        [ ] Resource counters
+        [ ] Collection indicators
+        [ ] Status effects
+        [ ] Resource maps
 
-[ ] Enemy Prototype
-    [ ] Basic enemy prefab
-    [ ] Simple follow behavior
-    [ ] Collision detection
-    [ ] Health system
+[ ] Comfort Zone System (MEDIUM PRIORITY)
+    [ ] Basic Zone Implementation
+        [ ] Zone creation
+        [ ] Zone effects
+        [ ] Visual boundaries
+    [ ] Zone Mechanics
+        [ ] Resource interaction
+        [ ] Enemy interaction
+        [ ] Player buffs/debuffs
+    [ ] Zone Strategy
+        [ ] Placement system
+        [ ] Zone types
+        [ ] Zone upgrades
 
 ## Phase 2: Feature Implementation
 [ ] Combat System
-    [ ] TEST INTERVAL 1
-        [ ] Basic attack implementation
-        [ ] Attack debugging
-        [ ] Combat metrics
-        [ ] Unit tests
-    [ ] TEST INTERVAL 2
-        [ ] Projectile system
-        [ ] Visual feedback
-        [ ] Integration tests
-
-[ ] Zone Mechanics
-    [ ] TEST INTERVAL 1
-        [ ] Player state changes
-        [ ] Debug visualization
-        [ ] State tests
-    [ ] TEST INTERVAL 2
-        [ ] Resource denial
-        [ ] Enemy awareness
-        [ ] Integration tests
+    [ ] Basic Attack Implementation
+        [ ] Melee attacks
+        [ ] Ranged attacks
+        [ ] Damage system
+    [ ] Combat Feedback
+        [ ] Hit effects
+        [ ] Damage numbers
+        [ ] Screen shake
+        [ ] Sound effects
 
 ## Phase 0.5: Technical Setup
-[ ] Unity Configuration
-    [ ] Input Action Asset Setup
-        [ ] Player controls
+[✓] Unity Configuration
+    [✓] Input Action Asset Setup
+        [✓] Player controls
         [ ] UI navigation
         [ ] Debug controls
-    [ ] Physics Setup
-        [ ] Layer matrix configuration
-        [ ] Collision matrix setup
-        [ ] Physics performance settings
-    [ ] Scene Configuration
-        [ ] Build settings setup
-        [ ] Scene loading strategy
-        [ ] Scene references management
+    [✓] Physics Setup
+        [✓] Layer matrix configuration
+        [✓] Collision matrix setup
+        [✓] Physics performance settings
+    [✓] Scene Configuration
+        [✓] Build settings setup
+        [✓] Scene loading strategy
+        [✓] Scene references management
 
 ## Phase 1: Core Mechanics Implementation
 ### Player Basics
-[ ] Movement System
-    [ ] Input handling using new Input System
-    [ ] Basic character controller
-    [ ] Movement feel adjustments
-    [ ] Collision handling
-    [ ] Performance metrics tracking
+[~] Movement System
+    [✓] Input handling using new Input System
+    [✓] Basic character controller
+    [~] Movement feel adjustments
+    [✓] Collision handling
+    [✓] Performance metrics tracking
 
 [ ] Basic Combat
     [ ] Auto-attack implementation
@@ -135,11 +173,11 @@
     [ ] Density control
 
 ## Phase 1.5: Asset Management
-[ ] Asset Pipeline Setup
-    [ ] Texture import settings
+[~] Asset Pipeline Setup
+    [✓] Texture import settings
     [ ] Audio compression settings
     [ ] Model import settings
-    [ ] Sprite atlas configuration
+    [✓] Sprite atlas configuration
     [ ] Addressables setup
 
 ## Phase 2: Core Systems Integration
@@ -152,115 +190,125 @@
     [ ] Performance optimization
 
 ### Core UI Elements
-[ ] Essential UI
+[~] Essential UI
     [ ] Health display
     [ ] Resource indicators
     [ ] Zone status
-    [ ] Performance stats (debug)
+    [✓] Performance stats (debug)
     [ ] Basic menus
 
 ### Core Loop Systems
-[ ] Game Flow
-    [ ] Start condition
-    [ ] Victory condition
-    [ ] Defeat condition
-    [ ] Restart system
-    [ ] State management
+[~] Game Flow
+    [✓] Start condition
+    [✓] Victory condition
+    [✓] Defeat condition
+    [✓] Restart system
+    [✓] State management
 
 ## Phase 3: Performance Verification
-[ ] Performance Targets
-    [ ] FPS monitoring (target: 60)
-    [ ] Draw call optimization (max: 100)
-    [ ] Memory usage tracking (max: 1024MB)
+[~] Performance Targets
+    [✓] FPS monitoring (target: 60)
+    [✓] Draw call optimization (max: 100)
+    [✓] Memory usage tracking (max: 1024MB)
     [ ] Entity count management
-    [ ] Physics performance
+    [~] Physics performance
 
-[ ] Optimization Systems
+[~] Optimization Systems
     [ ] Object pooling verification
-    [ ] Update frequency management
+    [✓] Update frequency management
     [ ] Batch rendering setup
-    [ ] Memory management
-    [ ] Physics optimization
+    [✓] Memory management
+    [✓] Physics optimization
 
 ## Phase 3.5: Platform-Specific Verification
-[ ] Platform Targets
-    [ ] Windows performance metrics
-        [ ] CPU usage targets
-        [ ] Memory limits
-        [ ] Storage requirements
-    [ ] Build pipeline setup
+[~] Platform Targets
+    [~] Windows performance metrics
+        [✓] CPU usage targets
+        [✓] Memory limits
+        [✓] Storage requirements
+    [~] Build pipeline setup
         [ ] CI/CD integration
-        [ ] Build verification
-        [ ] Platform-specific settings
+        [✓] Build verification
+        [✓] Platform-specific settings
 
 ## Phase 4: Testing & Validation
-[ ] Core Loop Testing
-    [ ] Movement feel
+[~] Core Loop Testing
+    [✓] Movement feel
     [ ] Combat responsiveness
     [ ] Zone mechanics
     [ ] Enemy behavior
     [ ] Resource system
 
-[ ] Performance Testing
-    [ ] Stress tests
-    [ ] Memory leak checks
-    [ ] Frame time analysis
-    [ ] Physics performance
-    [ ] Draw call monitoring
+[~] Performance Testing
+    [✓] Stress tests
+    [✓] Memory leak checks
+    [✓] Frame time analysis
+    [✓] Physics performance
+    [✓] Draw call monitoring
 
 ## Phase 4.5: Automated Testing
-[ ] Test Framework Setup
-    [ ] Edit mode tests
-    [ ] Play mode tests
-    [ ] Performance tests
-    [ ] Integration tests
-    [ ] Regression test suite
+[✓] Test Framework Setup
+    [✓] Edit mode tests
+    [✓] Play mode tests
+    [✓] Performance tests
+    [✓] Integration tests
+    [✓] Regression test suite
 
 ## Phase 5: Documentation & Review
-[ ] Technical Documentation
-    [ ] Core systems documentation
-    [ ] Performance guidelines
-    [ ] Implementation notes
-    [ ] Best practices
-    [ ] Future expansion points
+[~] Technical Documentation
+    [✓] Core systems documentation
+    [✓] Performance guidelines
+    [✓] Implementation notes
+    [✓] Best practices
+    [✓] Future expansion points
 
-[ ] Review Points
-    [ ] Code quality review
-    [ ] Performance review
-    [ ] Scalability assessment
-    [ ] Feature completeness
-    [ ] Technical debt evaluation
+[~] Review Points
+    [✓] Code quality review
+    [✓] Performance review
+    [~] Scalability assessment
+    [~] Feature completeness
+    [~] Technical debt evaluation
 
 ## Success Criteria for MVP
-1. Basic Functionality
-   - Player can move
-   - Game can start/restart
-   - No critical errors
-   - Stable framerate
+1. Player Movement
+   [ ] Smooth and responsive controls
+   [ ] Proper physics interaction
+   [ ] Clear visual feedback
+   [ ] Consistent performance
 
-2. Development Ready
-   - Debug tools functional
-   - Quick iteration possible
-   - Basic logging working
-   - Test framework operational
+2. Enemy System
+   [ ] Functional AI behavior
+   [ ] Proper pathfinding
+   [ ] Performance with multiple enemies
+   [ ] Clear visual distinction
+
+3. Resource System
+   [ ] Working pickup system
+   [ ] Clear visual indicators
+   [ ] Proper distribution
+   [ ] Performance with many resources
+
+4. Development Ready
+   [✓] Debug tools functional
+   [✓] Quick iteration possible
+   [✓] Basic logging working
+   [✓] Test framework operational
 
 ## Notes
-- Focus on IDE-completable tasks first
-- Clearly mark Unity Editor requirements
-- Maintain continuous testing capability
-- Keep initial systems simple but expandable
+- Priority order: Player Movement > Enemy System > Resource System > Comfort Zone
+- Focus on feel and responsiveness for player movement
+- Ensure scalability for enemy and resource systems
+- Maintain performance targets throughout implementation
 
 ## References
-- @environment_setup.txt
-- @infrastructure.txt
 - @market_research.txt
 - @performance_guidelines.txt
 - @project_plan.txt
 - @unity_resources.md
 - @ai_rules.json
 
-Last Updated: 2025-02-14
-Status: Updated with Extended Requirements
+Last Updated: 2025-02-15
+Status: Updated with Prioritized Core Systems
 
 ## Debug Verification Points
 [ ] Each Feature Implementation
