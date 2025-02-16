@@ -1,4 +1,4 @@
-# Unity 6 Performance Guidelines
+# Unity 6 Performance Guidelines for CZ Game
 
 ## Performance Targets
 - Target FPS: 60 (as per Unity 6 guidelines)
@@ -107,6 +107,195 @@ public class PerformanceMonitor : MonoBehaviour
     }
 }
 ```
+
+## Memory Management Strategy
+### Core Principles
+1. Pooling Strategy (HIGH PRIORITY)
+   - Implement pooling for all frequently spawned objects:
+     * Enemies (100+ instances)
+     * Projectiles (200+ instances)
+     * VFX/Particles (50+ instances)
+     * UI elements (damage numbers, popups)
+   - Pool sizes:
+     * Initial size: Expected peak / 2
+     * Max size: Expected peak * 1.2
+   - Monitoring:
+     * Track pool utilization
+     * Log pool expansion events
+     * Monitor memory impact
+
+2. Asset Loading (HIGH PRIORITY)
+   - Use Addressables for:
+     * Character variants
+     * Weapon prefabs
+     * Zone prefabs
+     * Large texture assets
+   - Implementation:
+     * Load on demand
+     * Unload unused assets
+     * Track reference counts
+     * Monitor memory footprint
+
+3. Scene Management
+   - Single scene approach:
+     * Main gameplay scene
+     * Additive UI scene
+     * No runtime scene loading
+   - Asset organization:
+     * Preload essential assets
+     * Async load non-critical assets
+     * Clear reference cache on restart
+
+### Memory Budgets
+1. Runtime Memory (1024MB Total)
+   - Managed Memory: 512MB
+     * Game Logic: 128MB
+     * Unity Systems: 256MB
+     * Asset Memory: 128MB
+   - Native Memory: 512MB
+     * Graphics: 256MB
+     * Physics: 128MB
+     * Audio: 64MB
+     * System: 64MB
+
+2. Asset Memory
+   - Textures: 128MB max
+   - Audio: 64MB max
+   - Meshes: 32MB max
+   - Materials: 32MB max
+   - Prefabs: 32MB max
+
+### Monitoring Implementation
+```csharp
+public class MemoryMonitor : MonoBehaviour
+{
+    private ProfilerRecorder totalMemoryRecorder;
+    private ProfilerRecorder managedMemoryRecorder;
+    private ProfilerRecorder gcMemoryRecorder;
+    
+    private void OnEnable()
+    {
+        totalMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total Used Memory");
+        managedMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Managed Memory");
+        gcMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "GC Reserved Memory");
+        
+        StartCoroutine(MonitorMemory());
+    }
+    
+    private IEnumerator MonitorMemory()
+    {
+        while (enabled)
+        {
+            var totalMemory = totalMemoryRecorder.LastValue / (1024 * 1024);
+            var managedMemory = managedMemoryRecorder.LastValue / (1024 * 1024);
+            var gcMemory = gcMemoryRecorder.LastValue / (1024 * 1024);
+            
+            // Log warnings for memory thresholds
+            if (totalMemory > 1024)
+                Debug.LogWarning($"Total memory exceeded: {totalMemory}MB");
+            if (managedMemory > 512)
+                Debug.LogWarning($"Managed memory exceeded: {managedMemory}MB");
+            if (gcMemory > 256)
+                Debug.LogWarning($"GC Reserved memory high: {gcMemory}MB");
+                
+            yield return new WaitForSeconds(0.5f); // Check every 500ms
+        }
+    }
+    
+    private void OnDisable()
+    {
+        totalMemoryRecorder.Dispose();
+        managedMemoryRecorder.Dispose();
+        gcMemoryRecorder.Dispose();
+    }
+}
+```
+
+### Memory Optimization Checklist
+1. Asset Configuration
+   - [ ] Texture compression appropriate for 2D
+   - [ ] Audio compression (Vorbis, quality setting 70%)
+   - [ ] Sprite atlas implementation
+   - [ ] Material sharing strategy
+   - [ ] Shader variant stripping
+
+2. Runtime Optimization
+   - [ ] Object pooling for all spawned objects
+   - [ ] Addressables loading patterns
+   - [ ] Garbage collection optimization
+   - [ ] Reference cleanup on scene changes
+   - [ ] Async loading implementation
+
+3. Development Practices
+   - [ ] Regular memory profiling
+   - [ ] Pool utilization monitoring
+   - [ ] GC allocation tracking
+   - [ ] Asset reference validation
+   - [ ] Memory leak detection
+
+### Critical Memory Considerations for Core Loop
+1. Enemy System
+   - Pool Size: 100 enemies max
+   - Memory per Enemy: ~100KB
+   - Total Budget: 10MB
+   - Monitoring: Pool expansion events
+
+2. Projectile System
+   - Pool Size: 200 projectiles max
+   - Memory per Projectile: ~50KB
+   - Total Budget: 10MB
+   - Cleanup: Automatic return to pool
+
+3. VFX System
+   - Pool Size: 50 effects max
+   - Memory per Effect: ~200KB
+   - Total Budget: 10MB
+   - Optimization: Particle system batching
+
+4. Comfort Zone System
+   - Active Zones: 5 max
+   - Memory per Zone: ~500KB
+   - Total Budget: 2.5MB
+   - Optimization: Shared materials
+
+### Memory Profiling Schedule
+1. Development Phase
+   - Daily: Basic memory snapshot
+   - Weekly: Deep memory analysis
+   - Per Feature: Memory impact assessment
+
+2. Testing Phase
+   - Every Build: Memory baseline check
+   - Load Testing: Peak memory validation
+   - Stress Testing: Memory leak detection
+
+### Unity Memory Profiler Usage
+1. Key Metrics to Monitor
+   - Total Memory Used
+   - Managed Heap Size
+   - GC Reserved Memory
+   - Texture Memory
+   - Mesh Memory
+   - Asset Memory
+
+2. Warning Thresholds
+   - Total Memory: 1024MB
+   - Managed Memory: 512MB
+   - GC Reserved: 256MB
+   - Texture Memory: 128MB
+   - Mesh Memory: 32MB
+
+3. Critical Thresholds
+   - Total Memory: 1200MB
+   - Managed Memory: 600MB
+   - GC Reserved: 300MB
+   - Texture Memory: 150MB
+   - Mesh Memory: 40MB
+
+## References
+- Unity Memory Management: https://docs.unity3d.com/Manual/performance-managed-memory.html
+- Performance Guidelines: https://docs.unity3d.com/Manual/UnderstandingPerformance.html
+- Memory Profiler: https://docs.unity3d.com/Packages/com.unity.memoryprofiler@1.0/manual/index.html
 
 ## Reference Documentation
 - [Unity 6 Performance Optimization](https://docs.unity3d.com/6000.0/Documentation/Manual/BestPracticeUnderstandingPerformanceInUnity.html)

@@ -5,5 +5,8 @@ globs:
 
 # AI RULES COMPLIANCE
 
-always review ai rules and ensure all responses are in full compliance with rules prior to responding to prompts:
-rules are located in settings or [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json)
+always review all of the ai rules listed in ai settings for cursor or in [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json) and ensure every response to prompts are in full compliance with the ai rules prior to responding, suggesting edits, editing code or changing files:
+
+    rules are located in settings or [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json)
+
+If a rule is unclear or appears to be in conflice with a solution that employs best practices for the packages in the program, suggest a correction.

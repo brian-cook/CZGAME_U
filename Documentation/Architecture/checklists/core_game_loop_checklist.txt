@@ -1,40 +1,189 @@
 # Core Game Loop Implementation Checklist
 
-## Phase 0: Minimal Playable Build (MVP)
-[✓] Basic Scene Setup
+## Phase 0: Core Systems Foundation
+[~] Scene Fundamentals
     [✓] Empty scene with essential GameObjects
     [✓] Main Camera setup
     [✓] Basic lighting
-    [✓] Test player placeholder
+    [✓] Performance monitoring setup
+        [✓] FPS counter
+        [✓] Draw call monitoring
+        [✓] Memory tracking
 
-[~] Essential Player Movement (HIGH PRIORITY)
+[NEW] Memory Management Foundation (CRITICAL PRIORITY)
+    [ ] Core Pooling System
+        [ ] PoolManager implementation
+        [ ] Basic object pool
+        [ ] Pool monitoring system
+        [ ] Memory tracking integration
+        [ ] Initial pool sizing:
+            - Enemies: 50 initial (100 max)
+            - Projectiles: 100 initial (200 max)
+            - VFX: 25 initial (50 max)
+            - UI Elements: 50 initial (100 max)
+
+    [ ] Memory Monitoring
+        [ ] MemoryMonitor implementation
+        [ ] Warning system setup
+        [ ] Memory profiler integration
+        [ ] Performance recorder setup
+        [ ] Memory threshold alerts
+
+    [ ] Asset Management
+        [ ] Texture compression setup
+        [ ] Sprite atlas configuration
+        [ ] Asset loading strategy
+        [ ] Reference tracking system
+        [ ] Memory budget enforcement
+
+    [ ] Scene Memory Optimization
+        [ ] Single scene setup
+        [ ] Additive UI scene
+        [ ] Asset preloading system
+        [ ] Reference cleanup system
+
+[~] Essential Player System (HIGH PRIORITY)
     [✓] Basic Player GameObject
         [✓] Simple sprite/primitive
-        [✓] Rigidbody2D
         [✓] Collider2D
-    [~] Enhanced Movement System
-        [✓] Basic WASD/Arrow movement
+    [~] Core Movement
+        [✓] WASD/Arrow movement
         [ ] Smooth acceleration/deceleration
-        [ ] Jump mechanics
-        [ ] Movement animation states
-        [ ] Movement sound effects
-    [ ] Player Feedback
-        [ ] Visual movement feedback
-        [ ] Physics-based particle effects
-        [ ] Audio feedback system
-        [ ] State indicators
+        [ ] Basic collision handling
+    [ ] Auto-Attack Foundation
+        [ ] Single weapon type
+        [ ] Basic attack timing
+        [ ] Simple projectile pooling
+        [ ] Collision detection
 
-[✓] Basic Game Management
+[NEW] Minimal Progression (HIGH PRIORITY)
+    [ ] Basic Experience
+        [ ] XP pickup items
+        [ ] Simple leveling mechanic
+        [ ] Level-up trigger
+    [ ] Starting Upgrade System
+        [ ] One weapon upgrade path
+        [ ] Basic stat improvements
+        [ ] UI feedback for upgrades
+
+[NEW] Enemy Foundation (HIGH PRIORITY)
+    [ ] Single Enemy Type
+        [ ] Basic pooled enemy
+        [ ] Simple follow behavior
+        [ ] Health system
+        [ ] Spawn on death
+    [ ] Basic Spawn System
+        [ ] Timed wave spawning
+        [ ] Pool management
+        [ ] Simple spawn points
+
+[NEW] Comfort Zone Core (HIGH PRIORITY)
+    [ ] Basic Zone
+        [ ] Single zone type
+        [ ] Simple boundary
+        [ ] Enemy awareness
+        [ ] Resource interaction
+
+[~] Resource Foundation
+    [ ] Basic Pickups
+        [ ] XP gems
+        [ ] Health pickup
+        [ ] Simple pooling
+    [ ] Collection
+        [ ] Pickup detection
+        [ ] Basic feedback
+
+[✓] Game Management
     [✓] GameManager script
     [✓] Scene loading
-    [✓] Simple game state (play/pause)
-    [✓] Debug restart capability
+    [✓] Simple game state
+    [✓] Debug restart
 
-[✓] Minimal Test Environment
-    [✓] Simple ground/boundaries
-    [✓] Basic collision setup
-    [✓] Test spawn point
-    [✓] FPS counter for performance
+## Phase 0.5: Core Loop Integration
+[ ] System Communication
+    [ ] Event system for core updates
+    [ ] Basic UI feedback
+    [ ] State management
+    [ ] Performance monitoring
+
+[ ] Memory Integration Verification
+    [ ] Pool System Validation
+        [ ] Enemy pool stress test
+        [ ] Projectile pool stress test
+        [ ] VFX pool stress test
+        [ ] UI element pool stress test
+    [ ] Memory Profiling
+        [ ] Baseline memory snapshot
+        [ ] Peak memory analysis
+        [ ] GC allocation tracking
+        [ ] Memory leak testing
+    [ ] Performance Validation
+        [ ] FPS stability under load
+        [ ] Memory usage patterns
+        [ ] GC frequency analysis
+        [ ] Draw call optimization
+
+[ ] Essential Feedback
+    [ ] Damage numbers (pooled)
+    [ ] XP gain feedback (pooled)
+    [ ] Level up indication
+    [ ] Health status
+
+## Success Criteria for Core Loop
+1. Player Experience
+   [ ] Smooth, responsive controls
+   [ ] Clear feedback for actions
+   [ ] Basic progression feels rewarding
+   [ ] Stable performance
+
+2. Enemy System
+   [ ] Consistent spawning with pool
+   [ ] Clear threat indication
+   [ ] Performance with 50+ entities
+   [ ] Basic challenge level
+   [ ] Pool expansion monitoring
+
+3. Comfort Zone
+   [ ] Clear zone boundaries
+   [ ] Functional enemy interaction
+   [ ] Basic strategic value
+   [ ] Performance impact acceptable
+
+4. Technical Foundation
+   [✓] Stable framerate (60 FPS target)
+   [✓] Memory usage within limits
+   [✓] Draw calls under budget
+   [✓] Clean debug output
+
+5. Memory Performance
+   [ ] Total memory under 1024MB
+   [ ] Managed memory under 512MB
+   [ ] GC Reserved under 256MB
+   [ ] Pool utilization optimal
+   [ ] No memory leaks detected
+
+## Core Technical Requirements
+- Target FPS: 60
+- Max Draw Calls: 100
+- Max Memory: 1024MB
+- Max Entities: 100 for MVP
+- Pool Expansion Rate: < 10% during normal gameplay
+- GC Collection Frequency: < 1 per minute
+
+## Notes
+- Each system should be minimal but complete
+- Focus on stability over features
+- All systems must be expandable
+- Performance is critical from day one
+- Clear feedback for all player actions
+
+## Next Development Phases (Post-Core)
+- Weapon variety
+- Enemy types
+- Zone mechanics
+- Build synergies
+- Visual effects
+- Sound design
 
 ## Phase 1: Core Systems Integration
 [✓] Input System Implementation
