@@ -1,0 +1,9 @@
+---
+description: AI Rules
+globs: 
+---
+
+# AI RULES COMPLIANCE
+
+always review ai rules and ensure all responses are in full compliance with rules prior to responding to prompts:
+rules are located in settings or [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json)
