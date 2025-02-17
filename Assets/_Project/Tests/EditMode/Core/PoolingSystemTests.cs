@@ -3,6 +3,10 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using CZ.Core.Pooling;
+using Unity.Profiling;
+using Unity.Profiling.LowLevel;
+using Unity.Profiling.LowLevel.Unsafe;
+using System.Collections.Generic;
 
 namespace CZ.Tests.EditMode.Core
 {
@@ -71,11 +75,15 @@ namespace CZ.Tests.EditMode.Core
         [Test]
         public void Pool_Expansion_StaysWithinMaxSize()
         {
-            // Ignore all warning messages since we'll have multiple expansions
+            // Configure test environment
             LogAssert.ignoreFailingMessages = true;
             
-            var objects = new TestPoolable[MAX_SIZE + 10];
+            var objects = new List<TestPoolable>();
             int successfulGets = 0;
+            int expectedWarnings = 0;
+            
+            // Track memory before expansion
+            var initialMemory = GetTotalMemoryMB();
             
             // Try to get more objects than max size
             for (int i = 0; i < MAX_SIZE + 10; i++)
@@ -83,26 +91,58 @@ namespace CZ.Tests.EditMode.Core
                 var obj = testPool.Get();
                 if (obj != null)
                 {
-                    objects[successfulGets] = obj;
+                    objects.Add(obj);
                     successfulGets++;
+                    
+                    if (i >= INITIAL_SIZE)
+                    {
+                        expectedWarnings++;
+                    }
                 }
             }
             
-            // Verify we didn't exceed max size
+            // Verify size constraints
             Assert.That(successfulGets, Is.LessThanOrEqualTo(MAX_SIZE), 
-                "Pool returned more objects than max size");
+                "Pool exceeded max size limit");
             Assert.That(testPool.TotalCount, Is.LessThanOrEqualTo(MAX_SIZE), 
-                "Pool total count exceeded max size");
+                "Total count exceeded max size");
+            Assert.That(testPool.PeakCount, Is.LessThanOrEqualTo(MAX_SIZE), 
+                "Peak count exceeded max size");
+            
+            // Verify memory constraints
+            var peakMemory = GetTotalMemoryMB();
+            Assert.That(peakMemory - initialMemory, Is.LessThan(100), 
+                "Memory usage exceeded expected growth");
             
             // Clean up
-            for (int i = 0; i < successfulGets; i++)
+            foreach (var obj in objects)
             {
-                if (objects[i] != null)
-                    testPool.Return(objects[i]);
+                testPool.Return(obj);
             }
+            
+            // Verify cleanup
+            Assert.That(testPool.ActiveCount, Is.Zero, 
+                "Not all objects were returned to pool");
+            Assert.That(GetTotalMemoryMB() - initialMemory, Is.LessThan(10), 
+                "Memory not properly cleaned up");
             
             // Reset log assert settings
             LogAssert.ignoreFailingMessages = false;
+        }
+        
+        private float GetTotalMemoryMB()
+        {
+            using (var sampler = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total Used Memory"))
+            {
+                try
+                {
+                    return sampler.LastValue / (1024f * 1024f);
+                }
+                finally
+                {
+                    sampler.Dispose();
+                }
+            }
         }
         
         [Test]

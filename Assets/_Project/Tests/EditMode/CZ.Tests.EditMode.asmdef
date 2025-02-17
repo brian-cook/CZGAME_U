@@ -2,10 +2,12 @@
     "name": "CZ.Tests.EditMode",
     "rootNamespace": "CZ.Tests.EditMode",
     "references": [
-        "GUID:27619889b8ba8c24980f49ee34dbb44a",
-        "GUID:0acc523941302664db1f4e527237feb3",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "Unity.PerformanceTesting",
         "CZ.Core",
-        "CZ.Core.Pooling"
+        "CZ.Core.Pooling",
+        "Unity.Profiling.Core"
     ],
     "includePlatforms": [
         "Editor"

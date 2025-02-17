@@ -26,14 +26,17 @@ namespace CZ.Core.Pooling
             }
         }
 
-        // Dictionary to store all pools
-        private readonly Dictionary<Type, object> pools = new();
+        private Dictionary<Type, object> pools = new Dictionary<Type, object>();
         private readonly Dictionary<string, (int current, int peak, long memory)> poolStats = new();
         
         // Memory monitoring
         private ProfilerRecorder totalMemoryRecorder;
         private float nextStatsUpdate;
         private const float STATS_UPDATE_INTERVAL = 0.5f; // 500ms
+
+        private int totalActiveObjects;
+        
+        public int ActiveCount => totalActiveObjects;
 
         private void Awake()
         {
@@ -131,15 +134,49 @@ namespace CZ.Core.Pooling
             return poolStats;
         }
 
-        private void OnDestroy()
+        public T Get<T>() where T : IPoolable
+        {
+            if (pools.TryGetValue(typeof(T), out var poolObj))
+            {
+                var pool = (ObjectPool<T>)poolObj;
+                var obj = pool.Get();
+                if (obj != null)
+                {
+                    totalActiveObjects++;
+                }
+                return obj;
+            }
+            return default;
+        }
+        
+        public void Return<T>(T obj) where T : IPoolable
+        {
+            if (obj == null) return;
+            
+            if (pools.TryGetValue(typeof(T), out var poolObj))
+            {
+                var pool = (ObjectPool<T>)poolObj;
+                pool.Return(obj);
+                totalActiveObjects--;
+            }
+        }
+        
+        public void ClearAllPools()
         {
             foreach (var pool in pools.Values)
             {
-                var clearMethod = pool.GetType().GetMethod("Clear");
-                clearMethod?.Invoke(pool, null);
+                if (pool is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
             }
-            
             pools.Clear();
+            totalActiveObjects = 0;
+        }
+
+        private void OnDestroy()
+        {
+            ClearAllPools();
             totalMemoryRecorder.Dispose();
         }
     }

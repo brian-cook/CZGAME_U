@@ -4,22 +4,37 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "Unity.PerformanceTesting",
+        "Unity.PerformanceTesting.Editor",
+        "Unity.PerformanceTesting.Tests.Runtime",
         "CZ.Core",
         "Unity.InputSystem",
         "Unity.InputSystem.TestFramework",
-        "CZ.Core.Pooling"
+        "CZ.Core.Enemy",
+        "CZ.Core.Pooling",
+        "Unity.Profiling.Core",
+        "Unity.Test-Framework.Performance"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll"
+        "nunit.framework.dll",
+        "Unity.PerformanceTesting.dll",
+        "Unity.TestFramework.Performance.Runtime.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
+        "UNITY_INCLUDE_TESTS",
+        "UNITY_INCLUDE_PERFORMANCE_TESTING"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.test-framework.performance",
+            "expression": "",
+            "define": "UNITY_INCLUDE_PERFORMANCE_TESTING"
+        }
+    ],
     "noEngineReferences": false
 } 

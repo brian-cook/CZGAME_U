@@ -28,7 +28,6 @@ namespace CZ.Tests.PlayMode.Core
         private static readonly ProfilerMarker s_createMarker = new(ProfilerCategory.Memory, "PoolingTest.CreateObject");
         
         // Performance tracking
-        private int gcAllocations;
         private float lastGcCheck;
         private const float GC_CHECK_INTERVAL = 1f;
         
@@ -138,7 +137,6 @@ namespace CZ.Tests.PlayMode.Core
             if (autoTest)
             {
                 Debug.Log("Starting performance monitoring...");
-                gcAllocations = 0;
                 lastGcCheck = Time.time;
             }
         }
