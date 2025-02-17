@@ -47,6 +47,27 @@ namespace CZ.Core.Player
         private bool isInputEnabled;
         #endregion
 
+        #region Test Support
+        #if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public float MaxVelocity => maxVelocity;
+        
+        /// <summary>
+        /// Test method to simulate input. Only available in editor and development builds.
+        /// </summary>
+        public void TestInput(Vector2 input)
+        {
+            if (!isInputEnabled) return;
+            moveInput = input;
+            isMoving = moveInput.sqrMagnitude > 0.01f;
+            
+            if (movementTrail != null)
+            {
+                movementTrail.emitting = isMoving;
+            }
+        }
+        #endif
+        #endregion
+
         #region Unity Lifecycle
         private void Awake()
         {

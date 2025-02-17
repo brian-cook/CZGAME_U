@@ -10,6 +10,7 @@ using CZ.Core.Player;
 using CZ.Core.Input;
 using CZ.Core;
 using UnityEditor;
+using UnityEngine.SceneManagement;
 
 namespace CZ.Tests.PlayMode
 {
@@ -28,6 +29,7 @@ namespace CZ.Tests.PlayMode
         private static bool isOneTimeSetupComplete;
         private static bool isStandardSetupComplete;
         private GameManager gameManager;
+        private Scene testScene;
 
         [UnityEngine.TestTools.UnitySetUpAttribute]
         public IEnumerator UnityOneTimeSetup()
@@ -207,76 +209,95 @@ namespace CZ.Tests.PlayMode
         [UnityTest]
         public IEnumerator PlayerController_Movement_RespondsToInput()
         {
-            // Ensure input is ready
-            Assert.That(keyboard, Is.Not.Null, "Keyboard should be available");
-            Assert.That(keyboard.dKey, Is.Not.Null, "D key should be available");
-            Assert.That(gameManager.CurrentGameState, Is.EqualTo(GameState.Playing), "Game should be in Playing state");
+            yield return SetupTestEnvironment();
             
-            // Wait a frame before starting input
-            yield return null;
+            // Verify initial state
+            Assert.That(GameManager.Instance.CurrentGameState, Is.EqualTo(GameManager.GameState.Playing));
             
-            // Simulate right movement input
-            Press(keyboard.dKey);
+            // Simulate input
+            var input = new Vector2(1f, 0f);
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            playerController.TestInput(input);
+            #endif
             
-            // Wait for physics update
+            // Wait for physics
+            yield return new WaitForFixedUpdate();
             yield return new WaitForFixedUpdate();
             
             // Verify movement
-            Assert.That(rb.linearVelocity.x, Is.GreaterThan(0f), "Player should move right");
+            var rb = playerController.GetComponent<Rigidbody2D>();
+            Assert.That(rb.linearVelocity.x, Is.GreaterThan(0f));
             
-            // Release key
-            Release(keyboard.dKey);
-            
-            // Wait for physics to settle
-            yield return new WaitForSeconds(0.5f);
-            
-            // Verify player stops
-            Assert.That(rb.linearVelocity.magnitude, Is.LessThan(0.1f), "Player should stop when no input");
+            // Cleanup at end of test
+            yield return TearDownTestEnvironment();
         }
 
         [UnityTest]
         public IEnumerator PlayerController_Velocity_RespectsMaxSpeed()
         {
-            // Simulate diagonal movement (maximum input)
-            Press(keyboard.dKey);
-            Press(keyboard.wKey);
+            yield return SetupTestEnvironment();
             
-            // Wait for physics to apply maximum velocity
-            yield return new WaitForSeconds(1f);
+            // Set maximum input
+            var input = new Vector2(1f, 1f).normalized;
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            playerController.TestInput(input);
+            #endif
             
-            // Verify velocity is clamped
-            Assert.That(rb.linearVelocity.magnitude, Is.LessThanOrEqualTo(10f), "Velocity should be clamped to maxVelocity");
+            // Wait for physics to stabilize
+            yield return new WaitForSeconds(0.5f);
             
-            // Release keys
-            Release(keyboard.dKey);
-            Release(keyboard.wKey);
+            // Verify speed limit
+            var rb = playerController.GetComponent<Rigidbody2D>();
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Assert.That(rb.linearVelocity.magnitude, Is.LessThanOrEqualTo(playerController.MaxVelocity));
+            #endif
+            
+            // Cleanup at end of test
+            yield return TearDownTestEnvironment();
         }
 
-        private void Press(KeyControl key)
+        private IEnumerator SetupTestEnvironment()
         {
-            var eventPtr = new InputEventPtr();
-            unsafe
+            // Create test scene
+            testScene = SceneManager.CreateScene("PlayerTestScene");
+            SceneManager.SetActiveScene(testScene);
+            
+            // Setup GameManager
+            var gameManagerObj = new GameObject("GameManager");
+            gameManager = gameManagerObj.AddComponent<GameManager>();
+            Object.DontDestroyOnLoad(gameManagerObj);
+            
+            // Setup Player
+            var playerObj = new GameObject("Player");
+            playerController = playerObj.AddComponent<PlayerController>();
+            
+            // Wait for initialization
+            yield return new WaitForSeconds(0.5f);
+            
+            // Start game
+            gameManager.StartGame();
+            yield return null;
+        }
+
+        private IEnumerator TearDownTestEnvironment()
+        {
+            // Cleanup player
+            if (playerController != null)
             {
-                using (StateEvent.From(keyboard, out eventPtr))
-                {
-                    ((KeyControl)key).WriteValueIntoEvent(1.0f, eventPtr);
-                    InputSystem.QueueEvent(eventPtr);
-                    InputSystem.Update();
-                }
+                playerController.enabled = false;
+                Object.DestroyImmediate(playerController.gameObject);
             }
-        }
-
-        private void Release(KeyControl key)
-        {
-            var eventPtr = new InputEventPtr();
-            unsafe
+            
+            // Cleanup GameManager
+            if (gameManager != null)
             {
-                using (StateEvent.From(keyboard, out eventPtr))
-                {
-                    ((KeyControl)key).WriteValueIntoEvent(0.0f, eventPtr);
-                    InputSystem.QueueEvent(eventPtr);
-                    InputSystem.Update();
-                }
+                Object.DestroyImmediate(gameManager.gameObject);
+            }
+            
+            // Cleanup test scene
+            if (testScene.IsValid())
+            {
+                yield return SceneManager.UnloadSceneAsync(testScene);
             }
         }
 

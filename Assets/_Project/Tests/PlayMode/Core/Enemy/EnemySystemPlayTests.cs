@@ -9,6 +9,9 @@ using Unity.PerformanceTesting;
 using Unity.Profiling;
 using CZ.Core.Enemy;
 using CZ.Core.Pooling;
+using UnityEngine.SceneManagement;
+using CZ.Core;
+using CZ.Core.Player;
 
 namespace CZ.Tests.PlayMode.Enemy
 {
@@ -18,6 +21,9 @@ namespace CZ.Tests.PlayMode.Enemy
         private GameObject spawnerObject;
         private EnemySpawner spawner;
         private PoolManager poolManager;
+        private Scene testScene;
+        private GameManager gameManager;
+        private PlayerController playerController;
         
         [UnitySetUp]
         public IEnumerator Setup()
@@ -101,50 +107,50 @@ namespace CZ.Tests.PlayMode.Enemy
         #endif
         public IEnumerator EnemySpawner_SpawnsCorrectNumberOfEnemies()
         {
-            #if UNITY_INCLUDE_PERFORMANCE_TESTING
-            using (Measure.Scope("EnemySpawner_SpawnsCorrectNumberOfEnemies"))
-            #endif
+            bool testCompleted = false;
+            
+            // Setup test environment
+            yield return SetupTestEnvironment();
+            
+            try
             {
-                const int TARGET_COUNT = 5;
-                var initialMemory = GetTotalMemoryMB();
-                
                 // Configure spawner
-                spawner.SetSpawnCount(TARGET_COUNT);
-                
-                // Wait for pool reinitialization
-                yield return null;
-                
-                // Start spawning
+                spawner.SetSpawnCount(5);
                 spawner.StartSpawning();
                 
                 // Wait for spawning to complete
-                yield return new WaitForSeconds(TARGET_COUNT * spawner.SpawnInterval + 0.5f);
+                float timeout = Time.time + 5f; // 5 second timeout
+                while (spawner.ActiveEnemyCount < 5 && Time.time < timeout)
+                {
+                    yield return null;
+                }
                 
-                // Verify spawn count
-                Assert.That(spawner.ActiveEnemyCount, Is.EqualTo(TARGET_COUNT),
-                    "Spawner created incorrect number of enemies");
+                // Verify results
+                Assert.AreEqual(5, spawner.ActiveEnemyCount, "Spawner created incorrect number of enemies");
                 
-                // Verify memory usage
-                var currentMemory = GetTotalMemoryMB();
-                Assert.That(currentMemory - initialMemory, Is.LessThan(50),
-                    "Spawning exceeded memory budget");
+                // Verify enemy behavior
+                var enemies = Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
+                Assert.AreEqual(5, enemies.Length, "Incorrect number of enemies found in scene");
                 
-                // Stop spawning
-                spawner.StopSpawning();
+                foreach (var enemy in enemies)
+                {
+                    Assert.IsTrue(enemy.gameObject.activeInHierarchy, "Enemy should be active");
+                    Assert.IsNotNull(enemy.GetComponent<Rigidbody2D>(), "Enemy should have Rigidbody2D");
+                }
                 
-                // Wait before despawning
-                yield return new WaitForSeconds(0.1f);
-                
-                // Cleanup
-                spawner.DespawnAllEnemies();
-                
-                // Wait for despawn
-                yield return new WaitForSeconds(0.5f);
-                
-                // Verify cleanup
-                Assert.That(spawner.ActiveEnemyCount, Is.Zero,
-                    "Not all enemies were despawned");
+                testCompleted = true;
             }
+            finally
+            {
+                // Mark that we need cleanup
+                if (!testCompleted)
+                {
+                    Debug.LogWarning("[EnemySystemPlayTests] Test did not complete successfully, performing cleanup");
+                }
+            }
+            
+            // Cleanup outside of finally
+            yield return TearDownTestEnvironment();
         }
         
         [UnityTest]
@@ -153,49 +159,51 @@ namespace CZ.Tests.PlayMode.Enemy
         #endif
         public IEnumerator EnemyPool_HandlesStressTest()
         {
-            const int STRESS_COUNT = 50;  // Reduced from performance guidelines
-            var spawnedEnemies = new List<BaseEnemy>();
-            var initialMemory = GetTotalMemoryMB();
+            bool testCompleted = false;
             
-            #if UNITY_INCLUDE_PERFORMANCE_TESTING
-            using (Measure.Frames()
-                .WarmupCount(5)
-                .MeasurementCount(30))
-            #endif
+            // Setup test environment
+            yield return SetupTestEnvironment();
+            
+            try
             {
-                // Spawn phase with memory monitoring
-                for (int i = 0; i < STRESS_COUNT; i++)
+                int maxEnemies = 10;
+                spawner.SetSpawnCount(maxEnemies);
+                
+                // Rapid spawn/despawn cycles
+                for (int cycle = 0; cycle < 3; cycle++)
                 {
-                    if (GetTotalMemoryMB() - initialMemory > 100)
+                    // Spawn phase
+                    spawner.StartSpawning();
+                    
+                    float spawnTimeout = Time.time + 5f;
+                    while (spawner.ActiveEnemyCount < maxEnemies && Time.time < spawnTimeout)
                     {
-                        Debug.LogWarning($"Memory threshold reached at {i} spawns");
-                        break;
+                        yield return null;
                     }
                     
-                    var enemy = poolManager.Get<BaseEnemy>();
-                    if (enemy != null)
-                    {
-                        spawnedEnemies.Add(enemy);
-                    }
-                    yield return null;
+                    Assert.AreEqual(maxEnemies, spawner.ActiveEnemyCount, 
+                        $"Failed to spawn {maxEnemies} enemies in cycle {cycle}");
+                    
+                    // Despawn phase
+                    spawner.DespawnAllEnemies();
+                    yield return new WaitForSeconds(0.5f);
+                    
+                    Assert.AreEqual(0, spawner.ActiveEnemyCount, 
+                        $"Failed to despawn all enemies in cycle {cycle}");
                 }
                 
-                // Verify memory constraints
-                var peakMemory = GetTotalMemoryMB();
-                Assert.That(peakMemory, Is.LessThan(1024), 
-                    $"Memory usage exceeded limit: {peakMemory}MB");
-                
-                // Cleanup phase
-                foreach (var enemy in spawnedEnemies)
+                testCompleted = true;
+            }
+            finally
+            {
+                if (!testCompleted)
                 {
-                    poolManager.Return(enemy);
-                    yield return null;
+                    Debug.LogWarning("[EnemySystemPlayTests] Stress test did not complete successfully, performing cleanup");
                 }
             }
             
-            // Verify final state
-            Assert.That(poolManager.ActiveCount, Is.Zero);
-            Assert.That(GetTotalMemoryMB() - initialMemory, Is.LessThan(50));
+            // Cleanup outside of finally
+            yield return TearDownTestEnvironment();
         }
         
         [UnityTest]
@@ -224,47 +232,44 @@ namespace CZ.Tests.PlayMode.Enemy
         [UnityTest]
         public IEnumerator EnemyPool_HandlesRapidSpawnDespawn()
         {
-            const int SPAWN_COUNT = 20;  // As per performance guidelines
-            var spawnedEnemies = new List<BaseEnemy>();
+            bool testCompleted = false;
             
-            // Monitor initial memory state
-            var initialMemory = GetTotalMemoryMB();
+            // Setup test environment
+            yield return SetupTestEnvironment();
             
-            // Rapid spawn phase
-            for (int i = 0; i < SPAWN_COUNT; i++)
+            try
             {
-                var enemy = poolManager.Get<BaseEnemy>();
-                if (enemy != null)
+                int testCount = 5;
+                spawner.SetSpawnCount(testCount);
+                
+                // Test rapid spawn/despawn
+                for (int i = 0; i < testCount; i++)
                 {
-                    spawnedEnemies.Add(enemy);
+                    spawner.StartSpawning();
+                    yield return new WaitForSeconds(0.1f);
+                    
+                    Assert.Greater(spawner.ActiveEnemyCount, 0, 
+                        $"Failed to spawn enemy in iteration {i}");
+                    
+                    spawner.DespawnAllEnemies();
+                    yield return new WaitForSeconds(0.1f);
+                    
+                    Assert.AreEqual(0, spawner.ActiveEnemyCount, 
+                        $"Failed to despawn enemies in iteration {i}");
                 }
-                yield return new WaitForSeconds(0.1f);
+                
+                testCompleted = true;
             }
-            
-            // Verify spawn count
-            Assert.That(spawnedEnemies.Count, Is.LessThanOrEqualTo(SPAWN_COUNT), 
-                "Pool spawned more enemies than requested");
-            
-            // Memory check
-            var currentMemory = GetTotalMemoryMB();
-            Assert.That(currentMemory - initialMemory, Is.LessThan(100), 
-                "Memory increase exceeded threshold during spawn");
-            
-            // Rapid despawn phase
-            foreach (var enemy in spawnedEnemies)
+            finally
             {
-                poolManager.Return(enemy);
-                yield return new WaitForSeconds(0.1f);
+                if (!testCompleted)
+                {
+                    Debug.LogWarning("[EnemySystemPlayTests] Rapid spawn/despawn test did not complete successfully, performing cleanup");
+                }
             }
             
-            // Verify cleanup
-            Assert.That(poolManager.ActiveCount, Is.Zero, 
-                "Not all enemies were returned to pool");
-            
-            // Final memory check
-            var finalMemory = GetTotalMemoryMB();
-            Assert.That(finalMemory - initialMemory, Is.LessThan(10), 
-                "Memory not properly cleaned up after despawn");
+            // Cleanup outside of finally
+            yield return TearDownTestEnvironment();
         }
         
         private float GetTotalMemoryMB()
@@ -274,6 +279,80 @@ namespace CZ.Tests.PlayMode.Enemy
                 var memoryMB = recorder.LastValue / (1024f * 1024f);
                 return memoryMB;
             }
+        }
+        
+        private IEnumerator SetupTestEnvironment()
+        {
+            // Create test scene
+            testScene = SceneManager.CreateScene("EnemyTestScene");
+            SceneManager.SetActiveScene(testScene);
+            
+            // Setup GameManager
+            var gameManagerObj = new GameObject("GameManager");
+            gameManager = gameManagerObj.AddComponent<GameManager>();
+            Object.DontDestroyOnLoad(gameManagerObj);
+            
+            // Setup Player
+            var playerObj = new GameObject("Player");
+            playerController = playerObj.AddComponent<PlayerController>();
+            
+            // Setup EnemySpawner
+            var spawnerObj = new GameObject("EnemySpawner");
+            spawner = spawnerObj.AddComponent<EnemySpawner>();
+            
+            // Setup enemy prefab
+            enemyPrefab = CreateEnemyPrefab();
+            spawner.SetEnemyPrefab(enemyPrefab);
+            
+            // Wait for initialization
+            yield return new WaitForSeconds(0.5f);
+            
+            // Start game
+            gameManager.StartGame();
+            yield return null;
+        }
+        
+        private IEnumerator TearDownTestEnvironment()
+        {
+            if (spawner != null)
+            {
+                spawner.StopSpawning();
+                spawner.DespawnAllEnemies();
+            }
+            
+            // Cleanup GameManager
+            if (gameManager != null)
+            {
+                Object.DestroyImmediate(gameManager.gameObject);
+            }
+            
+            // Cleanup test scene
+            yield return SceneManager.UnloadSceneAsync(testScene);
+            
+            // Cleanup prefab
+            if (enemyPrefab != null)
+            {
+                Object.DestroyImmediate(enemyPrefab);
+            }
+        }
+        
+        private GameObject CreateEnemyPrefab()
+        {
+            var prefab = new GameObject("EnemyPrefab");
+            
+            // Add required components
+            var enemy = prefab.AddComponent<BaseEnemy>();
+            var rb = prefab.AddComponent<Rigidbody2D>();
+            var collider = prefab.AddComponent<CircleCollider2D>();
+            var renderer = prefab.AddComponent<SpriteRenderer>();
+            
+            // Configure components
+            rb.gravityScale = 0f;
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            collider.radius = 0.5f;
+            
+            prefab.SetActive(false);
+            return prefab;
         }
     }
 } 

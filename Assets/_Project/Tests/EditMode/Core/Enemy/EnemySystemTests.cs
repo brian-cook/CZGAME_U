@@ -128,19 +128,29 @@ namespace CZ.Tests.EditMode.Enemy
         public void BaseEnemy_WhenTargetSet_UpdatesTargetPosition()
         {
             // Setup
-            Vector3 testPosition = new Vector3(1f, 2f, 3f);
+            var enemyObject = new GameObject("TestEnemy");
+            var enemy = enemyObject.AddComponent<BaseEnemy>();
+            var rb = enemyObject.AddComponent<Rigidbody2D>();
+            var collider = enemyObject.AddComponent<CircleCollider2D>();
+            var renderer = enemyObject.AddComponent<SpriteRenderer>();
             
-            // Set target
-            enemy.SetTarget(testPosition);
+            // Ensure initialization
+            enemy.OnSpawn();
             
-            // Get private targetPosition field using reflection
-            var targetPositionField = typeof(BaseEnemy).GetField("targetPosition", 
-                System.Reflection.BindingFlags.NonPublic | 
-                System.Reflection.BindingFlags.Instance);
-            Vector3 storedPosition = (Vector3)targetPositionField.GetValue(enemy);
+            // Test target setting
+            Vector3 targetPosition = new Vector3(1f, 2f, 3f);
+            enemy.SetTarget(targetPosition);
             
-            // Verify position was set
-            Assert.That(storedPosition, Is.EqualTo(testPosition));
+            // Get the actual target position through reflection for testing
+            var targetField = typeof(BaseEnemy).GetField("targetPosition", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var actualTarget = (Vector3)targetField.GetValue(enemy);
+            
+            // Verify
+            Assert.That(actualTarget, Is.EqualTo(targetPosition));
+            
+            // Cleanup
+            Object.DestroyImmediate(enemyObject);
         }
         
         [Test]
