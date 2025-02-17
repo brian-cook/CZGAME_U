@@ -50,6 +50,7 @@ namespace CZ.Core.Player
         #region Unity Lifecycle
         private void Awake()
         {
+            Debug.Log("[PlayerController] Awake called");
             SetupComponents();
             controls = new GameControls();
             
@@ -57,10 +58,13 @@ namespace CZ.Core.Player
             controls.Player.Move.performed += OnMove;
             controls.Player.Move.canceled += OnMove;
             
+            Debug.Log("[PlayerController] Input system initialized");
+            
             // Subscribe to game state changes
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+                Debug.Log("[PlayerController] Subscribed to GameManager events");
             }
             else
             {
@@ -128,7 +132,7 @@ namespace CZ.Core.Player
             controls?.Enable();
             isInputEnabled = GameManager.Instance?.CurrentGameState == GameManager.GameState.Playing;
             
-            if (enableDebugLogs) Debug.Log("[PlayerController] Input system enabled");
+            Debug.Log($"[PlayerController] OnEnable - Input Enabled: {isInputEnabled}, Controls Active: {controls?.Player.enabled}");
         }
 
         private void OnDisable()
@@ -141,7 +145,7 @@ namespace CZ.Core.Player
             }
             
             isInputEnabled = false;
-            if (enableDebugLogs) Debug.Log("[PlayerController] Input system disabled");
+            Debug.Log("[PlayerController] OnDisable - Input system disabled");
         }
 
         private void FixedUpdate()
@@ -199,7 +203,11 @@ namespace CZ.Core.Player
         #region Input Handling
         private void OnMove(InputAction.CallbackContext context)
         {
-            if (!isInputEnabled) return;
+            if (!isInputEnabled)
+            {
+                Debug.Log("[PlayerController] Input received but not enabled");
+                return;
+            }
             
             moveInput = context.ReadValue<Vector2>();
             isMoving = moveInput.sqrMagnitude > 0.01f;
@@ -220,7 +228,19 @@ namespace CZ.Core.Player
         #region Game State
         private void HandleGameStateChanged(GameManager.GameState newState)
         {
+            bool wasInputEnabled = isInputEnabled;
             isInputEnabled = newState == GameManager.GameState.Playing;
+            
+            if (isInputEnabled && !wasInputEnabled)
+            {
+                controls?.Enable();
+                Debug.Log("[PlayerController] Input enabled due to game state change to Playing");
+            }
+            else if (!isInputEnabled && wasInputEnabled)
+            {
+                controls?.Disable();
+                Debug.Log("[PlayerController] Input disabled due to game state change");
+            }
             
             if (!isInputEnabled)
             {
@@ -235,10 +255,7 @@ namespace CZ.Core.Player
                 }
             }
             
-            if (enableDebugLogs)
-            {
-                Debug.Log($"[PlayerController] Game state changed to {newState}, input enabled: {isInputEnabled}");
-            }
+            Debug.Log($"[PlayerController] Game state changed to {newState}, input enabled: {isInputEnabled}");
         }
         #endregion
 

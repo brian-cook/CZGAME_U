@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="10" result="Failed(Child)" total="10" passed="5" failed="5" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2025-02-17 20:30:47Z" end-time="2025-02-17 20:31:02Z" duration="14.566421">
+  <test-suite type="TestSuite" id="1027" name="CZGAME_U" fullname="CZGAME_U" runstate="Runnable" testcasecount="10" result="Failed" site="Child" start-time="2025-02-17 20:30:47Z" end-time="2025-02-17 20:31:02Z" duration="14.566421" total="10" passed="5" failed="5" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1010" name="CZ.Tests.PlayMode.dll" fullname="C:/Users/wiggl/Documents/Unity/CZGAME_U/Library/ScriptAssemblies/CZ.Tests.PlayMode.dll" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2025-02-17 20:30:47Z" end-time="2025-02-17 20:30:53Z" duration="5.944452" total="6" passed="4" failed="2" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="9116" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1011" name="CZ" fullname="CZ" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2025-02-17 20:30:47Z" end-time="2025-02-17 20:30:53Z" duration="5.929881" total="6" passed="4" failed="2" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1012" name="Tests" fullname="CZ.Tests" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2025-02-17 20:30:47Z" end-time="2025-02-17 20:30:53Z" duration="5.914065" total="6" passed="4" failed="2" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1013" name="PlayMode" fullname="CZ.Tests.PlayMode" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2025-02-17 20:30:47Z" end-time="2025-02-17 20:30:53Z" duration="5.899744" total="6" passed="4" failed="2" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1001" name="GameManagerTests" fullname="CZ.Tests.PlayMode.GameManagerTests" classname="CZ.Tests.PlayMode.GameManagerTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2025-02-17 20:30:47Z" end-time="2025-02-17 20:30:49Z" duration="2.072972" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1002" name="GameManager_Initialization_CreatesInstance" fullname="CZ.Tests.PlayMode.GameManagerTests.GameManager_Initialization_CreatesInstance" methodname="GameManager_Initialization_CreatesInstance" classname="CZ.Tests.PlayMode.GameManagerTests" runstate="Runnable" seed="1100870111" result="Passed" start-time="2025-02-17 20:30:47Z" end-time="2025-02-17 20:30:48Z" duration="0.663229" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1119.09MB)
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 617.16MB)
+[GameManager] Initial memory reading: 1119.09MB
+[GameManager] Adjusting memory thresholds for high initial state (Scale: 2.19)
+[GameManager] Setting initial memory baseline to: 1119.09MB (Adjusted threshold: 1119.09MB)
+[GameManager] Performing initial memory cleanup...
+[GameManager] Performance monitoring initialized successfully
+]]></output>
+              </test-case>
+              <test-case id="1004" name="GameManager_PerformanceMonitoring_IsActive" fullname="CZ.Tests.PlayMode.GameManagerTests.GameManager_PerformanceMonitoring_IsActive" methodname="GameManager_PerformanceMonitoring_IsActive" classname="CZ.Tests.PlayMode.GameManagerTests" runstate="Runnable" seed="1710908237" result="Passed" start-time="2025-02-17 20:30:48Z" end-time="2025-02-17 20:30:48Z" duration="0.415302" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1003" name="GameManager_StateTransitions_WorkCorrectly" fullname="CZ.Tests.PlayMode.GameManagerTests.GameManager_StateTransitions_WorkCorrectly" methodname="GameManager_StateTransitions_WorkCorrectly" classname="CZ.Tests.PlayMode.GameManagerTests" runstate="Runnable" seed="1785928474" result="Passed" start-time="2025-02-17 20:30:48Z" end-time="2025-02-17 20:30:49Z" duration="0.976434" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1119.19MB)
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 617.09MB)
+[GameManager] Initial memory reading: 1119.19MB
+[GameManager] Adjusting memory thresholds for high initial state (Scale: 2.19)
+[GameManager] Setting initial memory baseline to: 1119.19MB (Adjusted threshold: 1119.19MB)
+[GameManager] Performing initial memory cleanup...
+[GameManager] Performance monitoring initialized successfully
+[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1119.35MB)
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 617.09MB)
+[GameManager] Initial memory reading: 1119.35MB
+[GameManager] Adjusting memory thresholds for high initial state (Scale: 2.19)
+[GameManager] Setting initial memory baseline to: 1119.35MB (Adjusted threshold: 1119.35MB)
+[GameManager] Performance monitoring initialized successfully
+Performance Counters Reset
+[GameManager] Game started - Input and gameplay systems enabled
+Game Paused
+Game Resumed
+Game Ended
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1005" name="PlayerControllerTests" fullname="CZ.Tests.PlayMode.PlayerControllerTests" classname="CZ.Tests.PlayMode.PlayerControllerTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2025-02-17 20:30:49Z" end-time="2025-02-17 20:30:53Z" duration="3.739253" total="2" passed="0" failed="2" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <output><![CDATA[[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1119.37MB)
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 617.08MB)
+[GameManager] Initial memory reading: 1119.37MB
+[GameManager] Adjusting memory thresholds for high initial state (Scale: 2.19)
+[GameManager] Setting initial memory baseline to: 1119.37MB (Adjusted threshold: 1119.37MB)
+[GameManager] Performance monitoring initialized successfully
+Performance Counters Reset
+[GameManager] Game started - Input and gameplay systems enabled
+]]></output>
+              <test-case id="1006" name="PlayerController_Movement_RespondsToInput" fullname="CZ.Tests.PlayMode.PlayerControllerTests.PlayerController_Movement_RespondsToInput" methodname="PlayerController_Movement_RespondsToInput" classname="CZ.Tests.PlayMode.PlayerControllerTests" runstate="Runnable" seed="1353825686" result="Failed" start-time="2025-02-17 20:30:50Z" end-time="2025-02-17 20:30:51Z" duration="1.137830" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Game should be in Playing state
+  Expected: Playing
+  But was:  Playing
+
+TearDown : Unhandled log message: '[Assert] This will cause a leak and performance issues, GameControls.Player.Disable() has not been called.'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[CZ.Core.Input.GameControls:Finalize () (at Assets/_Project/Scripts/Core/Input/GameControls.cs:246)
+
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[Starting One Time Setup
+DontDestroyOnLoad only works for root GameObjects or components on root GameObjects.
+[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1119.50MB)
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 617.09MB)
+[GameManager] Initial memory reading: 1119.50MB
+[GameManager] Adjusting memory thresholds for high initial state (Scale: 2.19)
+[GameManager] Setting initial memory baseline to: 1119.50MB (Adjusted threshold: 1119.50MB)
+[GameManager] Performing initial memory cleanup...
+[GameManager] Performance monitoring initialized successfully
+One Time Setup Complete
+Starting Standard Setup
+[PlayerController] Awake called
+[PlayerController] Input system initialized
+[PlayerController] Subscribed to GameManager events
+[PlayerController] OnEnable - Input Enabled: False, Controls Active: True
+[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1121.95MB)
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 618.66MB)
+[GameManager] Initial memory reading: 1121.95MB
+[GameManager] Adjusting memory thresholds for high initial state (Scale: 2.19)
+[GameManager] Setting initial memory baseline to: 1121.95MB (Adjusted threshold: 1121.95MB)
+[GameManager] Performance monitoring initialized successfully
+Performance Counters Reset
+[PlayerController] Input enabled due to game state change to Playing
+[PlayerController] Game state changed to Playing, input enabled: True
+[GameManager] Game started - Input and gameplay systems enabled
+[PlayerController] Game state changed to Playing, input enabled: True
+Standard Setup Complete
+Starting Unity Setup
+Unity Setup Complete
+Starting Standard Setup
+[PlayerController] Awake called
+[PlayerController] Input system initialized
+[PlayerController] Subscribed to GameManager events
+[PlayerController] OnEnable - Input Enabled: True, Controls Active: True
+Standard Setup Complete
+Starting Standard Teardown
+[PlayerController] OnDisable - Input system disabled
+Standard Teardown Complete
+Starting One Time Teardown
+[PlayerController] OnDisable - Input system disabled
+One Time Teardown Complete
+]]></output>
+              </test-case>
+              <test-case id="1007" name="PlayerController_Velocity_RespectsMaxSpeed" fullname="CZ.Tests.PlayMode.PlayerControllerTests.PlayerController_Velocity_RespectsMaxSpeed" methodname="PlayerController_Velocity_RespectsMaxSpeed" classname="CZ.Tests.PlayMode.PlayerControllerTests" runstate="Runnable" seed="1252801234" result="Failed" start-time="2025-02-17 20:30:51Z" end-time="2025-02-17 20:30:53Z" duration="2.143548" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Assert] This will cause a leak and performance issues, GameControls.Player.Disable() has not been called.'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[CZ.Core.Input.GameControls:Finalize () (at Assets/_Project/Scripts/Core/Input/GameControls.cs:246)
+
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[Starting One Time Setup
+DontDestroyOnLoad only works for root GameObjects or components on root GameObjects.
+[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1122.17MB)
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 618.69MB)
+[GameManager] Initial memory reading: 1122.17MB
+[GameManager] Adjusting memory thresholds for high initial state (Scale: 2.19)
+[GameManager] Setting initial memory baseline to: 1122.17MB (Adjusted threshold: 1122.17MB)
+[GameManager] Performing initial memory cleanup...
+[GameManager] Performance monitoring initialized successfully
+One Time Setup Complete
+Starting Standard Setup
+[PlayerController] Awake called
+[PlayerController] Input system initialized
+[PlayerController] Subscribed to GameManager events
+[PlayerController] OnEnable - Input Enabled: False, Controls Active: True
+[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1122.90MB)
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 618.74MB)
+[GameManager] Initial memory reading: 1122.90MB
+[GameManager] Adjusting memory thresholds for high initial state (Scale: 2.19)
+[GameManager] Setting initial memory baseline to: 1122.90MB (Adjusted threshold: 1122.90MB)
+[GameManager] Performance monitoring initialized successfully
+Performance Counters Reset
+[PlayerController] Input enabled due to game state change to Playing
+[PlayerController] Game state changed to Playing, input enabled: True
+[GameManager] Game started - Input and gameplay systems enabled
+[PlayerController] Game state changed to Playing, input enabled: True
+Standard Setup Complete
+Starting Unity Setup
+Unity Setup Complete
+Starting Standard Setup
+[PlayerController] Awake called
+[PlayerController] Input system initialized
+[PlayerController] Subscribed to GameManager events
+[PlayerController] OnEnable - Input Enabled: True, Controls Active: True
+Standard Setup Complete
+Starting Standard Teardown
+[PlayerController] OnDisable - Input system disabled
+Standard Teardown Complete
+Starting One Time Teardown
+[PlayerController] OnDisable - Input system disabled
+One Time Teardown Complete
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1008" name="TestScriptPlayModeTests" fullname="CZ.Tests.PlayMode.TestScriptPlayModeTests" classname="CZ.Tests.PlayMode.TestScriptPlayModeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-02-17 20:30:53Z" end-time="2025-02-17 20:30:53Z" duration="0.067685" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1009" name="TestScript_InPlayMode_LogsMessageOnStart" fullname="CZ.Tests.PlayMode.TestScriptPlayModeTests.TestScript_InPlayMode_LogsMessageOnStart" methodname="TestScript_InPlayMode_LogsMessageOnStart" classname="CZ.Tests.PlayMode.TestScriptPlayModeTests" runstate="Runnable" seed="804878108" result="Passed" start-time="2025-02-17 20:30:53Z" end-time="2025-02-17 20:30:53Z" duration="0.049907" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Test script initialized
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1019" name="CZ.Tests.PlayMode.Enemy.dll" fullname="C:/Users/wiggl/Documents/Unity/CZGAME_U/Library/ScriptAssemblies/CZ.Tests.PlayMode.Enemy.dll" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2025-02-17 20:30:53Z" end-time="2025-02-17 20:31:02Z" duration="8.613883" total="4" passed="1" failed="3" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="9116" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1020" name="CZ" fullname="CZ" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2025-02-17 20:30:53Z" end-time="2025-02-17 20:31:02Z" duration="8.597474" total="4" passed="1" failed="3" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1021" name="Tests" fullname="CZ.Tests" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2025-02-17 20:30:53Z" end-time="2025-02-17 20:31:02Z" duration="8.581088" total="4" passed="1" failed="3" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1022" name="PlayMode" fullname="CZ.Tests.PlayMode" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2025-02-17 20:30:53Z" end-time="2025-02-17 20:31:02Z" duration="8.563857" total="4" passed="1" failed="3" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestSuite" id="1023" name="Enemy" fullname="CZ.Tests.PlayMode.Enemy" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2025-02-17 20:30:53Z" end-time="2025-02-17 20:31:02Z" duration="8.547358" total="4" passed="1" failed="3" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-suite type="TestFixture" id="1014" name="EnemySystemPlayTests" fullname="CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests" classname="CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2025-02-17 20:30:53Z" end-time="2025-02-17 20:31:02Z" duration="8.531271" total="4" passed="1" failed="3" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <failure>
+                  <message><![CDATA[One or more child tests had errors]]></message>
+                </failure>
+                <test-case id="1017" name="Enemy_FollowsTargetCorrectly" fullname="CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests.Enemy_FollowsTargetCorrectly" methodname="Enemy_FollowsTargetCorrectly" classname="CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests" runstate="Runnable" seed="2114839029" result="Passed" start-time="2025-02-17 20:30:53Z" end-time="2025-02-17 20:30:56Z" duration="2.233710" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[
+IgnoreFailingMessages:true
+[BaseEnemy] Initialized enemy: EnemyPrefab
+Can't add component 'SpriteRenderer' to EnemyPrefab because such a component is already added to the game object!
+[EnemySpawner] Awake called
+[EnemySpawner] OnEnable called
+[EnemySpawner] Start called
+[EnemySpawner] Component State - IsInitialized: False, IsInitializing: False, HasPrefab: False
+[EnemySpawner] PlayerController not found in scene!
+[EnemySpawner] No enemy prefab assigned in inspector!
+[EnemySpawner] Start completed - IsInitialized: False, IsGamePlaying: False, IsSpawning: False
+[EnemySpawner] Pool initialized with 5 initial enemies and 10 max size.
+[EnemySpawner] Cannot update targets - PlayerController is null!
+
+IgnoreFailingMessages:false
+[BaseEnemy] Initialized enemy: EnemyPrefab(Clone)
+[BaseEnemy] Enemy spawned: EnemyPrefab(Clone)
+[BaseEnemy] Target updated to: (5.00, 0.00, 0.00), Distance: 5.00
+[BaseEnemy] Enemy despawned: EnemyPrefab(Clone)
+[EnemySpawner] OnDisable called
+]]></output>
+                </test-case>
+                <test-case id="1018" name="EnemyPool_HandlesRapidSpawnDespawn" fullname="CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests.EnemyPool_HandlesRapidSpawnDespawn" methodname="EnemyPool_HandlesRapidSpawnDespawn" classname="CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests" runstate="Runnable" seed="1291160241" result="Failed" label="Error" start-time="2025-02-17 20:30:56Z" end-time="2025-02-17 20:30:56Z" duration="0.232887" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                    <stack-trace><![CDATA[  at CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests+<EnemyPool_HandlesRapidSpawnDespawn>d__9.MoveNext () [0x0004e] in C:\Users\wiggl\Documents\Unity\CZGAME_U\Assets\_Project\Tests\PlayMode\Core\Enemy\EnemySystemPlayTests.cs:236 
+  at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@5ac417e07314\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44 ]]></stack-trace>
+                  </failure>
+                  <output><![CDATA[
+IgnoreFailingMessages:true
+[BaseEnemy] Initialized enemy: EnemyPrefab
+Can't add component 'SpriteRenderer' to EnemyPrefab because such a component is already added to the game object!
+[EnemySpawner] Awake called
+[EnemySpawner] OnEnable called
+[EnemySpawner] Start called
+[EnemySpawner] Component State - IsInitialized: False, IsInitializing: False, HasPrefab: False
+[EnemySpawner] PlayerController not found in scene!
+[EnemySpawner] No enemy prefab assigned in inspector!
+[EnemySpawner] Start completed - IsInitialized: False, IsGamePlaying: False, IsSpawning: False
+[EnemySpawner] Pool initialized with 5 initial enemies and 10 max size.
+[EnemySpawner] Cannot update targets - PlayerController is null!
+
+IgnoreFailingMessages:false
+[EnemySpawner] OnDisable called
+]]></output>
+                </test-case>
+                <test-case id="1016" name="EnemyPool_HandlesStressTest" fullname="CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests.EnemyPool_HandlesStressTest" methodname="EnemyPool_HandlesStressTest" classname="CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests" runstate="Runnable" seed="2087508021" result="Failed" label="Error" start-time="2025-02-17 20:30:56Z" end-time="2025-02-17 20:30:56Z" duration="0.290707" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                    <stack-trace><![CDATA[  at CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests+<EnemyPool_HandlesStressTest>d__7.MoveNext () [0x00081] in C:\Users\wiggl\Documents\Unity\CZGAME_U\Assets\_Project\Tests\PlayMode\Core\Enemy\EnemySystemPlayTests.cs:175 
+  at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@5ac417e07314\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44 ]]></stack-trace>
+                  </failure>
+                  <output><![CDATA[
+IgnoreFailingMessages:true
+[BaseEnemy] Initialized enemy: EnemyPrefab
+Can't add component 'SpriteRenderer' to EnemyPrefab because such a component is already added to the game object!
+[EnemySpawner] Awake called
+[EnemySpawner] OnEnable called
+[EnemySpawner] Start called
+[EnemySpawner] Component State - IsInitialized: False, IsInitializing: False, HasPrefab: False
+[EnemySpawner] PlayerController not found in scene!
+[EnemySpawner] No enemy prefab assigned in inspector!
+[EnemySpawner] Start completed - IsInitialized: False, IsGamePlaying: False, IsSpawning: False
+[EnemySpawner] Pool initialized with 5 initial enemies and 10 max size.
+[EnemySpawner] Cannot update targets - PlayerController is null!
+
+IgnoreFailingMessages:false
+[EnemySpawner] OnDisable called
+]]></output>
+                </test-case>
+                <test-case id="1015" name="EnemySpawner_SpawnsCorrectNumberOfEnemies" fullname="CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests.EnemySpawner_SpawnsCorrectNumberOfEnemies" methodname="EnemySpawner_SpawnsCorrectNumberOfEnemies" classname="CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests" runstate="Runnable" seed="1729859538" result="Failed" start-time="2025-02-17 20:30:56Z" end-time="2025-02-17 20:31:02Z" duration="5.757023" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[  Spawner created incorrect number of enemies
+  Expected: 5
+  But was:  0
+]]></message>
+                    <stack-trace><![CDATA[at CZ.Tests.PlayMode.Enemy.EnemySystemPlayTests+<EnemySpawner_SpawnsCorrectNumberOfEnemies>d__6.MoveNext () [0x0009d] in C:\Users\wiggl\Documents\Unity\CZGAME_U\Assets\_Project\Tests\PlayMode\Core\Enemy\EnemySystemPlayTests.cs:124
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@5ac417e07314\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                  </failure>
+                  <output><![CDATA[
+IgnoreFailingMessages:true
+[BaseEnemy] Initialized enemy: EnemyPrefab
+Can't add component 'SpriteRenderer' to EnemyPrefab because such a component is already added to the game object!
+[EnemySpawner] Awake called
+[EnemySpawner] OnEnable called
+[EnemySpawner] Start called
+[EnemySpawner] Component State - IsInitialized: False, IsInitializing: False, HasPrefab: False
+[EnemySpawner] PlayerController not found in scene!
+[EnemySpawner] No enemy prefab assigned in inspector!
+[EnemySpawner] Start completed - IsInitialized: False, IsGamePlaying: False, IsSpawning: False
+[EnemySpawner] Pool initialized with 5 initial enemies and 10 max size.
+[EnemySpawner] Cannot update targets - PlayerController is null!
+
+IgnoreFailingMessages:false
+[EnemySpawner] Pool initialized with 5 initial enemies and 10 max size.
+[EnemySpawner] OnDisable called
+Saving results to: C:/Users/wiggl/AppData/LocalLow/Bobbert Games/CZGAME_U\TestResults.xml
+]]></output>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

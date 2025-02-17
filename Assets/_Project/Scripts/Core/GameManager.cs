@@ -12,6 +12,7 @@ namespace CZ.Core
     /// Core GameManager class handling game state, scene management, and performance monitoring.
     /// Follows Unity 6.0 best practices and performance guidelines.
     /// </summary>
+    [DefaultExecutionOrder(-100)] // Ensure GameManager initializes before other scripts
     public class GameManager : MonoBehaviour
     {
         #region Singleton Setup

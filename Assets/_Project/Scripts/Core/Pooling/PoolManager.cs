@@ -18,9 +18,21 @@ namespace CZ.Core.Pooling
             {
                 if (instance == null)
                 {
-                    var go = new GameObject("PoolManager");
-                    instance = go.AddComponent<PoolManager>();
-                    DontDestroyOnLoad(go);
+                    // Handle edit mode differently
+                    if (!Application.isPlaying)
+                    {
+                        // In edit mode, just create a temporary instance without DontDestroyOnLoad
+                        var go = new GameObject("PoolManager_EditorOnly");
+                        instance = go.AddComponent<PoolManager>();
+                        instance.InitializeManager(true);
+                    }
+                    else
+                    {
+                        var go = new GameObject("PoolManager");
+                        instance = go.AddComponent<PoolManager>();
+                        DontDestroyOnLoad(go);
+                        instance.InitializeManager(false);
+                    }
                 }
                 return instance;
             }
@@ -35,23 +47,39 @@ namespace CZ.Core.Pooling
         private const float STATS_UPDATE_INTERVAL = 0.5f; // 500ms
 
         private int totalActiveObjects;
+        private bool isEditorInstance;
         
         public int ActiveCount => totalActiveObjects;
+
+        private void InitializeManager(bool isEditor)
+        {
+            isEditorInstance = isEditor;
+            if (!isEditor)
+            {
+                totalMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total_Pools_Memory");
+            }
+        }
 
         private void Awake()
         {
             if (instance != null && instance != this)
             {
-                Destroy(gameObject);
+                DestroyImmediate(gameObject);
                 return;
             }
             
             instance = this;
-            totalMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total_Pools_Memory");
+            if (!isEditorInstance && Application.isPlaying)
+            {
+                DontDestroyOnLoad(gameObject);
+                totalMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total_Pools_Memory");
+            }
         }
 
         private void Update()
         {
+            if (isEditorInstance) return;
+            
             if (Time.time >= nextStatsUpdate)
             {
                 UpdatePoolStats();
@@ -176,8 +204,16 @@ namespace CZ.Core.Pooling
 
         private void OnDestroy()
         {
+            if (this == instance)
+            {
+                instance = null;
+            }
+            
             ClearAllPools();
-            totalMemoryRecorder.Dispose();
+            if (!isEditorInstance && totalMemoryRecorder.Valid)
+            {
+                totalMemoryRecorder.Dispose();
+            }
         }
     }
 } 

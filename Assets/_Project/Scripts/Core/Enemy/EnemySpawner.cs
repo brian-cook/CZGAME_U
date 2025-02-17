@@ -30,52 +30,126 @@ namespace CZ.Core.Enemy
         private bool isSpawning;
         private float nextSpawnTime;
         private int activeEnemies;
-        private Vector3 targetPosition;
         private bool isInitialized;
         private bool isInitializing;
         private PlayerController playerController;
         private bool isGamePlaying;
         
+        [Header("Update Settings")]
+        [SerializeField, MinValue(0.01f)]
+        private float targetUpdateInterval = 0.05f;
+        private float nextTargetUpdateTime;
+        private Vector3 debugTargetPosition; // For test visualization only
+        
         public float SpawnInterval => spawnInterval;
         public int ActiveEnemyCount => activeEnemies;
         
-        private void Awake()
+        private void OnEnable()
         {
-            isInitializing = false;
-            isInitialized = false;
-            
+            Debug.Log("[EnemySpawner] OnEnable called");
+            SubscribeToGameManager();
+        }
+
+        private void OnDisable()
+        {
+            Debug.Log("[EnemySpawner] OnDisable called");
+            UnsubscribeFromGameManager();
+            StopSpawning();
+        }
+
+        private void SubscribeToGameManager()
+        {
             if (GameManager.Instance != null)
             {
+                UnsubscribeFromGameManager(); // Ensure no duplicate subscriptions
                 GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+                
+                // Check current state
+                if (GameManager.Instance.CurrentGameState == GameManager.GameState.Playing)
+                {
+                    HandleGameStateChanged(GameManager.GameState.Playing);
+                }
             }
         }
-        
+
+        private void UnsubscribeFromGameManager()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+            }
+        }
+
+        private void Awake()
+        {
+            Debug.Log("[EnemySpawner] Awake called");
+            isInitializing = false;
+            isInitialized = false;
+        }
+
         private void Start()
         {
+            Debug.Log("[EnemySpawner] Start called");
+            
+            // Verify component state
+            Debug.Log($"[EnemySpawner] Component State - IsInitialized: {isInitialized}, IsInitializing: {isInitializing}, HasPrefab: {enemyPrefab != null}");
+            
             playerController = Object.FindFirstObjectByType<PlayerController>();
             if (playerController == null)
             {
                 Debug.LogWarning("[EnemySpawner] PlayerController not found in scene!");
             }
+            else
+            {
+                Debug.Log("[EnemySpawner] PlayerController found successfully");
+            }
             
             if (enemyPrefab != null)
             {
+                Debug.Log($"[EnemySpawner] Initializing pool with prefab: {enemyPrefab.name}");
                 InitializePool();
             }
+            else
+            {
+                Debug.LogError("[EnemySpawner] No enemy prefab assigned in inspector!");
+            }
+            
+            // Subscribe to GameManager after initialization
+            SubscribeToGameManager();
+            
+            // Log final state
+            Debug.Log($"[EnemySpawner] Start completed - IsInitialized: {isInitialized}, IsGamePlaying: {isGamePlaying}, IsSpawning: {isSpawning}");
         }
         
         private void HandleGameStateChanged(GameManager.GameState newState)
         {
+            Debug.Log($"[EnemySpawner] Game state changed to {newState} (Previous isGamePlaying: {isGamePlaying})");
             isGamePlaying = newState == GameManager.GameState.Playing;
             
             if (!isGamePlaying)
             {
+                Debug.Log("[EnemySpawner] Game no longer playing, stopping spawn");
                 StopSpawning();
                 DespawnAllEnemies();
             }
             else if (isInitialized)
             {
+                Debug.Log("[EnemySpawner] Starting spawning due to game state change to Playing");
                 StartSpawning();
+            }
+            else
+            {
+                Debug.LogWarning($"[EnemySpawner] Cannot start spawning - not initialized when game state changed to Playing (Init: {isInitialized}, Initializing: {isInitializing})");
+                // Attempt late initialization if we have a prefab
+                if (enemyPrefab != null && !isInitializing)
+                {
+                    Debug.Log("[EnemySpawner] Attempting late initialization");
+                    InitializePool();
+                    if (isInitialized)
+                    {
+                        StartSpawning();
+                    }
+                }
             }
         }
         
@@ -104,8 +178,15 @@ namespace CZ.Core.Enemy
             
             try
             {
+                // Ensure prefab is inactive before creating pool
+                enemyPrefab.SetActive(false);
+                
                 enemyPool = new ObjectPool<BaseEnemy>(
-                    createFunc: () => Instantiate(enemyPrefab).GetComponent<BaseEnemy>(),
+                    createFunc: () => {
+                        var obj = Instantiate(enemyPrefab).GetComponent<BaseEnemy>();
+                        obj.gameObject.SetActive(false);
+                        return obj;
+                    },
                     initialSize: maxEnemiesPerWave,
                     maxSize: maxEnemiesPerWave * 2,
                     "EnemyPool"
@@ -206,22 +287,71 @@ namespace CZ.Core.Enemy
         
         private void Update()
         {
-            if (!isInitialized || !isSpawning || !isGamePlaying || activeEnemies >= maxEnemiesPerWave) return;
-            
-            // Update target position from player
-            if (playerController != null)
+            if (!isInitialized || !isSpawning || !isGamePlaying || playerController == null)
             {
-                targetPosition = playerController.GetPosition();
+                return;
             }
             
-            if (Time.time >= nextSpawnTime)
+            Vector3 currentPlayerPos = playerController.GetPosition();
+            
+            // Ensure we always update targets when the player moves
+            bool shouldUpdateTargets = Time.time >= nextTargetUpdateTime;
+            if (shouldUpdateTargets)
             {
-                SpawnEnemy();
+                UpdateEnemyTargets(currentPlayerPos);
+                nextTargetUpdateTime = Time.time + targetUpdateInterval;
+                
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Debug.Log($"[EnemySpawner] Scheduled next target update in {targetUpdateInterval}s");
+                #endif
+            }
+            
+            // Handle spawning
+            if (activeEnemies < maxEnemiesPerWave && Time.time >= nextSpawnTime)
+            {
+                SpawnEnemy(currentPlayerPos);
                 nextSpawnTime = Time.time + spawnInterval;
             }
         }
         
-        private void SpawnEnemy()
+        private void UpdateEnemyTargets(Vector3 currentPlayerPos)
+        {
+            if (playerController == null)
+            {
+                Debug.LogError("[EnemySpawner] Cannot update targets - PlayerController is null!");
+                return;
+            }
+            
+            // Use debug target in editor test mode, otherwise use player position
+            Vector3 targetPos = Application.isEditor && !Application.isPlaying ? debugTargetPosition : currentPlayerPos;
+            
+            var enemies = Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
+            int updatedCount = 0;
+            int failedCount = 0;
+            
+            foreach (var enemy in enemies)
+            {
+                if (enemy != null && enemy.gameObject.activeInHierarchy)
+                {
+                    try 
+                    {
+                        enemy.SetTarget(targetPos);
+                        updatedCount++;
+                    }
+                    catch (System.Exception e)
+                    {
+                        failedCount++;
+                        Debug.LogError($"[EnemySpawner] Failed to update enemy target: {e.Message}");
+                    }
+                }
+            }
+            
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[EnemySpawner] Target update complete - Updated: {updatedCount}, Failed: {failedCount}, Target: {targetPos}");
+            #endif
+        }
+        
+        private void SpawnEnemy(Vector3 currentPlayerPos)
         {
             using var _ = s_spawnMarker.Auto();
             
@@ -236,7 +366,7 @@ namespace CZ.Core.Enemy
             {
                 System.Threading.Interlocked.Increment(ref activeEnemies);
                 
-                // Calculate spawn position
+                // Calculate spawn position relative to spawner
                 float angle = Random.Range(0f, 360f);
                 float distance = Random.Range(minSpawnDistance, spawnRadius);
                 Vector2 spawnOffset = Quaternion.Euler(0, 0, angle) * Vector2.right * distance;
@@ -244,21 +374,29 @@ namespace CZ.Core.Enemy
                 // Position enemy
                 enemy.transform.position = (Vector2)transform.position + spawnOffset;
                 
-                // Set target if available
-                if (targetPosition != Vector3.zero)
-                {
-                    enemy.SetTarget(targetPosition);
-                }
-                else
-                {
-                    Debug.LogWarning("[EnemySpawner] Target position not set - enemy will not move!", this);
-                }
+                // Set initial target
+                enemy.SetTarget(currentPlayerPos);
+                
+                Debug.Log($"[EnemySpawner] Spawned enemy at {enemy.transform.position}. Active count: {activeEnemies}");
+            }
+            else
+            {
+                Debug.LogError("[EnemySpawner] Failed to get enemy from pool!");
             }
         }
         
+        /// <summary>
+        /// Sets a fixed target position for testing purposes.
+        /// This method is primarily used by the test framework and should not be used in gameplay.
+        /// </summary>
+        /// <param name="position">The target position to set</param>
         public void SetTargetPosition(Vector3 position)
         {
-            targetPosition = position;
+            debugTargetPosition = position;
+            if (isInitialized)
+            {
+                UpdateEnemyTargets(position);
+            }
         }
         
         private void OnDrawGizmosSelected()
@@ -269,11 +407,11 @@ namespace CZ.Core.Enemy
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, minSpawnDistance);
             
-            // Draw target position if set
-            if (targetPosition != Vector3.zero)
+            // Draw debug target position if set (for tests)
+            if (debugTargetPosition != Vector3.zero)
             {
                 Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(targetPosition, 0.5f);
+                Gizmos.DrawWireSphere(debugTargetPosition, 0.5f);
             }
         }
         

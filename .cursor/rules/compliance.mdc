@@ -2,11 +2,81 @@
 description: AI Rules
 globs: 
 ---
-
 # AI RULES COMPLIANCE
 
-always review all of the ai rules listed in ai settings for cursor or in [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json) and ensure every response to prompts are in full compliance with the ai rules prior to responding, suggesting edits, editing code or changing files:
+## Overview
+This rule defines the mandatory compliance process for all AI the codebase.
 
-    rules are located in settings or [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json)
+## Priority
+CRITICAL - Must be followed for every operation
 
-If a rule is unclear or appears to be in conflict with a solution that employs best practices for the packages in the program, suggest a correction.
+## Process
+1. Pre-Operation Checks:
+   - Review all rules in [ai_rules.json](mdc:Documentation/Guidelines/ai_rulVerify compliance with each rule category:
+     * File Verification (Critical)
+     * Cursor First Operations (Critical)
+     * Cursor Integration (Critical)
+     * Unity Compliance (Highest)
+     * Technical Standards (High)
+     * Project Alignment (Medium)
+     * Implementation Tracking (Ongoing)
+     * Error Handling (High)
+     * Documentation (Medium)
+     * Interaction Personalization (High)
+     * Workspace Settings (Critical)
+
+2. During Operation:
+   - Maintain active compliance with all rules
+   - Track modifications against requirements
+   - Document changes in accordance with guidelines
+   - Follow proper tool usage patterns
+
+3. Post-Operation Verification:
+   - Verify changes against all rule requirements
+   - Ensure documentation is updated
+   - Validate technical standards compliance
+   - Confirm workspace integrity
+
+## Conflict Resolution
+If a rule conflicts with Unity/package best practices:
+1. Document the conflict
+2. Explain the best practice recommendation
+3. Propose a solution that maintains compliance while following best practices
+4. Request clarification if needed
+
+## Reference Files
+- Primary: [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json)
+- Supporting:
+  * [project_dependencies.md](mdc:Documentation/Resources/project_dependencies.md)
+  * [version_troubleshooting.md](mdc:Documentation/Resources/version_troubleshooting.md)
+  * [infrastructure.txt](mdc:Documentation/Guidelines/infrastructure.txt)
+  * [performance_guidelines.txt](mdc:Documentation/Guidelines/performance_guidelines.txt)
+
+## Implementation Requirements
+1. Every response must:
+   - Follow all rules in ai_rules.json
+   - Document compliance with each relevant rule
+   - Maintain proper versioning and dependencies
+   - Use appropriate tools and patterns
+   - Respect workspace structure and settings
+
+2. All code changes must:
+   - Be implemented through Cursor when possible
+   - Follow Unity 6.0 best practices
+   - Maintain project architecture
+   - Include proper error handling
+   - Update relevant documentation
+
+3. All tool operations must:
+   - Respect tool limitations
+   - Follow proper calling patterns
+   - Maintain workspace integrity
+   - Track modifications appropriately
+
+## Validation
+Before completing any operation, verify:
+1. All relevant rules have been followed
+2. Changes comply with project standards
+3. Documentation is complete and accurate
+4. Technical requirements are met
+5. Workspace integrity is maintained
