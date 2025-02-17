@@ -1,4 +1,107 @@
-# Project Dependencies and Resources
+# Project Dependencies Documentation
+
+## Assembly Structure
+```mermaid
+graph TD
+    A[CZ.Core.Pooling] --> B[CZ.Core]
+    A --> C[CZ.Core.Enemy]
+    B --> D[CZ.Tests.PlayMode]
+    B --> E[CZ.Tests.EditMode]
+    A --> D
+    A --> E
+    C --> D
+```
+
+## Assembly Definitions
+
+### Core Assemblies
+1. **CZ.Core.Pooling**
+   - Base pooling functionality
+   - Dependencies:
+     * Input System (GUID:75469ad4d38634e559750d17036d5f7c)
+     * NaughtyAttributes (GUID:776d03a35f1b52c4a9aed9f56d7b4229)
+
+2. **CZ.Core**
+   - Core game functionality
+   - Dependencies:
+     * CZ.Core.Pooling
+     * Input System
+     * NaughtyAttributes
+
+3. **CZ.Core.Enemy**
+   - Enemy system implementation
+   - Dependencies:
+     * CZ.Core.Pooling
+     * Input System
+     * NaughtyAttributes
+
+### Test Assemblies
+1. **CZ.Tests.PlayMode**
+   - Runtime/PlayMode tests
+   - Dependencies:
+     * UnityEngine.TestRunner
+     * UnityEditor.TestRunner
+     * Unity.InputSystem
+     * Unity.InputSystem.TestFramework
+     * CZ.Core
+     * CZ.Core.Pooling
+   - Test Framework: 1.4.6
+
+2. **CZ.Tests.EditMode**
+   - Editor/EditMode tests
+   - Dependencies:
+     * UnityEngine.TestRunner (GUID:27619889b8ba8c24980f49ee34dbb44a)
+     * UnityEditor.TestRunner (GUID:0acc523941302664db1f4e527237feb3)
+     * CZ.Core
+     * CZ.Core.Pooling
+   - Test Framework: 1.4.6
+
+## Package Dependencies
+- Universal RP: 17.0.3
+- Input System: 1.13.0
+- Test Framework: 1.4.6
+- Timeline: 1.8.7
+- Multiplayer Center: 1.0.0
+- NaughtyAttributes: 2.1.4
+
+## Testing Infrastructure
+### Test Categories
+1. Edit Mode Tests
+   - Unit tests for core systems
+   - No runtime dependencies
+   - Fast execution
+
+2. Play Mode Tests
+   - Integration tests
+   - Runtime behavior
+   - Performance tests
+   - Pool system tests
+
+### Test Framework Setup
+- NUnit for test structure
+- Unity Test Runner integration
+- Performance Testing Package
+- Input System Test Framework
+
+## Version Requirements
+- Unity Version: 6000.0.38f1
+- API Compatibility: .NET Standard 2.1
+- Scripting Backend: IL2CPP
+
+## Performance Monitoring
+- ProfilerRecorder integration
+- Memory tracking
+- Pool utilization monitoring
+- Draw call optimization
+
+## Notes
+- All assemblies must maintain proper reference hierarchy
+- Avoid circular dependencies
+- Test assemblies should reference only necessary assemblies
+- Keep assembly references minimal for performance
+
+Last Updated: 2024-02-16
+Unity Version: 6000.0.38f1
 
 ## Development Environment
 - **Unity Version**: 6.0
@@ -73,13 +176,6 @@
   ]
 }
 ```
-
-## Assembly Definitions
-| Assembly | Path | Purpose |
-|----------|------|----------|
-| CZ.Core | `Assets/_Project/Scripts/Core/CZ.Core.asmdef` | Core game systems |
-| CZ.Tests.PlayMode | `Assets/_Project/Tests/PlayMode/CZ.Tests.PlayMode.asmdef` | Play mode tests |
-| CZ.Tests.EditMode | `Assets/_Project/Tests/EditMode/CZ.Tests.EditMode.asmdef` | Edit mode tests |
 
 ## Official Unity 6 Resources
 - [2D Development Guide](https://docs.unity3d.com/6000.0/Documentation/Manual/2DFeature.html)

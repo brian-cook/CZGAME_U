@@ -19,10 +19,14 @@ namespace CZ.Core.Pooling
         private ProfilerRecorder memoryRecorder;
         private int peakCount;
         private bool isExpanding;
+        private int activeCount;  // Track active objects
         
         public int CurrentCount => pool.Count;
+        public int ActiveCount => activeCount;
+        public int TotalCount => CurrentCount + activeCount;
         public int PeakCount => peakCount;
         public bool IsExpanding => isExpanding;
+        public int MaxSize => maxSize;
         
         /// <summary>
         /// Creates a new object pool
@@ -49,6 +53,7 @@ namespace CZ.Core.Pooling
             }
             
             peakCount = initialSize;
+            activeCount = 0;
         }
         
         /// <summary>
@@ -63,13 +68,13 @@ namespace CZ.Core.Pooling
             {
                 obj = pool.Dequeue();
             }
-            else if (CurrentCount < maxSize)
+            else if (TotalCount < maxSize)  // Check total objects against maxSize
             {
                 isExpanding = true;
                 obj = createFunc();
-                peakCount = Math.Max(peakCount, CurrentCount + 1);
+                peakCount = Math.Max(peakCount, TotalCount + 1);
                 
-                Debug.LogWarning($"Pool '{poolName}' expanded. Current size: {CurrentCount + 1}, Peak: {peakCount}");
+                Debug.LogWarning($"Pool '{poolName}' expanded. Current size: {TotalCount + 1}, Peak: {peakCount}");
             }
             else
             {
@@ -77,6 +82,7 @@ namespace CZ.Core.Pooling
                 return default;
             }
             
+            activeCount++;
             obj.GameObject.SetActive(true);
             obj.OnSpawn();
             return obj;
@@ -92,6 +98,7 @@ namespace CZ.Core.Pooling
             obj.OnDespawn();
             obj.GameObject.SetActive(false);
             pool.Enqueue(obj);
+            activeCount--;
         }
         
         /// <summary>
@@ -101,6 +108,7 @@ namespace CZ.Core.Pooling
         {
             pool.Clear();
             memoryRecorder.Dispose();
+            activeCount = 0;
         }
         
         /// <summary>
