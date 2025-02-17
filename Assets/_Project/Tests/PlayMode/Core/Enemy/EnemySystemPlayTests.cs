@@ -86,7 +86,7 @@ namespace CZ.Tests.PlayMode.Enemy
             yield return null;
             
             // Clear any remaining objects
-            var remainingEnemies = Object.FindObjectsOfType<BaseEnemy>();
+            var remainingEnemies = Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
             foreach (var enemy in remainingEnemies)
             {
                 Object.Destroy(enemy.gameObject);

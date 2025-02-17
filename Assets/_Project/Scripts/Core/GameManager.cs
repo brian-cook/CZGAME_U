@@ -131,6 +131,11 @@ namespace CZ.Core
             {
                 // Only start monitoring after initialization
                 enabled = true;
+                
+                // Auto-start game for testing (remove in production)
+                #if UNITY_EDITOR
+                StartCoroutine(AutoStartGame());
+                #endif
             }
             else
             {
@@ -419,6 +424,13 @@ namespace CZ.Core
             
             isCleaningUp = false;
         }
+
+        private IEnumerator AutoStartGame()
+        {
+            // Wait for all systems to initialize
+            yield return new WaitForSeconds(0.5f);
+            StartGame();
+        }
         #endregion
 
         #region Game State Management
@@ -427,9 +439,24 @@ namespace CZ.Core
         {
             if (CurrentGameState != GameState.Playing)
             {
+                // Reset performance counters for new game session
+                ResetPerformanceCounters();
+                
+                // Enable input system
+                if (UnityEngine.InputSystem.InputSystem.devices.Count == 0)
+                {
+                    Debug.LogWarning("[GameManager] No input devices found. Attempting to initialize input system.");
+                    UnityEngine.InputSystem.InputSystem.Update();
+                }
+                
+                // Set game state to playing which enables systems
                 CurrentGameState = GameState.Playing;
-                Time.timeScale = 1f;
-                Debug.Log("Game Started");
+                
+                // Log game start for debugging
+                Debug.Log("[GameManager] Game started - Input and gameplay systems enabled");
+                
+                // Notify systems that game has started
+                OnGameStateChanged?.Invoke(GameState.Playing);
             }
         }
 

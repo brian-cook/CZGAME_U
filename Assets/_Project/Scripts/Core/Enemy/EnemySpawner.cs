@@ -1,5 +1,6 @@
 using UnityEngine;
 using CZ.Core.Pooling;
+using CZ.Core.Player;
 using Unity.Profiling;
 using NaughtyAttributes;
 using System.Collections;
@@ -12,7 +13,6 @@ namespace CZ.Core.Enemy
         [SerializeField, Required] private GameObject enemyPrefab;
         [SerializeField] private float spawnInterval = 1f;
         [SerializeField] private int maxEnemiesPerWave = 5;
-        [SerializeField] private float waveInterval = 5f;
         
         [Header("Spawn Area")]
         [SerializeField] private float spawnRadius = 10f;
@@ -33,22 +33,49 @@ namespace CZ.Core.Enemy
         private Vector3 targetPosition;
         private bool isInitialized;
         private bool isInitializing;
+        private PlayerController playerController;
+        private bool isGamePlaying;
         
         public float SpawnInterval => spawnInterval;
         public int ActiveEnemyCount => activeEnemies;
         
         private void Awake()
         {
-            // Defer initialization to Start to avoid Awake/OnEnable race conditions
             isInitializing = false;
             isInitialized = false;
+            
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+            }
         }
         
         private void Start()
         {
+            playerController = Object.FindFirstObjectByType<PlayerController>();
+            if (playerController == null)
+            {
+                Debug.LogWarning("[EnemySpawner] PlayerController not found in scene!");
+            }
+            
             if (enemyPrefab != null)
             {
                 InitializePool();
+            }
+        }
+        
+        private void HandleGameStateChanged(GameManager.GameState newState)
+        {
+            isGamePlaying = newState == GameManager.GameState.Playing;
+            
+            if (!isGamePlaying)
+            {
+                StopSpawning();
+                DespawnAllEnemies();
+            }
+            else if (isInitialized)
+            {
+                StartSpawning();
             }
         }
         
@@ -161,7 +188,7 @@ namespace CZ.Core.Enemy
                 return;
             }
             
-            var enemies = FindObjectsOfType<BaseEnemy>();
+            var enemies = Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
             foreach (var enemy in enemies)
             {
                 if (enemy != null)
@@ -171,7 +198,6 @@ namespace CZ.Core.Enemy
                 }
             }
             
-            // Ensure count doesn't go negative
             if (activeEnemies < 0)
             {
                 activeEnemies = 0;
@@ -180,7 +206,13 @@ namespace CZ.Core.Enemy
         
         private void Update()
         {
-            if (!isInitialized || !isSpawning || activeEnemies >= maxEnemiesPerWave) return;
+            if (!isInitialized || !isSpawning || !isGamePlaying || activeEnemies >= maxEnemiesPerWave) return;
+            
+            // Update target position from player
+            if (playerController != null)
+            {
+                targetPosition = playerController.GetPosition();
+            }
             
             if (Time.time >= nextSpawnTime)
             {
@@ -247,6 +279,11 @@ namespace CZ.Core.Enemy
         
         private void OnDestroy()
         {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+            }
+            
             if (enemyPool != null)
             {
                 enemyPool.Clear();

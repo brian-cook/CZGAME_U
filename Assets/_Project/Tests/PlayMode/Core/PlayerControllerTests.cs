@@ -7,6 +7,8 @@ using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
 using CZ.Core.Player;
+using CZ.Core.Input;
+using CZ.Core;
 using UnityEditor;
 
 namespace CZ.Tests.PlayMode
@@ -20,11 +22,12 @@ namespace CZ.Tests.PlayMode
         private GameObject playerObject;
         private PlayerController playerController;
         private Rigidbody2D rb;
-        private PlayerInput playerInput;
+        private GameControls controls;
         private Keyboard keyboard;
         private static GameObject persistentRoot;
         private static bool isOneTimeSetupComplete;
         private static bool isStandardSetupComplete;
+        private GameManager gameManager;
 
         [UnityEngine.TestTools.UnitySetUpAttribute]
         public IEnumerator UnityOneTimeSetup()
@@ -38,12 +41,18 @@ namespace CZ.Tests.PlayMode
                 persistentRoot = new GameObject("[TestRoot]");
                 Object.DontDestroyOnLoad(persistentRoot);
                 
+                // Create GameManager first
+                var gmObject = new GameObject("[GameManager]");
+                gmObject.transform.SetParent(persistentRoot.transform);
+                gameManager = gmObject.AddComponent<GameManager>();
+                
                 // Wait a frame to ensure the object is properly initialized
                 yield return null;
                 
                 // Verify root persistence
                 Assert.That(persistentRoot, Is.Not.Null, "Test root should be created");
                 Assert.That(persistentRoot.activeInHierarchy, Is.True, "Test root should be active");
+                Assert.That(gameManager, Is.Not.Null, "GameManager should be created");
                 
                 isOneTimeSetupComplete = true;
                 
@@ -98,46 +107,28 @@ namespace CZ.Tests.PlayMode
                 rb.gravityScale = 0f;
                 rb.constraints = RigidbodyConstraints2D.FreezeRotation;
                 
-                // Setup input actions before adding PlayerController
-                var inputActionsPath = "Assets/_Project/Input/GameControls.inputactions";
-                var inputActions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(inputActionsPath);
-                Assert.That(inputActions, Is.Not.Null, $"Input actions not found at {inputActionsPath}");
-
                 // Setup keyboard first
                 keyboard = InputSystem.AddDevice<Keyboard>();
                 Assert.That(keyboard, Is.Not.Null, "Keyboard device should be created");
                 Assert.That(keyboard.added, Is.True, "Keyboard should be added to Input System");
                 InputSystem.Update(); // Ensure device is properly initialized
 
-                // Setup PlayerInput with proper initialization order
-                playerInput = playerObject.AddComponent<PlayerInput>();
-                Assert.That(playerInput, Is.Not.Null, "PlayerInput component should be added");
-                
-                playerInput.actions = inputActions;
-                playerInput.defaultActionMap = "Player";
-                playerInput.notificationBehavior = PlayerNotifications.InvokeCSharpEvents;
-                
-                // Now add PlayerController after input is setup
+                // Now add PlayerController
                 playerController = playerObject.AddComponent<PlayerController>();
                 Assert.That(playerController, Is.Not.Null, "PlayerController component should be added");
-
-                // Ensure the input actions are properly initialized
-                Assert.That(playerInput.actions, Is.Not.Null, "PlayerInput actions should be assigned");
                 
-                // Force enable the action map and bind the callback
-                var actionMap = playerInput.actions.FindActionMap("Player");
-                Assert.That(actionMap, Is.Not.Null, "Player action map should exist");
-                var moveAction = actionMap.FindAction("Move");
-                Assert.That(moveAction, Is.Not.Null, "Move action should exist");
-                moveAction.performed += ctx => playerController.OnMovePerformed(ctx);
-                moveAction.canceled += ctx => playerController.OnMoveCanceled(ctx);
-                actionMap.Enable();
+                // Initialize GameControls
+                controls = new GameControls();
+                controls.Enable();
                 
                 // Final verification of setup
-                Assert.That(playerObject.GetComponent<PlayerInput>(), Is.EqualTo(playerInput), "PlayerInput component should be properly attached");
                 Assert.That(playerObject.GetComponent<PlayerController>(), Is.EqualTo(playerController), "PlayerController component should be properly attached");
                 Assert.That(playerObject.activeInHierarchy, Is.True, "Player object should be active");
+                Assert.That(controls.Player.enabled, Is.True, "Player controls should be enabled");
 
+                // Start the game
+                gameManager.StartGame();
+                
                 // Set completion flag only after all setup is successful
                 isStandardSetupComplete = true;
                 Debug.Log("Standard Setup Complete");
@@ -190,17 +181,16 @@ namespace CZ.Tests.PlayMode
             try
             {
                 // Re-cache components to ensure they're still valid
-                playerInput = playerObject.GetComponent<PlayerInput>();
                 playerController = playerObject.GetComponent<PlayerController>();
                 rb = playerObject.GetComponent<Rigidbody2D>();
                 
                 // Safe verification of input system state
-                Assert.That(playerInput, Is.Not.Null, "PlayerInput should exist after initialization");
-                Assert.That(playerInput.actions, Is.Not.Null, "PlayerInput actions should exist");
+                Assert.That(playerController, Is.Not.Null, "PlayerController should exist after initialization");
+                Assert.That(rb, Is.Not.Null, "Rigidbody2D should exist after initialization");
                 Assert.That(keyboard, Is.Not.Null, "Keyboard should exist");
                 Assert.That(keyboard.added, Is.True, "Keyboard should be added to Input System");
                 
-                var actionMap = playerInput.actions.FindActionMap("Player");
+                var actionMap = controls.Player;
                 Assert.That(actionMap, Is.Not.Null, "Player action map should exist after initialization");
                 Assert.That(actionMap.enabled, Is.True, "Player action map should be enabled");
 
@@ -220,6 +210,7 @@ namespace CZ.Tests.PlayMode
             // Ensure input is ready
             Assert.That(keyboard, Is.Not.Null, "Keyboard should be available");
             Assert.That(keyboard.dKey, Is.Not.Null, "D key should be available");
+            Assert.That(gameManager.CurrentGameState, Is.EqualTo(GameState.Playing), "Game should be in Playing state");
             
             // Wait a frame before starting input
             yield return null;
@@ -292,6 +283,9 @@ namespace CZ.Tests.PlayMode
         [TearDown]
         public override void TearDown()
         {
+            controls?.Disable();
+            controls?.Dispose();
+            
             if (!isStandardSetupComplete) return;
 
             Debug.Log("Starting Standard Teardown");
@@ -302,9 +296,9 @@ namespace CZ.Tests.PlayMode
                 if (playerObject != null)
                 {
                     // Properly cleanup components before destroying object
-                    if (playerInput != null)
+                    if (playerController != null)
                     {
-                        playerInput.actions?.Disable();
+                        playerController.enabled = false;
                     }
                     
                     Object.DestroyImmediate(playerObject);

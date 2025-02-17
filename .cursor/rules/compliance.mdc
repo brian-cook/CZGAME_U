@@ -9,4 +9,4 @@ always review all of the ai rules listed in ai settings for cursor or in [ai_rul
 
     rules are located in settings or [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json)
 
-If a rule is unclear or appears to be in conflice with a solution that employs best practices for the packages in the program, suggest a correction.
+If a rule is unclear or appears to be in conflict with a solution that employs best practices for the packages in the program, suggest a correction.

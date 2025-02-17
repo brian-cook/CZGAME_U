@@ -1,37 +1,38 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using NaughtyAttributes;
+using CZ.Core;
+using CZ.Core.Input;
+using static NaughtyAttributes.EInfoBoxType;
 
 namespace CZ.Core.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(PlayerInput))]
     [RequireComponent(typeof(CircleCollider2D))]
     public class PlayerController : MonoBehaviour
     {
         #region Components
         private Rigidbody2D rb;
-        private PlayerInput playerInput;
-        private InputAction moveAction;
         private CircleCollider2D circleCollider;
         private TrailRenderer movementTrail;
         private static Material sharedTrailMaterial;
+        private GameControls controls;
         #endregion
 
         #region Configuration
         [BoxGroup("Movement Settings")]
         [SerializeField, MinValue(0f), MaxValue(20f)]
-        [InfoBox("Base movement speed of the player", EInfoBoxType.Normal)]
+        [InfoBox("Base movement speed of the player", Normal)]
         private float moveSpeed = 5f;
 
         [BoxGroup("Movement Settings")]
         [SerializeField, MinValue(0f), MaxValue(20f)]
-        [InfoBox("Maximum velocity the player can reach", EInfoBoxType.Normal)]
+        [InfoBox("Maximum velocity the player can reach", Normal)]
         private float maxVelocity = 8f;
         
         [BoxGroup("Physics Settings")]
         [SerializeField, MinValue(0f)]
-        [InfoBox("Linear drag applied to slow down movement", EInfoBoxType.Normal)]
+        [InfoBox("Linear drag applied to slow down movement", Normal)]
         private float linearDrag = 3f;
 
         [BoxGroup("Debug Settings")]
@@ -43,12 +44,28 @@ namespace CZ.Core.Player
         private Vector2 moveInput;
         private bool isMoving;
         private bool isInitialized;
+        private bool isInputEnabled;
         #endregion
 
         #region Unity Lifecycle
         private void Awake()
         {
             SetupComponents();
+            controls = new GameControls();
+            
+            // Subscribe to input events
+            controls.Player.Move.performed += OnMove;
+            controls.Player.Move.canceled += OnMove;
+            
+            // Subscribe to game state changes
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+            }
+            else
+            {
+                Debug.LogError("[PlayerController] GameManager instance not found!");
+            }
         }
 
         private void SetupComponents()
@@ -64,41 +81,6 @@ namespace CZ.Core.Player
                 rb.constraints = RigidbodyConstraints2D.FreezeRotation;
                 rb.interpolation = RigidbodyInterpolation2D.Interpolate;
                 rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-            }
-            
-            // Get PlayerInput
-            playerInput = GetComponent<PlayerInput>();
-            if (playerInput != null)
-            {
-                if (enableDebugLogs) Debug.Log("[PlayerController] Setting up PlayerInput");
-                playerInput.defaultActionMap = "Player";
-                playerInput.notificationBehavior = PlayerNotifications.InvokeCSharpEvents;
-                
-                // Ensure actions asset is assigned
-                if (playerInput.actions == null)
-                {
-                    Debug.LogError("[PlayerController] No input actions asset assigned");
-                    return;
-                }
-
-                var actionMap = playerInput.actions.FindActionMap("Player", true);
-                if (actionMap != null)
-                {
-                    actionMap.Enable();
-                    moveAction = actionMap.FindAction("Move");
-                    if (moveAction != null)
-                    {
-                        moveAction.performed += OnMovePerformed;
-                        moveAction.canceled += OnMoveCanceled;
-                        moveAction.Enable();
-                        if (enableDebugLogs) Debug.Log("[PlayerController] Move action enabled");
-                    }
-                }
-            }
-            else
-            {
-                Debug.LogError("[PlayerController] PlayerInput component missing");
-                return;
             }
             
             // Get and configure CircleCollider2D
@@ -133,39 +115,7 @@ namespace CZ.Core.Player
             }
             
             isInitialized = true;
-        }
-
-        public void OnMovePerformed(InputAction.CallbackContext context)
-        {
-            moveInput = context.ReadValue<Vector2>();
-            isMoving = moveInput.sqrMagnitude > 0.01f;
-            
-            // Only enable trail when moving
-            if (movementTrail != null)
-            {
-                movementTrail.emitting = isMoving;
-            }
-            
-            if (enableDebugLogs && isMoving)
-            {
-                Debug.Log($"[PlayerController] Move: {moveInput:F2}");
-            }
-        }
-
-        public void OnMoveCanceled(InputAction.CallbackContext context)
-        {
-            moveInput = Vector2.zero;
-            isMoving = false;
-            
-            if (movementTrail != null)
-            {
-                movementTrail.emitting = false;
-            }
-            
-            if (enableDebugLogs)
-            {
-                Debug.Log("[PlayerController] Move canceled");
-            }
+            if (enableDebugLogs) Debug.Log("[PlayerController] Components initialized successfully");
         }
 
         private void OnEnable()
@@ -174,37 +124,46 @@ namespace CZ.Core.Player
             {
                 SetupComponents();
             }
-            else if (moveAction != null)
-            {
-                moveAction.Enable();
-            }
+            
+            controls?.Enable();
+            isInputEnabled = GameManager.Instance?.CurrentGameState == GameManager.GameState.Playing;
+            
+            if (enableDebugLogs) Debug.Log("[PlayerController] Input system enabled");
         }
 
         private void OnDisable()
         {
-            if (moveAction != null)
-            {
-                moveAction.Disable();
-            }
+            controls?.Disable();
             
             if (movementTrail != null)
             {
                 movementTrail.emitting = false;
             }
+            
+            isInputEnabled = false;
+            if (enableDebugLogs) Debug.Log("[PlayerController] Input system disabled");
         }
 
         private void FixedUpdate()
         {
-            HandleMovement();
+            if (isInputEnabled)
+            {
+                HandleMovement();
+            }
         }
 
         private void OnDestroy()
         {
-            if (moveAction != null)
+            if (GameManager.Instance != null)
             {
-                moveAction.performed -= OnMovePerformed;
-                moveAction.canceled -= OnMoveCanceled;
-                moveAction.Disable();
+                GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+            }
+            
+            if (controls != null)
+            {
+                controls.Player.Move.performed -= OnMove;
+                controls.Player.Move.canceled -= OnMove;
+                controls.Dispose();
             }
         }
         #endregion
@@ -229,17 +188,64 @@ namespace CZ.Core.Player
 
             Vector2 targetVelocity = moveInput.normalized * moveSpeed;
             rb.linearVelocity = Vector2.ClampMagnitude(targetVelocity, maxVelocity);
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[PlayerController] Moving with velocity: {rb.linearVelocity}");
+            }
         }
         #endregion
 
-        #region Debug Methods
-        [Button("Reset Velocity")]
-        private void ResetVelocity()
+        #region Input Handling
+        private void OnMove(InputAction.CallbackContext context)
         {
-            if (rb != null)
+            if (!isInputEnabled) return;
+            
+            moveInput = context.ReadValue<Vector2>();
+            isMoving = moveInput.sqrMagnitude > 0.01f;
+            
+            // Only enable trail when moving
+            if (movementTrail != null)
             {
-                rb.linearVelocity = Vector2.zero;
+                movementTrail.emitting = isMoving;
             }
+            
+            if (enableDebugLogs && isMoving)
+            {
+                Debug.Log($"[PlayerController] Move input: {moveInput}");
+            }
+        }
+        #endregion
+
+        #region Game State
+        private void HandleGameStateChanged(GameManager.GameState newState)
+        {
+            isInputEnabled = newState == GameManager.GameState.Playing;
+            
+            if (!isInputEnabled)
+            {
+                // Reset movement when input is disabled
+                moveInput = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
+                isMoving = false;
+                
+                if (movementTrail != null)
+                {
+                    movementTrail.emitting = false;
+                }
+            }
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[PlayerController] Game state changed to {newState}, input enabled: {isInputEnabled}");
+            }
+        }
+        #endregion
+
+        #region Public Methods
+        public Vector3 GetPosition()
+        {
+            return transform.position;
         }
         #endregion
     }

@@ -13,7 +13,9 @@
         "CZ.Core.Enemy",
         "CZ.Core.Pooling",
         "Unity.Profiling.Core",
-        "Unity.Test-Framework.Performance"
+        "Unity.Test-Framework.Performance",
+        "CZ.Core.Player",
+        "CZ.Core.Input"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
