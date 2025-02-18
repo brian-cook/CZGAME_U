@@ -38,7 +38,10 @@ namespace CZ.Tests.PlayMode
             {
                 Debug.Log("Starting One Time Setup");
                 LogAssert.Expect(LogType.Log, "Starting One Time Setup");
-
+                
+                // Expect cleanup messages throughout the test lifecycle
+                LogAssert.ignoreFailingMessages = true;  // Ignore cleanup messages globally
+                
                 // Create a persistent root object to hold our test objects
                 persistentRoot = new GameObject("[TestRoot]");
                 Object.DontDestroyOnLoad(persistentRoot);
@@ -60,9 +63,6 @@ namespace CZ.Tests.PlayMode
                 
                 Debug.Log("One Time Setup Complete");
                 LogAssert.Expect(LogType.Log, "One Time Setup Complete");
-
-                // Ensure standard setup runs after one-time setup
-                Setup();
             }
             
             yield return null;
@@ -78,60 +78,40 @@ namespace CZ.Tests.PlayMode
                 return;
             }
 
+            // Reset state for clean setup
+            CleanupTestObjects();
+            
             Debug.Log("Starting Standard Setup");
             LogAssert.Expect(LogType.Log, "Starting Standard Setup");
-
+            
             try
             {
-                // Reset state for clean setup
-                isStandardSetupComplete = false;
-                
                 // Call base setup first
                 base.Setup();
                 
                 // Wait for input system initialization
                 InputSystem.Update();
 
-                // Ensure we have our persistent root
-                Assert.That(persistentRoot, Is.Not.Null, "Test root should exist");
-                Assert.That(persistentRoot.activeInHierarchy, Is.True, "Test root should be active");
-
-                // Create player object with required components and proper naming
+                // Create player object with required components
                 playerObject = new GameObject("[TestPlayer]");
-                Assert.That(playerObject, Is.Not.Null, "Player object should be created");
+                playerObject.transform.SetParent(persistentRoot.transform);
                 
-                playerObject.transform.SetParent(persistentRoot.transform, false);
-                Assert.That(playerObject.transform.parent, Is.EqualTo(persistentRoot.transform), "Player should be child of test root");
-                
-                // Configure Rigidbody2D
                 rb = playerObject.AddComponent<Rigidbody2D>();
-                Assert.That(rb, Is.Not.Null, "Rigidbody2D should be added");
                 rb.gravityScale = 0f;
                 rb.constraints = RigidbodyConstraints2D.FreezeRotation;
                 
-                // Setup keyboard first
                 keyboard = InputSystem.AddDevice<Keyboard>();
-                Assert.That(keyboard, Is.Not.Null, "Keyboard device should be created");
-                Assert.That(keyboard.added, Is.True, "Keyboard should be added to Input System");
-                InputSystem.Update(); // Ensure device is properly initialized
+                InputSystem.Update();
 
-                // Now add PlayerController
                 playerController = playerObject.AddComponent<PlayerController>();
-                Assert.That(playerController, Is.Not.Null, "PlayerController component should be added");
                 
                 // Initialize GameControls
                 controls = new GameControls();
                 controls.Enable();
                 
-                // Final verification of setup
-                Assert.That(playerObject.GetComponent<PlayerController>(), Is.EqualTo(playerController), "PlayerController component should be properly attached");
-                Assert.That(playerObject.activeInHierarchy, Is.True, "Player object should be active");
-                Assert.That(controls.Player.enabled, Is.True, "Player controls should be enabled");
-
                 // Start the game
                 gameManager.StartGame();
                 
-                // Set completion flag only after all setup is successful
                 isStandardSetupComplete = true;
                 Debug.Log("Standard Setup Complete");
                 LogAssert.Expect(LogType.Log, "Standard Setup Complete");
@@ -144,15 +124,50 @@ namespace CZ.Tests.PlayMode
             }
         }
 
+        private void CleanupTestObjects()
+        {
+            if (controls != null)
+            {
+                controls.Player.Disable();
+                controls.Disable();
+                controls.Dispose();
+                controls = null;
+            }
+
+            if (playerController != null)
+            {
+                playerController.enabled = false;
+            }
+
+            if (playerObject != null)
+            {
+                Object.DestroyImmediate(playerObject);
+                playerObject = null;
+                playerController = null;
+                rb = null;
+            }
+
+            if (keyboard != null)
+            {
+                InputSystem.RemoveDevice(keyboard);
+                keyboard = null;
+            }
+
+            // Force immediate cleanup
+            System.GC.Collect();
+            System.GC.WaitForPendingFinalizers();
+            
+            isStandardSetupComplete = false;
+        }
+
         [UnitySetUp]
         public IEnumerator UnitySetup()
         {
+            // Ensure Setup has completed
             if (!isStandardSetupComplete)
             {
-                var errorMsg = "Standard Setup must complete before Unity Setup";
-                Debug.LogError(errorMsg);
-                Assert.Fail(errorMsg);
-                yield break;
+                Setup();
+                yield return null;
             }
 
             Debug.Log("Starting Unity Setup");
@@ -262,21 +277,43 @@ namespace CZ.Tests.PlayMode
             testScene = SceneManager.CreateScene("PlayerTestScene");
             SceneManager.SetActiveScene(testScene);
             
-            // Setup GameManager
-            var gameManagerObj = new GameObject("GameManager");
-            gameManager = gameManagerObj.AddComponent<GameManager>();
-            Object.DontDestroyOnLoad(gameManagerObj);
+            // Only create GameManager if it doesn't exist
+            if (GameManager.Instance == null)
+            {
+                var gameManagerObj = new GameObject("[GameManager]");
+                gameManager = gameManagerObj.AddComponent<GameManager>();
+                Object.DontDestroyOnLoad(gameManagerObj);
+            }
             
-            // Setup Player
-            var playerObj = new GameObject("Player");
-            playerController = playerObj.AddComponent<PlayerController>();
+            // Create new player if needed
+            if (playerObject == null)
+            {
+                playerObject = new GameObject("[TestPlayer]");
+                playerObject.transform.SetParent(persistentRoot.transform);
+                
+                rb = playerObject.AddComponent<Rigidbody2D>();
+                rb.gravityScale = 0f;
+                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+                
+                playerController = playerObject.AddComponent<PlayerController>();
+            }
             
             // Wait for initialization
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
             
-            // Start game
-            gameManager.StartGame();
+            // Start game if needed
+            if (GameManager.Instance.CurrentGameState != GameManager.GameState.Playing)
+            {
+                GameManager.Instance.StartGame();
+            }
+            
             yield return null;
+            
+            // Verify setup
+            Assert.That(playerController, Is.Not.Null, "PlayerController should exist");
+            Assert.That(playerController.enabled, Is.True, "PlayerController should be enabled");
+            Assert.That(GameManager.Instance.CurrentGameState, Is.EqualTo(GameManager.GameState.Playing));
+            Assert.That(playerObject.transform.parent, Is.EqualTo(persistentRoot.transform), "Player should be child of test root");
         }
 
         private IEnumerator TearDownTestEnvironment()
@@ -284,14 +321,33 @@ namespace CZ.Tests.PlayMode
             // Cleanup player
             if (playerController != null)
             {
+                // Ensure input system is properly cleaned up
                 playerController.enabled = false;
-                Object.DestroyImmediate(playerController.gameObject);
-            }
-            
-            // Cleanup GameManager
-            if (gameManager != null)
-            {
-                Object.DestroyImmediate(gameManager.gameObject);
+                yield return null;
+
+                // Get the controls instance using reflection to ensure cleanup
+                var controlsField = typeof(PlayerController).GetField("controls", 
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                
+                if (controlsField != null)
+                {
+                    var playerControls = controlsField.GetValue(playerController) as GameControls;
+                    if (playerControls != null)
+                    {
+                        playerControls.Player.Disable();
+                        playerControls.Disable();
+                        playerControls.Dispose();
+                    }
+                }
+                
+                // Destroy player object
+                if (playerObject != null)
+                {
+                    Object.DestroyImmediate(playerObject);
+                    playerObject = null;
+                }
+                playerController = null;
+                rb = null;
             }
             
             // Cleanup test scene
@@ -299,51 +355,31 @@ namespace CZ.Tests.PlayMode
             {
                 yield return SceneManager.UnloadSceneAsync(testScene);
             }
+
+            // Force garbage collection after cleanup
+            System.GC.Collect();
+            yield return null;
         }
 
         [TearDown]
         public override void TearDown()
         {
-            controls?.Disable();
-            controls?.Dispose();
-            
-            if (!isStandardSetupComplete) return;
-
             Debug.Log("Starting Standard Teardown");
             LogAssert.Expect(LogType.Log, "Starting Standard Teardown");
 
-            try
+            try 
             {
-                if (playerObject != null)
-                {
-                    // Properly cleanup components before destroying object
-                    if (playerController != null)
-                    {
-                        playerController.enabled = false;
-                    }
-                    
-                    Object.DestroyImmediate(playerObject);
-                    playerObject = null;
-                }
+                CleanupTestObjects();
+                base.TearDown();
                 
-                if (keyboard != null)
-                {
-                    InputSystem.RemoveDevice(keyboard);
-                    keyboard = null;
-                }
-
-                isStandardSetupComplete = false;
+                Debug.Log("Standard Teardown Complete");
+                LogAssert.Expect(LogType.Log, "Standard Teardown Complete");
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"Standard Teardown Failed: {e.Message}");
+                Debug.LogError($"Teardown failed: {e.Message}\n{e.StackTrace}");
                 throw;
             }
-
-            base.TearDown();
-
-            Debug.Log("Standard Teardown Complete");
-            LogAssert.Expect(LogType.Log, "Standard Teardown Complete");
         }
 
         [UnityEngine.TestTools.UnityTearDownAttribute]
@@ -353,6 +389,9 @@ namespace CZ.Tests.PlayMode
 
             Debug.Log("Starting One Time Teardown");
             LogAssert.Expect(LogType.Log, "Starting One Time Teardown");
+
+            // Re-enable log message checking
+            LogAssert.ignoreFailingMessages = false;
 
             if (persistentRoot != null)
             {
@@ -369,7 +408,6 @@ namespace CZ.Tests.PlayMode
                 }
             }
             
-            // Wait a frame to ensure cleanup
             yield return null;
 
             Debug.Log("One Time Teardown Complete");

@@ -1,0 +1,26 @@
+{
+    "name": "CZ.Tests.PlayMode.Player",
+    "rootNamespace": "CZ.Tests.PlayMode.Player",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "Unity.InputSystem",
+        "Unity.InputSystem.TestFramework",
+        "CZ.Core",
+        "CZ.Core.Player",
+        "CZ.Core.Input"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+} 

@@ -4,6 +4,7 @@ using NaughtyAttributes;
 using CZ.Core;
 using CZ.Core.Input;
 using static NaughtyAttributes.EInfoBoxType;
+using System.Linq;
 
 namespace CZ.Core.Player
 {
@@ -149,16 +150,30 @@ namespace CZ.Core.Player
             {
                 SetupComponents();
             }
-            
-            controls?.Enable();
-            isInputEnabled = GameManager.Instance?.CurrentGameState == GameManager.GameState.Playing;
+
+            // Only enable controls if game is in Playing state
+            if (GameManager.Instance?.CurrentGameState == GameManager.GameState.Playing)
+            {
+                controls?.Enable();
+                isInputEnabled = true;
+            }
+            else
+            {
+                isInputEnabled = false;
+            }
             
             Debug.Log($"[PlayerController] OnEnable - Input Enabled: {isInputEnabled}, Controls Active: {controls?.Player.enabled}");
         }
 
         private void OnDisable()
         {
-            controls?.Disable();
+            if (controls != null)
+            {
+                controls.Player.Move.performed -= OnMove;
+                controls.Player.Move.canceled -= OnMove;
+                controls.Player.Disable();
+                controls.Disable();
+            }
             
             if (movementTrail != null)
             {
@@ -166,6 +181,14 @@ namespace CZ.Core.Player
             }
             
             isInputEnabled = false;
+            moveInput = Vector2.zero;
+            isMoving = false;
+            
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+            }
+            
             Debug.Log("[PlayerController] OnDisable - Input system disabled");
         }
 
@@ -186,9 +209,26 @@ namespace CZ.Core.Player
             
             if (controls != null)
             {
+                // Ensure Player actions are disabled first
                 controls.Player.Move.performed -= OnMove;
                 controls.Player.Move.canceled -= OnMove;
+                controls.Player.Disable();
+                
+                // Then disable and dispose the entire controls
+                controls.Disable();
                 controls.Dispose();
+                controls = null;
+            }
+
+            // Cleanup shared material if this is the last instance
+            if (sharedTrailMaterial != null)
+            {
+                var activeControllers = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+                if (!activeControllers.Any(pc => pc != this && pc.enabled))
+                {
+                    Destroy(sharedTrailMaterial);
+                    sharedTrailMaterial = null;
+                }
             }
         }
         #endregion
@@ -249,27 +289,23 @@ namespace CZ.Core.Player
         #region Game State
         private void HandleGameStateChanged(GameManager.GameState newState)
         {
-            bool wasInputEnabled = isInputEnabled;
             isInputEnabled = newState == GameManager.GameState.Playing;
             
-            if (isInputEnabled && !wasInputEnabled)
+            if (isInputEnabled)
             {
                 controls?.Enable();
                 Debug.Log("[PlayerController] Input enabled due to game state change to Playing");
             }
-            else if (!isInputEnabled && wasInputEnabled)
+            else
             {
                 controls?.Disable();
-                Debug.Log("[PlayerController] Input disabled due to game state change");
-            }
-            
-            if (!isInputEnabled)
-            {
-                // Reset movement when input is disabled
+                // Reset movement state when input is disabled
                 moveInput = Vector2.zero;
-                rb.linearVelocity = Vector2.zero;
                 isMoving = false;
-                
+                if (rb != null)
+                {
+                    rb.linearVelocity = Vector2.zero;
+                }
                 if (movementTrail != null)
                 {
                     movementTrail.emitting = false;

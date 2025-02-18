@@ -166,173 +166,45 @@ namespace CZ.Core
                     return false;
                 }
                 
-                // Use Unity 6.0 specific memory counter with fallbacks
-                try
+                // Initialize memory monitoring
+                if (!InitializeMemoryMonitoring())
                 {
-                    // Try each known memory counter name in order with proper category
-                    string[] memoryCounters = new string[] 
-                    {
-                        "Total Used Memory",       // Primary counter
-                        "System Memory",           // Fallback 1
-                        "Total System Memory",     // Fallback 2
-                        "Total Reserved Memory"    // Fallback 3
-                    };
-                    
-                    bool memoryInitialized = false;
-                    foreach (string counterName in memoryCounters)
-                    {
-                        try
-                        {
-                            memoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, counterName, 15);
-                            if (memoryRecorder.Valid)
-                            {
-                                // Wait for valid reading
-                                float testValue = 0f;
-                                for (int i = 0; i < 10; i++)
-                                {
-                                    testValue = ConvertToMB(memoryRecorder.CurrentValue);
-                                    if (testValue > 0)
-                                    {
-                                        Debug.Log($"[GameManager] Successfully initialized memory recorder with counter: {counterName} (Current: {testValue:F2}MB)");
-                                        memoryInitialized = true;
-                                        // Cache the initial valid reading
-                                        currentMemoryUsageMB = testValue;
-                                        break;
-                                    }
-                                    System.Threading.Thread.Sleep(50); // Short delay between checks
-                                }
-                                
-                                if (!memoryInitialized)
-                                {
-                                    Debug.LogWarning($"[GameManager] Counter '{counterName}' failed to provide valid reading after initialization");
-                                    memoryRecorder.Dispose();
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                memoryRecorder.Dispose();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.LogWarning($"[GameManager] Failed to initialize counter '{counterName}': {e.Message}");
-                            continue;
-                        }
-                    }
-                    
-                    if (!memoryInitialized)
-                    {
-                        Debug.LogError("[GameManager] Failed to initialize memory recorder - No valid Unity 6.0 memory counters found");
-                        CleanupRecorders();
-                        return false;
-                    }
-                }
-                catch (Exception memEx)
-                {
-                    Debug.LogError($"[GameManager] Error initializing memory recorder: {memEx.Message}");
+                    Debug.LogError("[GameManager] Failed to initialize memory monitoring");
                     CleanupRecorders();
                     return false;
                 }
-                
-                // Use Unity 6.0 GC specific counter with fallbacks
-                try
+
+                // Initialize GC monitoring
+                if (!InitializeGCMonitoring())
                 {
-                    string[] gcCounters = new string[] 
-                    {
-                        "GC Used Memory",     // Primary counter
-                        "GC Memory",          // Fallback 1
-                        "GC Reserved Memory", // Fallback 2
-                        "GC Heap Size"       // Fallback 3
-                    };
-                    
-                    bool gcInitialized = false;
-                    foreach (string counterName in gcCounters)
-                    {
-                        try
-                        {
-                            gcMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, counterName, 15);
-                            if (gcMemoryRecorder.Valid)
-                            {
-                                // Wait for valid reading
-                                float testValue = 0f;
-                                for (int i = 0; i < 10; i++)
-                                {
-                                    testValue = ConvertToMB(gcMemoryRecorder.CurrentValue);
-                                    if (testValue > 0)
-                                    {
-                                        Debug.Log($"[GameManager] Successfully initialized GC recorder with counter: {counterName} (Current: {testValue:F2}MB)");
-                                        gcInitialized = true;
-                                        break;
-                                    }
-                                    System.Threading.Thread.Sleep(50); // Short delay between checks
-                                }
-                                
-                                if (!gcInitialized)
-                                {
-                                    Debug.LogWarning($"[GameManager] GC Counter '{counterName}' failed to provide valid reading after initialization");
-                                    gcMemoryRecorder.Dispose();
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                gcMemoryRecorder.Dispose();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.LogWarning($"[GameManager] Failed to initialize GC counter '{counterName}': {e.Message}");
-                            continue;
-                        }
-                    }
-                    
-                    if (!gcInitialized)
-                    {
-                        Debug.LogError("[GameManager] Failed to initialize GC memory recorder - No valid Unity 6.0 GC counters found");
-                        CleanupRecorders();
-                        return false;
-                    }
-                }
-                catch (Exception gcEx)
-                {
-                    Debug.LogError($"[GameManager] Error initializing GC memory recorder: {gcEx.Message}");
+                    Debug.LogError("[GameManager] Failed to initialize GC monitoring");
                     CleanupRecorders();
                     return false;
                 }
-                
-                // Use cached initial memory reading
-                Debug.Log($"[GameManager] Initial memory reading: {currentMemoryUsageMB:F2}MB");
-                
-                // Set initial baseline - this will be our starting point regardless of current usage
-                memoryBaseline = currentMemoryUsageMB;
-                startupMemoryBaseline = currentMemoryUsageMB; // Cache startup baseline
-                
-                // Adjust thresholds based on initial memory state if above baseline
-                if (currentMemoryUsageMB > BASELINE_THRESHOLD_MB)
+
+                // Set initial memory baseline
+                if (memoryRecorder.Valid && memoryRecorder.CurrentValue > 0)
                 {
-                    float thresholdScale = currentMemoryUsageMB / BASELINE_THRESHOLD_MB;
-                    float adjustedBaseline = BASELINE_THRESHOLD_MB * thresholdScale;
+                    float initialMemory = ConvertToMB(memoryRecorder.CurrentValue);
+                    Debug.Log($"[GameManager] Initial memory reading: {initialMemory:F2}MB");
+                    startupMemoryBaseline = initialMemory;
+                    memoryBaseline = initialMemory;
+                    Debug.Log($"[GameManager] Setting initial memory baseline to: {memoryBaseline:F2}MB");
                     
-                    Debug.Log($"[GameManager] Adjusting memory thresholds for high initial state (Scale: {thresholdScale:F2})");
-                    Debug.Log($"[GameManager] Setting initial memory baseline to: {memoryBaseline:F2}MB (Adjusted threshold: {adjustedBaseline:F2}MB)");
-                    
-                    // Start with a preemptive cleanup to try to reduce memory
-                    StartCoroutine(PerformInitialCleanup(adjustedBaseline));
+                    // Perform initial cleanup if needed
+                    if (initialMemory > BASELINE_THRESHOLD_MB)
+                    {
+                        Debug.Log("[GameManager] Performing initial memory cleanup...");
+                        StartCoroutine(PerformInitialCleanup(BASELINE_THRESHOLD_MB));
+                    }
                 }
                 else
                 {
-                    Debug.Log($"[GameManager] Setting initial memory baseline to: {memoryBaseline:F2}MB");
-                    // Start with a preemptive cleanup to try to reduce memory
-                    StartCoroutine(PerformInitialCleanup(BASELINE_THRESHOLD_MB));
+                    Debug.LogError("[GameManager] Failed to get initial memory reading");
+                    CleanupRecorders();
+                    return false;
                 }
-                
+
                 Debug.Log("[GameManager] Performance monitoring initialized successfully");
                 return true;
             }
@@ -342,6 +214,85 @@ namespace CZ.Core
                 CleanupRecorders();
                 return false;
             }
+        }
+
+        private bool InitializeMemoryMonitoring()
+        {
+            string[] memoryCounters = new string[] 
+            {
+                "Total Used Memory",       // Primary counter
+                "System Memory",           // Fallback 1
+                "Total System Memory",     // Fallback 2
+                "Total Reserved Memory"    // Fallback 3
+            };
+            
+            foreach (string counterName in memoryCounters)
+            {
+                try
+                {
+                    memoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, counterName, 15);
+                    if (memoryRecorder.Valid)
+                    {
+                        float testValue = ConvertToMB(memoryRecorder.CurrentValue);
+                        if (testValue > 0)
+                        {
+                            Debug.Log($"[GameManager] Successfully initialized memory recorder with counter: {counterName} (Current: {testValue:F2}MB)");
+                            currentMemoryUsageMB = testValue;
+                            return true;
+                        }
+                        memoryRecorder.Dispose();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"[GameManager] Failed to initialize counter '{counterName}': {e.Message}");
+                    if (!memoryRecorder.Equals(default(ProfilerRecorder)))
+                    {
+                        memoryRecorder.Dispose();
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        private bool InitializeGCMonitoring()
+        {
+            string[] gcCounters = new string[] 
+            {
+                "GC Used Memory",     // Primary counter
+                "GC Memory",          // Fallback 1
+                "GC Reserved Memory", // Fallback 2
+                "GC Heap Size"       // Fallback 3
+            };
+            
+            foreach (string counterName in gcCounters)
+            {
+                try
+                {
+                    gcMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, counterName, 15);
+                    if (gcMemoryRecorder.Valid)
+                    {
+                        float testValue = ConvertToMB(gcMemoryRecorder.CurrentValue);
+                        if (testValue > 0)
+                        {
+                            Debug.Log($"[GameManager] Successfully initialized GC recorder with counter: {counterName} (Current: {testValue:F2}MB)");
+                            return true;
+                        }
+                        gcMemoryRecorder.Dispose();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"[GameManager] Failed to initialize GC counter '{counterName}': {e.Message}");
+                    if (!gcMemoryRecorder.Equals(default(ProfilerRecorder)))
+                    {
+                        gcMemoryRecorder.Dispose();
+                    }
+                }
+            }
+            
+            return false;
         }
 
         private IEnumerator PerformInitialCleanup(float adjustedBaseline)

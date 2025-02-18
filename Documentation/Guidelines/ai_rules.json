@@ -179,7 +179,35 @@
         "priority": "high",
         "user_name": "Brian",
         "use_name": true,
-        "frequency": "every_response"
+        "frequency": "every_response",
+        "compliance_verification": {
+            "required": true,
+            "frequency": "every_response",
+            "checks": {
+                "verify_all_rules": true,
+                "document_compliance": true,
+                "report_violations": true,
+                "suggest_improvements": true
+            },
+            "verification_format": {
+                "prefix": "AI Rules Compliance Report:",
+                "sections": [
+                    "File Verification",
+                    "Cursor Operations",
+                    "Unity Compliance",
+                    "Technical Standards",
+                    "Project Alignment",
+                    "Implementation Tracking",
+                    "Error Handling",
+                    "Documentation"
+                ],
+                "status_levels": [
+                    "Compliant",
+                    "Partial",
+                    "Non-Compliant"
+                ]
+            }
+        }
     },
     "response_format": {
         "1_file_review": "Review and verify all relevant files and structure",

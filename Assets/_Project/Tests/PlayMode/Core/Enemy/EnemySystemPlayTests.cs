@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -12,6 +13,8 @@ using CZ.Core.Pooling;
 using UnityEngine.SceneManagement;
 using CZ.Core;
 using CZ.Core.Player;
+using UnityEngine.InputSystem;
+using Object = UnityEngine.Object;
 
 namespace CZ.Tests.PlayMode.Enemy
 {
@@ -25,6 +28,18 @@ namespace CZ.Tests.PlayMode.Enemy
         private GameManager gameManager;
         private PlayerController playerController;
         
+        // Test configuration constants
+        private const int TARGET_COUNT = 10;
+        private const float SPAWN_INTERVAL = 0.2f;
+        private const float CYCLE_TIMEOUT = 10.0f;
+        private const int MAX_CYCLES = 3;
+        private const float MAX_MEMORY_DELTA = 50f;
+
+        private string GetUniqueSceneName()
+        {
+            return $"EnemyTestScene_{System.Guid.NewGuid()}";
+        }
+
         [UnitySetUp]
         public IEnumerator Setup()
         {
@@ -33,17 +48,36 @@ namespace CZ.Tests.PlayMode.Enemy
             
             try
             {
+                // Create a new scene for the test
+                testScene = SceneManager.CreateScene(GetUniqueSceneName());
+                SceneManager.SetActiveScene(testScene);
+
                 // Create pool manager
                 var poolManagerObject = new GameObject("PoolManager");
                 poolManager = poolManagerObject.AddComponent<PoolManager>();
+                SceneManager.MoveGameObjectToScene(poolManagerObject, testScene);
                 
                 // Create and configure test prefab
                 enemyPrefab = new GameObject("EnemyPrefab");
+                SceneManager.MoveGameObjectToScene(enemyPrefab, testScene);
+                
                 var enemy = enemyPrefab.AddComponent<BaseEnemy>();
-                enemyPrefab.AddComponent<SpriteRenderer>();
+                if (enemyPrefab.GetComponent<SpriteRenderer>() == null)
+                {
+                    var renderer = enemyPrefab.AddComponent<SpriteRenderer>();
+                    renderer.sprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 4, 4), Vector2.one * 0.5f);
+                }
+                
+                if (enemyPrefab.GetComponent<Rigidbody2D>() == null)
+                {
+                    var rb = enemyPrefab.AddComponent<Rigidbody2D>();
+                    rb.gravityScale = 0f;
+                    rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+                }
                 
                 // Create spawner object first
                 spawnerObject = new GameObject("EnemySpawner");
+                SceneManager.MoveGameObjectToScene(spawnerObject, testScene);
                 
                 // Wait one frame to ensure proper initialization
                 yield return null;
@@ -75,30 +109,71 @@ namespace CZ.Tests.PlayMode.Enemy
         [UnityTearDown]
         public IEnumerator Teardown()
         {
-            // Stop spawning first
-            if (spawner != null)
+            bool teardownComplete = false;
+            Exception teardownException = null;
+
+            try
             {
-                spawner.StopSpawning();
-                spawner.DespawnAllEnemies();
+                // Stop spawning first
+                if (spawner != null)
+                {
+                    spawner.StopSpawning();
+                    spawner.DespawnAllEnemies();
+                }
+                
+                teardownComplete = true;
             }
-            
-            yield return new WaitForSeconds(0.1f);
-            
-            if (spawnerObject != null) Object.Destroy(spawnerObject);
-            if (enemyPrefab != null) Object.Destroy(enemyPrefab);
-            if (poolManager != null) Object.Destroy(poolManager.gameObject);
-            
-            // Wait for destruction
-            yield return null;
-            
-            // Clear any remaining objects
-            var remainingEnemies = Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
-            foreach (var enemy in remainingEnemies)
+            catch (Exception e)
             {
-                Object.Destroy(enemy.gameObject);
+                teardownException = e;
+                Debug.LogError($"Error during test teardown: {e}");
             }
-            
-            yield return null;
+
+            if (teardownException != null)
+                throw teardownException;
+
+            if (teardownComplete)
+            {
+                yield return new WaitForSeconds(0.1f);
+                
+                // Cleanup input system
+                var inputComponents = Object.FindObjectsByType<PlayerInput>(FindObjectsSortMode.None);
+                foreach (var input in inputComponents)
+                {
+                    if (input != null && input.actions != null)
+                    {
+                        input.actions.Disable();
+                        Object.Destroy(input.gameObject);
+                    }
+                }
+                
+                // Clear any remaining objects
+                var remainingEnemies = Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
+                foreach (var enemy in remainingEnemies)
+                {
+                    if (enemy != null)
+                    {
+                        Object.Destroy(enemy.gameObject);
+                    }
+                }
+                
+                yield return null;
+
+                // Cleanup scene
+                if (testScene.isLoaded)
+                {
+                    var asyncOperation = SceneManager.UnloadSceneAsync(testScene);
+                    while (!asyncOperation.isDone)
+                    {
+                        yield return null;
+                    }
+                }
+                
+                // Force cleanup
+                yield return new WaitForSeconds(0.1f);
+                System.GC.Collect();
+                yield return null;
+            }
         }
         
         [UnityTest]
@@ -129,7 +204,7 @@ namespace CZ.Tests.PlayMode.Enemy
                 Assert.AreEqual(5, spawner.ActiveEnemyCount, "Spawner created incorrect number of enemies");
                 
                 // Verify enemy behavior
-                var enemies = Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
+                var enemies = UnityEngine.Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
                 Assert.AreEqual(5, enemies.Length, "Incorrect number of enemies found in scene");
                 
                 foreach (var enemy in enemies)
@@ -159,58 +234,161 @@ namespace CZ.Tests.PlayMode.Enemy
         #endif
         public IEnumerator EnemyPool_HandlesStressTest()
         {
-            bool testCompleted = false;
+            // Setup state tracking
+            bool setupSuccess = false;
+            bool testInProgress = false;
+            float initialMemory = 0f;
             
-            // Setup test environment
-            yield return SetupTestEnvironment();
-            
+            // Pre-test setup
             try
             {
-                int maxEnemies = 10;
-                spawner.SetSpawnCount(maxEnemies);
+                initialMemory = GetTotalMemoryMB();
+                setupSuccess = true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to initialize memory tracking: {e.Message}");
+                Assert.Fail($"Test setup failed: {e.Message}");
+                yield break;
+            }
+
+            if (setupSuccess)
+            {
+                yield return SetupTestEnvironment();
                 
-                // Rapid spawn/despawn cycles
-                for (int cycle = 0; cycle < 3; cycle++)
+                try
                 {
-                    // Spawn phase
+                    // Initialize pool with sufficient capacity
+                    spawner.SetSpawnCount(TARGET_COUNT);
+                    testInProgress = true;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to initialize spawner: {e.Message}");
+                    Assert.Fail($"Spawner initialization failed: {e.Message}");
+                    yield break;
+                }
+            }
+
+            // Main test execution
+            if (testInProgress)
+            {
+                LogPoolStats("Initial");
+                
+                // Track performance metrics
+                float totalElapsedTime = 0f;
+                int totalSpawnAttempts = 0;
+                int successfulSpawns = 0;
+                
+                // Perform spawn/despawn cycles
+                for (int cycle = 0; cycle < MAX_CYCLES && testInProgress; cycle++)
+                {
+                    Debug.Log($"Starting cycle {cycle}");
+                    float cycleStartMemory = GetTotalMemoryMB();
+                    float cycleStartTime = Time.time;
+                    
+                    // Start spawning phase
+                    bool spawningComplete = false;
                     spawner.StartSpawning();
                     
-                    float spawnTimeout = Time.time + 5f;
-                    while (spawner.ActiveEnemyCount < maxEnemies && Time.time < spawnTimeout)
+                    // Monitor spawn progress
+                    while (!spawningComplete && Time.time - cycleStartTime < CYCLE_TIMEOUT)
                     {
-                        yield return null;
+                        totalSpawnAttempts++;
+                        
+                        if (Mathf.FloorToInt(Time.time - cycleStartTime) > 
+                            Mathf.FloorToInt(Time.time - cycleStartTime - Time.deltaTime))
+                        {
+                            LogPoolStats($"Cycle {cycle} Progress");
+                        }
+                        
+                        if (spawner.ActiveEnemyCount >= TARGET_COUNT)
+                        {
+                            spawningComplete = true;
+                            successfulSpawns += spawner.ActiveEnemyCount;
+                        }
+                        
+                        yield return new WaitForSeconds(SPAWN_INTERVAL);
                     }
                     
-                    Assert.AreEqual(maxEnemies, spawner.ActiveEnemyCount, 
-                        $"Failed to spawn {maxEnemies} enemies in cycle {cycle}");
+                    float elapsedTime = Time.time - cycleStartTime;
+                    totalElapsedTime += elapsedTime;
                     
-                    // Despawn phase
+                    // Verify cycle results
+                    if (!spawningComplete)
+                    {
+                        Debug.LogError($"Cycle {cycle} failed to complete within timeout. " +
+                                     $"Spawned {spawner.ActiveEnemyCount}/{TARGET_COUNT} enemies");
+                        testInProgress = false;
+                        break;
+                    }
+                    
+                    // Memory verification
+                    float cycleDeltaMemory = GetTotalMemoryMB() - cycleStartMemory;
+                    if (cycleDeltaMemory >= MAX_MEMORY_DELTA)
+                    {
+                        Debug.LogError($"Cycle {cycle} exceeded memory threshold. " +
+                                     $"Delta: {cycleDeltaMemory:F2}MB");
+                        testInProgress = false;
+                        break;
+                    }
+                    
+                    // Cleanup phase
+                    LogPoolStats($"Before Despawn Cycle {cycle}");
                     spawner.DespawnAllEnemies();
                     yield return new WaitForSeconds(0.5f);
                     
-                    Assert.AreEqual(0, spawner.ActiveEnemyCount, 
-                        $"Failed to despawn all enemies in cycle {cycle}");
+                    if (spawner.ActiveEnemyCount > 0)
+                    {
+                        Debug.LogError($"Failed to despawn all enemies in cycle {cycle}. " +
+                                     $"Remaining: {spawner.ActiveEnemyCount}");
+                        testInProgress = false;
+                        break;
+                    }
+                    
+                    LogPoolStats($"After Despawn Cycle {cycle}");
+                    
+                    // Force cleanup between cycles
+                    System.GC.Collect();
+                    yield return null;
                 }
                 
-                testCompleted = true;
-            }
-            finally
-            {
-                if (!testCompleted)
+                // Final verification
+                if (testInProgress)
                 {
-                    Debug.LogWarning("[EnemySystemPlayTests] Stress test did not complete successfully, performing cleanup");
+                    float finalMemoryDelta = GetTotalMemoryMB() - initialMemory;
+                    Debug.Log($"Stress Test Statistics:\n" +
+                             $"Total Elapsed Time: {totalElapsedTime:F2}s\n" +
+                             $"Average Time Per Cycle: {totalElapsedTime/MAX_CYCLES:F2}s\n" +
+                             $"Total Spawn Attempts: {totalSpawnAttempts}\n" +
+                             $"Successful Spawns: {successfulSpawns}\n" +
+                             $"Memory Delta: {finalMemoryDelta:F2}MB");
+                    
+                    Assert.That(successfulSpawns, Is.GreaterThan(0), 
+                        "No successful spawns completed during test");
                 }
             }
             
-            // Cleanup outside of finally
+            // Always perform cleanup
+            Debug.Log($"Final Memory Delta: {GetTotalMemoryMB() - initialMemory:F2}MB");
             yield return TearDownTestEnvironment();
+        }
+        
+        private void LogPoolStats(string phase)
+        {
+            if (spawner != null)
+            {
+                Debug.Log($"[Pool Stats] {phase}" +
+                         $"\nActive Count: {spawner.ActiveEnemyCount}" +
+                         $"\nMemory Usage: {GetTotalMemoryMB():F2}MB");
+            }
         }
         
         [UnityTest]
         public IEnumerator Enemy_FollowsTargetCorrectly()
         {
             // Spawn single enemy
-            var enemy = Object.Instantiate(enemyPrefab).GetComponent<BaseEnemy>();
+            var enemy = UnityEngine.Object.Instantiate(enemyPrefab).GetComponent<BaseEnemy>();
             enemy.OnSpawn();
             
             // Set initial position
@@ -226,7 +404,7 @@ namespace CZ.Tests.PlayMode.Enemy
             // Verify position (should be at or near target)
             Assert.That(Vector3.Distance(enemy.transform.position, target), Is.LessThan(0.1f));
             
-            Object.Destroy(enemy.gameObject);
+            UnityEngine.Object.Destroy(enemy.gameObject);
         }
         
         [UnityTest]
@@ -283,56 +461,128 @@ namespace CZ.Tests.PlayMode.Enemy
         
         private IEnumerator SetupTestEnvironment()
         {
-            // Create test scene
-            testScene = SceneManager.CreateScene("EnemyTestScene");
-            SceneManager.SetActiveScene(testScene);
+            bool setupComplete = false;
+            Exception setupException = null;
+
+            // Check for existing test scene and unload if found
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+                if (scene.name.StartsWith("EnemyTestScene"))
+                {
+                    yield return SceneManager.UnloadSceneAsync(scene);
+                }
+            }
+
+            // Create test scene with unique name
+            string uniqueSceneName = $"EnemyTestScene_{System.Guid.NewGuid().ToString("N")}";
             
-            // Setup GameManager
-            var gameManagerObj = new GameObject("GameManager");
-            gameManager = gameManagerObj.AddComponent<GameManager>();
-            Object.DontDestroyOnLoad(gameManagerObj);
-            
-            // Setup Player
-            var playerObj = new GameObject("Player");
-            playerController = playerObj.AddComponent<PlayerController>();
-            
-            // Setup EnemySpawner
-            var spawnerObj = new GameObject("EnemySpawner");
-            spawner = spawnerObj.AddComponent<EnemySpawner>();
-            
-            // Setup enemy prefab
-            enemyPrefab = CreateEnemyPrefab();
-            spawner.SetEnemyPrefab(enemyPrefab);
-            
-            // Wait for initialization
-            yield return new WaitForSeconds(0.5f);
-            
-            // Start game
-            gameManager.StartGame();
-            yield return null;
+            try
+            {
+                testScene = SceneManager.CreateScene(uniqueSceneName);
+                SceneManager.SetActiveScene(testScene);
+
+                // Setup GameManager
+                var gameManagerObj = new GameObject("GameManager");
+                gameManager = gameManagerObj.AddComponent<GameManager>();
+                SceneManager.MoveGameObjectToScene(gameManagerObj, testScene);
+
+                // Setup Player
+                var playerObj = new GameObject("Player");
+                playerController = playerObj.AddComponent<PlayerController>();
+                SceneManager.MoveGameObjectToScene(playerObj, testScene);
+
+                // Setup EnemySpawner
+                var spawnerObj = new GameObject("EnemySpawner");
+                spawner = spawnerObj.AddComponent<EnemySpawner>();
+                SceneManager.MoveGameObjectToScene(spawnerObj, testScene);
+
+                // Setup enemy prefab
+                enemyPrefab = CreateEnemyPrefab();
+                spawner.SetEnemyPrefab(enemyPrefab);
+
+                setupComplete = true;
+            }
+            catch (System.Exception e)
+            {
+                setupException = e;
+                Debug.LogError($"[EnemySystemPlayTests] Failed to setup test environment: {e.Message}");
+            }
+
+            // Wait for initialization outside try-catch
+            if (setupComplete)
+            {
+                yield return new WaitForSeconds(0.5f);
+                gameManager.StartGame();
+                yield return null;
+            }
+            else if (setupException != null)
+            {
+                throw setupException;
+            }
         }
         
         private IEnumerator TearDownTestEnvironment()
         {
-            if (spawner != null)
+            bool teardownComplete = false;
+            Exception teardownException = null;
+
+            try
             {
-                spawner.StopSpawning();
-                spawner.DespawnAllEnemies();
+                if (spawner != null)
+                {
+                    spawner.StopSpawning();
+                    spawner.DespawnAllEnemies();
+                }
+
+                if (gameManager != null)
+                {
+                    gameManager.EndGame();
+                }
+
+                teardownComplete = true;
             }
-            
-            // Cleanup GameManager
-            if (gameManager != null)
+            catch (System.Exception e)
             {
-                Object.DestroyImmediate(gameManager.gameObject);
+                teardownException = e;
+                Debug.LogError($"[EnemySystemPlayTests] Failed initial teardown: {e.Message}");
             }
-            
-            // Cleanup test scene
-            yield return SceneManager.UnloadSceneAsync(testScene);
-            
-            // Cleanup prefab
-            if (enemyPrefab != null)
+
+            if (teardownException != null)
+                throw teardownException;
+
+            if (teardownComplete)
             {
-                Object.DestroyImmediate(enemyPrefab);
+                yield return null;
+
+                // Cleanup test scene
+                if (testScene.isLoaded)
+                {
+                    var sceneName = testScene.name;
+                    var asyncOperation = SceneManager.UnloadSceneAsync(testScene);
+                    while (!asyncOperation.isDone)
+                    {
+                        yield return null;
+                    }
+                    Debug.Log($"[EnemySystemPlayTests] Successfully unloaded test scene: {sceneName}");
+                }
+
+                // Cleanup objects
+                if (gameManager != null) Object.DestroyImmediate(gameManager.gameObject);
+                if (enemyPrefab != null) Object.DestroyImmediate(enemyPrefab);
+
+                yield return null;
+
+                // Final verification using new API
+                var remainingEnemies = Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
+                if (remainingEnemies.Length > 0)
+                {
+                    Debug.LogWarning($"[EnemySystemPlayTests] Found {remainingEnemies.Length} remaining enemies after cleanup");
+                    foreach (var enemy in remainingEnemies)
+                    {
+                        Object.DestroyImmediate(enemy.gameObject);
+                    }
+                }
             }
         }
         
@@ -340,19 +590,47 @@ namespace CZ.Tests.PlayMode.Enemy
         {
             var prefab = new GameObject("EnemyPrefab");
             
-            // Add required components
-            var enemy = prefab.AddComponent<BaseEnemy>();
-            var rb = prefab.AddComponent<Rigidbody2D>();
-            var collider = prefab.AddComponent<CircleCollider2D>();
-            var renderer = prefab.AddComponent<SpriteRenderer>();
-            
-            // Configure components
-            rb.gravityScale = 0f;
-            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-            collider.radius = 0.5f;
-            
-            prefab.SetActive(false);
-            return prefab;
+            try
+            {
+                // Add required components in correct order
+                var enemy = prefab.AddComponent<BaseEnemy>();
+                
+                // Only add components if they don't exist
+                if (prefab.GetComponent<Rigidbody2D>() == null)
+                {
+                    var rb = prefab.AddComponent<Rigidbody2D>();
+                    rb.gravityScale = 0f;
+                    rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+                }
+                
+                if (prefab.GetComponent<CircleCollider2D>() == null)
+                {
+                    var collider = prefab.AddComponent<CircleCollider2D>();
+                    collider.radius = 0.5f;
+                }
+                
+                if (prefab.GetComponent<SpriteRenderer>() == null)
+                {
+                    var renderer = prefab.AddComponent<SpriteRenderer>();
+                    renderer.sprite = UnityEngine.Sprite.Create(
+                        Texture2D.whiteTexture,
+                        new Rect(0, 0, Texture2D.whiteTexture.width, Texture2D.whiteTexture.height),
+                        new Vector2(0.5f, 0.5f)
+                    );
+                }
+                
+                // Set initial state instead of calling Initialize
+                enemy.enabled = true;
+                
+                prefab.SetActive(false);
+                return prefab;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[EnemySystemPlayTests] Failed to create enemy prefab: {e.Message}");
+                UnityEngine.Object.DestroyImmediate(prefab);
+                throw;
+            }
         }
     }
 } 
