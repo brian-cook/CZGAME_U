@@ -1,8 +1,2 @@
-Assets\_Project\Scripts\Core\GameManager.cs(238,25): error CS0019: Operator '==' cannot be applied to operands of type 'ProfilerRecorder' and '<null>'
-
-Assets\_Project\Scripts\Core\GameManager.cs(282,33): error CS0019: Operator '!=' cannot be applied to operands of type 'ProfilerRecorder' and '<null>'
-
-Assets\_Project\Scripts\Core\GameManager.cs(304,33): error CS0019: Operator '!=' cannot be applied to operands of type 'ProfilerRecorder' and '<null>'
-
-Assets\_Project\Scripts\Core\GameManager.cs(346,54): error CS0023: Operator '?' cannot be applied to operand of type 'ProfilerRecorder'
+Assets\_Project\Scripts\Core\Enemy\EnemySpawner.cs(287,49): error CS1061: 'HashSet<BaseEnemy>' does not contain a definition for 'ToArray' and no accessible extension method 'ToArray' accepting a first argument of type 'HashSet<BaseEnemy>' could be found (are you missing a using directive or an assembly reference?)
 

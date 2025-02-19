@@ -111,32 +111,40 @@ public class PerformanceMonitor : MonoBehaviour
 ## Memory Management Strategy
 ### Core Principles
 1. Dynamic Memory Management (HIGH PRIORITY)
-   - Implement adaptive thresholds based on startup conditions:
-     * Base thresholds: Warning (768MB), Critical (896MB), Emergency (1024MB)
-     * Dynamic scaling based on initial memory state
-     * Relative threshold calculation for high-memory environments
+   - System-aware thresholds based on available memory:
+     * Base: 1024MB (1GB base memory)
+     * Warning: 1536MB (1.5GB - 150% of base)
+     * Critical: 1792MB (1.75GB - 175% of base)
+     * Emergency: 2048MB (2GB - 200% of base)
+   - Pool Memory Thresholds:
+     * Pool Warning: 256MB (25% of base)
+     * Pool Critical: 358.40MB (35% of base)
+     * Pool Emergency: 460.80MB (45% of base)
    - Memory Monitoring:
      * Track absolute and relative memory changes
      * Monitor memory delta against baseline
      * Implement graduated cleanup responses
    - Cleanup Strategy:
-     * Preemptive: Light cleanup at warning threshold
-     * Aggressive: Full cleanup at critical threshold
-     * Emergency: Scene restart if cleanup fails
+     * Preemptive: Light cleanup at warning threshold (1536MB)
+     * Aggressive: Full cleanup at critical threshold (1792MB)
+     * Emergency: Scene restart if cleanup fails (2048MB)
 
 2. Pooling Strategy (HIGH PRIORITY)
-   - Implement pooling for all frequently spawned objects:
-     * Enemies (100+ instances)
-     * Projectiles (200+ instances)
-     * VFX/Particles (50+ instances)
-     * UI elements (damage numbers, popups)
-   - Pool sizes:
-     * Initial size: Expected peak / 2
-     * Max size: Expected peak * 1.2
+   - Pool Configurations:
+     * Projectiles: 100 initial, 200 max
+     * Enemies: 50 initial, 100 max
+     * VFX/Particles: 25 initial, 50 max
+     * UI Elements: 50 initial, 100 max
+   - Pool Memory Budgets:
+     * Projectiles: 10MB total (50KB per instance)
+     * Enemies: 10MB total (100KB per instance)
+     * VFX: 10MB total (200KB per instance)
+     * UI: 5MB total (50KB per instance)
    - Monitoring:
      * Track pool utilization
      * Log pool expansion events
      * Monitor memory impact
+     * Implement emergency cleanup
 
 3. Asset Loading (HIGH PRIORITY)
    - Use Addressables for:
@@ -161,23 +169,27 @@ public class PerformanceMonitor : MonoBehaviour
      * Clear reference cache on restart
 
 ### Memory Budgets
-1. Runtime Memory (1024MB Total)
-   - Managed Memory: 512MB
-     * Game Logic: 128MB
-     * Unity Systems: 256MB
-     * Asset Memory: 128MB
-   - Native Memory: 512MB
-     * Graphics: 256MB
-     * Physics: 128MB
-     * Audio: 64MB
-     * System: 64MB
+1. Runtime Memory (2048MB Emergency Total)
+   - Managed Memory: 1024MB (Base)
+     * Game Logic: 256MB
+     * Unity Systems: 512MB
+     * Asset Memory: 256MB
+   - Pool Memory: 460.80MB (45% of base)
+     * Projectile Pool: 100MB
+     * Enemy Pool: 150MB
+     * VFX Pool: 150MB
+     * UI Pool: 60.80MB
+   - Reserved Memory: 563.20MB
+     * System: 256MB
+     * Graphics: 204.80MB
+     * Audio: 102.40MB
 
 2. Asset Memory
-   - Textures: 128MB max
-   - Audio: 64MB max
-   - Meshes: 32MB max
-   - Materials: 32MB max
-   - Prefabs: 32MB max
+   - Textures: 256MB max
+   - Audio: 128MB max
+   - Meshes: 64MB max
+   - Materials: 64MB max
+   - Prefabs: 64MB max
 
 ### Monitoring Implementation
 ```csharp

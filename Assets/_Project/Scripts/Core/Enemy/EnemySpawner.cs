@@ -5,6 +5,8 @@ using CZ.Core.Player;
 using Unity.Profiling;
 using NaughtyAttributes;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CZ.Core.Enemy
 {
@@ -30,7 +32,7 @@ namespace CZ.Core.Enemy
         private ObjectPool<BaseEnemy> enemyPool;
         private bool isSpawning;
         private float nextSpawnTime;
-        private int activeEnemies;
+        private HashSet<BaseEnemy> activeEnemies = new HashSet<BaseEnemy>();
         private bool isInitialized;
         private bool isInitializing;
         private IPositionProvider targetPositionProvider;
@@ -43,7 +45,7 @@ namespace CZ.Core.Enemy
         private Vector3 debugTargetPosition; // For test visualization only
         
         public float SpawnInterval => spawnInterval;
-        public int ActiveEnemyCount => activeEnemies;
+        public int ActiveEnemyCount => activeEnemies.Count;
         
         private void OnEnable()
         {
@@ -125,31 +127,39 @@ namespace CZ.Core.Enemy
         
         private void HandleGameStateChanged(GameManager.GameState newState)
         {
-            Debug.Log($"[EnemySpawner] Game state changed to {newState} (Previous isGamePlaying: {isGamePlaying})");
+            bool wasGamePlaying = isGamePlaying;
             isGamePlaying = newState == GameManager.GameState.Playing;
             
-            if (!isGamePlaying)
+            // Only process if state actually changed
+            if (wasGamePlaying != isGamePlaying)
             {
-                Debug.Log("[EnemySpawner] Game no longer playing, stopping spawn");
-                StopSpawning();
-                DespawnAllEnemies();
-            }
-            else if (isInitialized)
-            {
-                Debug.Log("[EnemySpawner] Starting spawning due to game state change to Playing");
-                StartSpawning();
-            }
-            else
-            {
-                Debug.LogWarning($"[EnemySpawner] Cannot start spawning - not initialized when game state changed to Playing (Init: {isInitialized}, Initializing: {isInitializing})");
-                // Attempt late initialization if we have a prefab
-                if (enemyPrefab != null && !isInitializing)
+                Debug.Log($"[EnemySpawner] Game state changed to {newState} (Previous isGamePlaying: {wasGamePlaying})");
+                
+                if (!isGamePlaying)
                 {
-                    Debug.Log("[EnemySpawner] Attempting late initialization");
-                    InitializePool();
-                    if (isInitialized)
+                    Debug.Log("[EnemySpawner] Game no longer playing, stopping spawn");
+                    StopSpawning();
+                    DespawnAllEnemies();
+                }
+                else if (isInitialized && !GameManager.Instance.IsInEmergencyMode)
+                {
+                    Debug.Log("[EnemySpawner] Starting spawning due to game state change to Playing");
+                    StartSpawning();
+                }
+                else
+                {
+                    string reason = !isInitialized ? "not initialized" : "in emergency memory state";
+                    Debug.LogWarning($"[EnemySpawner] Cannot start spawning - {reason} when game state changed to Playing (Init: {isInitialized}, Initializing: {isInitializing})");
+                    
+                    // Attempt late initialization if we have a prefab and not in emergency mode
+                    if (enemyPrefab != null && !isInitializing && !GameManager.Instance.IsInEmergencyMode)
                     {
-                        StartSpawning();
+                        Debug.Log("[EnemySpawner] Attempting late initialization");
+                        InitializePool();
+                        if (isInitialized)
+                        {
+                            StartSpawning();
+                        }
                     }
                 }
             }
@@ -183,19 +193,23 @@ namespace CZ.Core.Enemy
                 // Ensure prefab is inactive before creating pool
                 enemyPrefab.SetActive(false);
                 
+                // Get memory-aware pool size from GameManager
+                int initialPoolSize = Mathf.Min(maxEnemiesPerWave, 5); // Start with smaller initial size
+                int maxPoolSize = Mathf.Min(maxEnemiesPerWave * 2, 20); // Cap maximum size
+                
                 enemyPool = new ObjectPool<BaseEnemy>(
                     createFunc: () => {
                         var obj = Instantiate(enemyPrefab).GetComponent<BaseEnemy>();
                         obj.gameObject.SetActive(false);
                         return obj;
                     },
-                    initialSize: maxEnemiesPerWave,
-                    maxSize: maxEnemiesPerWave * 2,
+                    initialSize: initialPoolSize,
+                    maxSize: maxPoolSize,
                     "EnemyPool"
                 );
                 
                 isInitialized = true;
-                Debug.Log($"[EnemySpawner] Pool initialized with {maxEnemiesPerWave} initial enemies and {maxEnemiesPerWave * 2} max size.");
+                Debug.Log($"[EnemySpawner] Pool initialized with {initialPoolSize} initial enemies and {maxPoolSize} max size.");
             }
             catch (System.Exception e)
             {
@@ -271,20 +285,17 @@ namespace CZ.Core.Enemy
                 return;
             }
             
-            var enemies = Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
-            foreach (var enemy in enemies)
+            // Create a temporary list to avoid collection modification during enumeration
+            var enemiesToDespawn = activeEnemies.ToList();
+            foreach (var enemy in enemiesToDespawn)
             {
                 if (enemy != null)
                 {
                     enemyPool.Return(enemy);
-                    System.Threading.Interlocked.Decrement(ref activeEnemies);
                 }
             }
             
-            if (activeEnemies < 0)
-            {
-                activeEnemies = 0;
-            }
+            activeEnemies.Clear();
         }
         
         private void Update()
@@ -309,7 +320,7 @@ namespace CZ.Core.Enemy
             }
             
             // Handle spawning
-            if (activeEnemies < maxEnemiesPerWave && Time.time >= nextSpawnTime)
+            if (activeEnemies.Count < maxEnemiesPerWave && Time.time >= nextSpawnTime)
             {
                 SpawnEnemy(currentPlayerPos);
                 nextSpawnTime = Time.time + spawnInterval;
@@ -324,14 +335,13 @@ namespace CZ.Core.Enemy
                 return;
             }
             
-            // Use debug target in editor test mode, otherwise use player position
             Vector3 targetPos = Application.isEditor && !Application.isPlaying ? debugTargetPosition : currentPlayerPos;
             
-            var enemies = Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
             int updatedCount = 0;
             int failedCount = 0;
             
-            foreach (var enemy in enemies)
+            // Use cached active enemies instead of FindObjectsByType
+            foreach (var enemy in activeEnemies)
             {
                 if (enemy != null && enemy.gameObject.activeInHierarchy)
                 {
@@ -366,7 +376,7 @@ namespace CZ.Core.Enemy
             var enemy = enemyPool.Get();
             if (enemy != null)
             {
-                System.Threading.Interlocked.Increment(ref activeEnemies);
+                activeEnemies.Add(enemy);
                 
                 // Calculate spawn position relative to spawner
                 float angle = Random.Range(0f, 360f);
@@ -379,7 +389,7 @@ namespace CZ.Core.Enemy
                 // Set initial target
                 enemy.SetTarget(currentPlayerPos);
                 
-                Debug.Log($"[EnemySpawner] Spawned enemy at {enemy.transform.position}. Active count: {activeEnemies}");
+                Debug.Log($"[EnemySpawner] Spawned enemy at {enemy.transform.position}. Active count: {activeEnemies.Count}");
             }
             else
             {
@@ -426,8 +436,11 @@ namespace CZ.Core.Enemy
             
             if (enemyPool != null)
             {
+                DespawnAllEnemies();
                 enemyPool.Clear();
             }
+            
+            activeEnemies.Clear();
         }
     }
 } 

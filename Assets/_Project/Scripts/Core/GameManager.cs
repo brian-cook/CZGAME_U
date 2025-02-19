@@ -342,23 +342,32 @@ namespace CZ.Core
             // Ensure we have a valid configuration
             EnsureMemoryConfiguration();
             
-            // Calculate thresholds based on system memory or use conservative defaults
+            // Calculate thresholds based on system memory or use project defaults
             float systemMemory = (!systemMemoryRecorder.Equals(default(ProfilerRecorder)) && systemMemoryRecorder.Valid) ? 
-                ConvertToMB(systemMemoryRecorder.LastValue) : 2048f; // 2GB fallback
+                ConvertToMB(systemMemoryRecorder.LastValue) : 2048f; // Default to 2GB if can't detect
             
-            float baseValue = Mathf.Max(systemMemory / 8f, 256f); // Minimum 256MB base
+            // Use at least 1GB base, or 1/4 of system memory if higher
+            float baseValue = Mathf.Max(1024f, systemMemory / 4f);
             
             memoryConfig.BaseThreshold = baseValue;
-            memoryConfig.WarningThreshold = baseValue * 1.5f;
-            memoryConfig.CriticalThreshold = baseValue * 1.75f;
-            memoryConfig.EmergencyThreshold = baseValue * 2.0f;
+            memoryConfig.WarningThreshold = Mathf.Min(baseValue * 1.5f, 1536f);  // Cap at 1.5GB
+            memoryConfig.CriticalThreshold = Mathf.Min(baseValue * 1.75f, 1792f); // Cap at 1.75GB
+            memoryConfig.EmergencyThreshold = Mathf.Min(baseValue * 2f, 2048f);   // Cap at 2GB
             
-            // Set pool thresholds as percentage of base thresholds
-            memoryConfig.PoolWarningThreshold = baseValue * 0.5f;
-            memoryConfig.PoolCriticalThreshold = baseValue * 0.75f;
-            memoryConfig.PoolEmergencyThreshold = baseValue;
+            // Set pool thresholds as percentage of base memory per infrastructure.txt
+            memoryConfig.PoolWarningThreshold = baseValue * 0.25f;  // 25% of base
+            memoryConfig.PoolCriticalThreshold = baseValue * 0.35f;  // 35% of base
+            memoryConfig.PoolEmergencyThreshold = baseValue * 0.45f; // 45% of base
             
-            Debug.Log($"[GameManager] Fallback thresholds set - Base: {baseValue:F2}MB, Warning: {memoryConfig.WarningThreshold:F2}MB, Critical: {memoryConfig.CriticalThreshold:F2}MB, Emergency: {memoryConfig.EmergencyThreshold:F2}MB");
+            Debug.Log($"[GameManager] System-aware thresholds set:\n" +
+                     $"System Memory: {systemMemory:F2}MB\n" +
+                     $"Base: {baseValue:F2}MB\n" +
+                     $"Warning: {memoryConfig.WarningThreshold:F2}MB\n" +
+                     $"Critical: {memoryConfig.CriticalThreshold:F2}MB\n" +
+                     $"Emergency: {memoryConfig.EmergencyThreshold:F2}MB\n" +
+                     $"Pool Warning: {memoryConfig.PoolWarningThreshold:F2}MB\n" +
+                     $"Pool Critical: {memoryConfig.PoolCriticalThreshold:F2}MB\n" +
+                     $"Pool Emergency: {memoryConfig.PoolEmergencyThreshold:F2}MB");
         }
 
         private bool InitializeGCMonitoring()
@@ -496,6 +505,13 @@ namespace CZ.Core
         {
             if (CurrentGameState != GameState.Playing)
             {
+                // Verify memory state before starting
+                if (isInEmergencyMode)
+                {
+                    Debug.LogError("[GameManager] Cannot start game while in emergency memory state");
+                    return;
+                }
+
                 // Reset performance counters for new game session
                 ResetPerformanceCounters();
                 
@@ -511,9 +527,6 @@ namespace CZ.Core
                 
                 // Log game start for debugging
                 Debug.Log("[GameManager] Game started - Input and gameplay systems enabled");
-                
-                // Notify systems that game has started
-                OnGameStateChanged?.Invoke(GameState.Playing);
             }
         }
 
@@ -876,14 +889,19 @@ namespace CZ.Core
                     Debug.LogWarning("[GameManager] MemoryConfiguration not found in Resources. Creating runtime instance.");
                     memoryConfig = ScriptableObject.CreateInstance<MemoryConfiguration>();
                     
-                    // Set default values as per performance guidelines
-                    memoryConfig.BaseThreshold = 256f;
-                    memoryConfig.WarningThreshold = 384f;
-                    memoryConfig.CriticalThreshold = 512f;
-                    memoryConfig.EmergencyThreshold = 768f;
-                    memoryConfig.PoolWarningThreshold = 128f;
-                    memoryConfig.PoolCriticalThreshold = 256f;
-                    memoryConfig.PoolEmergencyThreshold = 384f;
+                    // Set values according to project requirements
+                    float baseMemory = 1024f; // 1GB base
+                    memoryConfig.BaseThreshold = baseMemory;
+                    memoryConfig.WarningThreshold = 1536f;  // 1.5GB
+                    memoryConfig.CriticalThreshold = 1792f; // 1.75GB
+                    memoryConfig.EmergencyThreshold = 2048f; // 2GB
+                    
+                    // Pool thresholds as percentage of base memory
+                    memoryConfig.PoolWarningThreshold = baseMemory * 0.25f;  // 25% of base
+                    memoryConfig.PoolCriticalThreshold = baseMemory * 0.35f;  // 35% of base
+                    memoryConfig.PoolEmergencyThreshold = baseMemory * 0.45f; // 45% of base
+                    
+                    Debug.Log($"[GameManager] Created runtime MemoryConfiguration with project-specified thresholds:\nBase: {baseMemory:F2}MB\nWarning: {memoryConfig.WarningThreshold:F2}MB\nCritical: {memoryConfig.CriticalThreshold:F2}MB\nEmergency: {memoryConfig.EmergencyThreshold:F2}MB");
                 }
             }
         }

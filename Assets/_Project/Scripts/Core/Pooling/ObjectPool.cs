@@ -182,9 +182,10 @@ namespace CZ.Core.Pooling
         /// <summary>
         /// Get pool statistics for monitoring
         /// </summary>
-        public (int current, int peak, float memoryUsageMB) GetStats()
+        public (int current, int peak, long memory) GetStats()
         {
-            return (CurrentCount, peakCount, totalMemoryRecorder.LastValue / (1024f * 1024f));
+            var memoryMB = totalMemoryRecorder.LastValue / (1024f * 1024f);
+            return (CurrentCount, peakCount, (long)(memoryMB * 1024 * 1024));
         }
     }
 } 

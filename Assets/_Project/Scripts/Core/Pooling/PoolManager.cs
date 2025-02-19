@@ -68,20 +68,30 @@ namespace CZ.Core.Pooling
         {
             isEditorInstance = isEditor;
             
+            // Try to load MemoryConfiguration from Resources if not assigned
+            if (memoryConfig == null)
+            {
+                memoryConfig = Resources.Load<MemoryConfiguration>("Configuration/MemoryConfiguration");
+            }
+            
+            // Calculate system-aware thresholds
+            float systemMemoryMB = SystemInfo.systemMemorySize;
+            float baseMemory = Mathf.Max(1024f, systemMemoryMB / 4f); // At least 1GB or 1/4 system memory
+            
             if (memoryConfig != null)
             {
                 poolWarningThreshold = memoryConfig.PoolWarningThreshold;
                 poolCriticalThreshold = memoryConfig.PoolCriticalThreshold;
                 poolEmergencyThreshold = memoryConfig.PoolEmergencyThreshold;
-                
-                Debug.Log($"[PoolManager] Initialized with thresholds - Warning: {poolWarningThreshold:F2}MB, Critical: {poolCriticalThreshold:F2}MB, Emergency: {poolEmergencyThreshold:F2}MB");
             }
             else
             {
-                Debug.LogWarning("[PoolManager] MemoryConfiguration not assigned, using default pool thresholds");
-                poolWarningThreshold = 384f;  // 384MB (25% of 1536MB)
-                poolCriticalThreshold = 627f;  // 627MB (35% of 1792MB)
-                poolEmergencyThreshold = 921f;  // 921MB (45% of 2048MB)
+                // Calculate pool thresholds as percentage of base memory
+                poolWarningThreshold = baseMemory * POOL_MEMORY_WARNING_RATIO;
+                poolCriticalThreshold = baseMemory * POOL_MEMORY_CRITICAL_RATIO;
+                poolEmergencyThreshold = baseMemory * POOL_MEMORY_EMERGENCY_RATIO;
+                
+                Debug.LogWarning($"[PoolManager] Using calculated thresholds - Warning: {poolWarningThreshold:F2}MB, Critical: {poolCriticalThreshold:F2}MB, Emergency: {poolEmergencyThreshold:F2}MB");
             }
 
             // Initialize monitoring
@@ -205,7 +215,20 @@ namespace CZ.Core.Pooling
             var statsMethod = pool.GetType().GetMethod("GetStats");
             if (statsMethod == null) return (0, 0, 0);
 
-            return ((int, int, long))statsMethod.Invoke(pool, null);
+            var result = statsMethod.Invoke(pool, null);
+            if (result == null) return (0, 0, 0);
+
+            // Handle the tuple conversion safely
+            if (result is ValueTuple<int, int, float> floatTuple)
+            {
+                return (floatTuple.Item1, floatTuple.Item2, (long)(floatTuple.Item3 * 1024 * 1024));
+            }
+            else if (result is ValueTuple<int, int, long> longTuple)
+            {
+                return longTuple;
+            }
+            
+            return (0, 0, 0);
         }
 
         /// <summary>
