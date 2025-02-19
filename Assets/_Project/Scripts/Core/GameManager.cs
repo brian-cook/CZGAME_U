@@ -29,12 +29,16 @@ namespace CZ.Core
             }
             instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            // Ensure configuration exists before initialization
+            EnsureMemoryConfiguration();
             InitializeManager();
         }
         #endregion
 
         #region Properties and Fields
         [SerializeField] private MemoryConfiguration memoryConfig;
+        private const string MEMORY_CONFIG_PATH = "Configuration/MemoryConfiguration";
 
         // Performance monitoring
         private ProfilerRecorder drawCallsRecorder;
@@ -220,84 +224,141 @@ namespace CZ.Core
 
         private bool InitializeMemoryMonitoring()
         {
-            // First, try to get system memory
-            try
+            // Ensure configuration exists
+            EnsureMemoryConfiguration();
+            
+            int retryAttempts = 0;
+            const int MAX_RETRY_ATTEMPTS = 3;
+            
+            while (retryAttempts < MAX_RETRY_ATTEMPTS)
             {
-                systemMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "System Memory");
-                if (systemMemoryRecorder.Valid)
+                try
                 {
-                    systemMemoryTotal = ConvertToMB(systemMemoryRecorder.CurrentValue);
-                    if (systemMemoryTotal > 0)
+                    // First, try to get system memory
+                    if (systemMemoryRecorder.Equals(default(ProfilerRecorder)) || !systemMemoryRecorder.Valid)
                     {
-                        // Calculate dynamic thresholds
-                        memoryConfig.BaseThreshold = systemMemoryTotal / 8f;
-                        memoryConfig.WarningThreshold = memoryConfig.BaseThreshold * 1.5f;
-                        memoryConfig.CriticalThreshold = memoryConfig.BaseThreshold * 1.75f;
-                        memoryConfig.EmergencyThreshold = memoryConfig.BaseThreshold * 2.0f;
-                        
-                        Debug.Log($"[GameManager] Dynamic thresholds calculated - Base: {memoryConfig.BaseThreshold:F2}MB, Warning: {memoryConfig.WarningThreshold:F2}MB, Critical: {memoryConfig.CriticalThreshold:F2}MB, Emergency: {memoryConfig.EmergencyThreshold:F2}MB");
+                        systemMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "System Memory");
+                    }
+
+                    if (systemMemoryRecorder.Valid)
+                    {
+                        systemMemoryTotal = ConvertToMB(systemMemoryRecorder.CurrentValue);
+                        if (systemMemoryTotal > 0)
+                        {
+                            // Calculate dynamic thresholds
+                            float baseValue = systemMemoryTotal / 8f;
+                            memoryConfig.BaseThreshold = baseValue;
+                            memoryConfig.WarningThreshold = baseValue * 1.5f;
+                            memoryConfig.CriticalThreshold = baseValue * 1.75f;
+                            memoryConfig.EmergencyThreshold = baseValue * 2.0f;
+                            
+                            Debug.Log($"[GameManager] Dynamic thresholds calculated - Base: {memoryConfig.BaseThreshold:F2}MB, Warning: {memoryConfig.WarningThreshold:F2}MB, Critical: {memoryConfig.CriticalThreshold:F2}MB, Emergency: {memoryConfig.EmergencyThreshold:F2}MB");
+                        }
+                        else
+                        {
+                            UseDefaultThresholds();
+                        }
                     }
                     else
                     {
                         UseDefaultThresholds();
                     }
-                }
-                else
-                {
-                    UseDefaultThresholds();
-                }
-            }
-            catch
-            {
-                UseDefaultThresholds();
-            }
 
-            // Initialize memory monitoring
-            string[] memoryCounters = new string[] 
-            {
-                "Total Used Memory",
-                "System Memory",
-                "Total System Memory",
-                "Total Reserved Memory"
-            };
-            
-            foreach (string counterName in memoryCounters)
-            {
-                try
-                {
-                    memoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, counterName, 15);
-                    if (memoryRecorder.Valid)
+                    // Initialize memory monitoring with multiple fallback counters
+                    string[] memoryCounters = new string[] 
                     {
-                        float testValue = ConvertToMB(memoryRecorder.CurrentValue);
-                        if (testValue > 0)
+                        "Total Used Memory",
+                        "System Memory",
+                        "Total System Memory",
+                        "Total Reserved Memory"
+                    };
+                    
+                    bool memoryRecorderInitialized = false;
+                    
+                    foreach (string counterName in memoryCounters)
+                    {
+                        try
                         {
-                            Debug.Log($"[GameManager] Successfully initialized memory recorder with counter: {counterName} (Current: {testValue:F2}MB)");
-                            currentMemoryUsageMB = testValue;
-                            return true;
+                            if (!memoryRecorder.Equals(default(ProfilerRecorder)) && memoryRecorder.Valid)
+                            {
+                                memoryRecorder.Dispose();
+                            }
+                            
+                            memoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, counterName, 15);
+                            if (memoryRecorder.Valid)
+                            {
+                                float testValue = ConvertToMB(memoryRecorder.CurrentValue);
+                                if (testValue > 0)
+                                {
+                                    Debug.Log($"[GameManager] Successfully initialized memory recorder with counter: {counterName} (Current: {testValue:F2}MB)");
+                                    currentMemoryUsageMB = testValue;
+                                    memoryRecorderInitialized = true;
+                                    break;
+                                }
+                                memoryRecorder.Dispose();
+                            }
                         }
-                        memoryRecorder.Dispose();
+                        catch (Exception e)
+                        {
+                            Debug.LogWarning($"[GameManager] Failed to initialize counter '{counterName}': {e.Message}");
+                            if (!memoryRecorder.Equals(default(ProfilerRecorder)))
+                            {
+                                memoryRecorder.Dispose();
+                            }
+                        }
+                    }
+                    
+                    if (memoryRecorderInitialized)
+                    {
+                        return true;
+                    }
+                    
+                    retryAttempts++;
+                    if (retryAttempts < MAX_RETRY_ATTEMPTS)
+                    {
+                        Debug.LogWarning($"[GameManager] Memory monitoring initialization attempt {retryAttempts} failed. Retrying...");
+                        System.Threading.Thread.Sleep(100); // Brief pause before retry
                     }
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning($"[GameManager] Failed to initialize counter '{counterName}': {e.Message}");
-                    if (!memoryRecorder.Equals(default(ProfilerRecorder)))
+                    Debug.LogError($"[GameManager] Error during memory monitoring initialization: {e.Message}");
+                    retryAttempts++;
+                    if (retryAttempts < MAX_RETRY_ATTEMPTS)
                     {
-                        memoryRecorder.Dispose();
+                        System.Threading.Thread.Sleep(100);
                     }
                 }
             }
             
+            Debug.LogError("[GameManager] Failed to initialize memory monitoring after multiple attempts");
             return false;
         }
 
         private void UseDefaultThresholds()
         {
             Debug.LogWarning("[GameManager] Using fallback memory thresholds");
-            memoryConfig.WarningThreshold = memoryConfig.BaseThreshold * 1.5f;
-            memoryConfig.CriticalThreshold = memoryConfig.BaseThreshold * 1.75f;
-            memoryConfig.EmergencyThreshold = memoryConfig.BaseThreshold * 2.0f;
-            memoryConfig.BaseThreshold = memoryConfig.WarningThreshold / 1.5f;
+            
+            // Ensure we have a valid configuration
+            EnsureMemoryConfiguration();
+            
+            // Calculate thresholds based on system memory or use conservative defaults
+            float systemMemory = (!systemMemoryRecorder.Equals(default(ProfilerRecorder)) && systemMemoryRecorder.Valid) ? 
+                ConvertToMB(systemMemoryRecorder.LastValue) : 2048f; // 2GB fallback
+            
+            float baseValue = Mathf.Max(systemMemory / 8f, 256f); // Minimum 256MB base
+            
+            memoryConfig.BaseThreshold = baseValue;
+            memoryConfig.WarningThreshold = baseValue * 1.5f;
+            memoryConfig.CriticalThreshold = baseValue * 1.75f;
+            memoryConfig.EmergencyThreshold = baseValue * 2.0f;
+            
+            // Set pool thresholds as percentage of base thresholds
+            memoryConfig.PoolWarningThreshold = baseValue * 0.5f;
+            memoryConfig.PoolCriticalThreshold = baseValue * 0.75f;
+            memoryConfig.PoolEmergencyThreshold = baseValue;
+            
+            Debug.Log($"[GameManager] Fallback thresholds set - Base: {baseValue:F2}MB, Warning: {memoryConfig.WarningThreshold:F2}MB, Critical: {memoryConfig.CriticalThreshold:F2}MB, Emergency: {memoryConfig.EmergencyThreshold:F2}MB");
         }
 
         private bool InitializeGCMonitoring()
@@ -734,23 +795,29 @@ namespace CZ.Core
         {
             try
             {
-                if (drawCallsRecorder.Valid)
+                if (!drawCallsRecorder.Equals(default(ProfilerRecorder)) && drawCallsRecorder.Valid)
                 {
                     drawCallsRecorder.Dispose();
                 }
                 drawCallsRecorder = default;
                 
-                if (memoryRecorder.Valid)
+                if (!memoryRecorder.Equals(default(ProfilerRecorder)) && memoryRecorder.Valid)
                 {
                     memoryRecorder.Dispose();
                 }
                 memoryRecorder = default;
                 
-                if (gcMemoryRecorder.Valid)
+                if (!gcMemoryRecorder.Equals(default(ProfilerRecorder)) && gcMemoryRecorder.Valid)
                 {
                     gcMemoryRecorder.Dispose();
                 }
                 gcMemoryRecorder = default;
+                
+                if (!systemMemoryRecorder.Equals(default(ProfilerRecorder)) && systemMemoryRecorder.Valid)
+                {
+                    systemMemoryRecorder.Dispose();
+                }
+                systemMemoryRecorder = default;
                 
                 // Force a GC collection after disposing recorders
                 GC.Collect();
@@ -796,5 +863,29 @@ namespace CZ.Core
             Debug.Log("Performance Counters Reset");
         }
         #endregion
+
+        private void EnsureMemoryConfiguration()
+        {
+            if (memoryConfig == null)
+            {
+                // Try to load from Resources first
+                memoryConfig = Resources.Load<MemoryConfiguration>(MEMORY_CONFIG_PATH);
+                
+                if (memoryConfig == null)
+                {
+                    Debug.LogWarning("[GameManager] MemoryConfiguration not found in Resources. Creating runtime instance.");
+                    memoryConfig = ScriptableObject.CreateInstance<MemoryConfiguration>();
+                    
+                    // Set default values as per performance guidelines
+                    memoryConfig.BaseThreshold = 256f;
+                    memoryConfig.WarningThreshold = 384f;
+                    memoryConfig.CriticalThreshold = 512f;
+                    memoryConfig.EmergencyThreshold = 768f;
+                    memoryConfig.PoolWarningThreshold = 128f;
+                    memoryConfig.PoolCriticalThreshold = 256f;
+                    memoryConfig.PoolEmergencyThreshold = 384f;
+                }
+            }
+        }
     }
 } 
