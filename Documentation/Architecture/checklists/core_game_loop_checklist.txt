@@ -11,42 +11,6 @@
         [✓] Memory tracking
         [✓] Dynamic threshold adjustment
 
-[✓] Memory Management Foundation (CRITICAL PRIORITY)
-    [✓] Core Pooling System
-        [✓] PoolManager implementation
-        [✓] Basic object pool
-        [✓] Pool monitoring system
-        [✓] Memory tracking integration
-        [✓] Initial pool sizing:
-            - Enemies: 50 initial (100 max)
-            - Projectiles: 100 initial (200 max)
-            - VFX: 25 initial (50 max)
-            - UI Elements: 50 initial (100 max)
-
-    [✓] Memory Monitoring
-        [✓] MemoryMonitor implementation
-        [✓] Warning system setup
-        [✓] Memory profiler integration
-        [✓] Performance recorder setup
-        [✓] Memory threshold alerts
-        [✓] Dynamic threshold scaling
-        [✓] Relative memory tracking
-        [✓] Graduated cleanup responses
-        [✓] Counter initialization fallbacks
-
-    [ ] Asset Management
-        [ ] Texture compression setup
-        [ ] Sprite atlas configuration
-        [ ] Asset loading strategy
-        [ ] Reference tracking system
-        [ ] Memory budget enforcement
-
-    [ ] Scene Memory Optimization
-        [ ] Single scene setup
-        [ ] Additive UI scene
-        [ ] Asset preloading system
-        [ ] Reference cleanup system
-
 [~] Essential Player System (HIGH PRIORITY)
     [✓] Basic Player GameObject
         [✓] Simple sprite/primitive
@@ -57,11 +21,32 @@
         [✓] WASD/Arrow movement
         [~] Smooth acceleration/deceleration
         [~] Collision response system
-    [ ] Auto-Attack Foundation
-        [ ] Basic weapon system
-        [ ] Projectile pooling
-        [ ] Simple collision detection
-        [ ] Attack timing system
+    [~] Auto-Attack Foundation (CRITICAL PRIORITY)
+        [~] Projectile System Setup
+            [ ] Projectile Prefab Configuration
+                [ ] Assign prefab to PlayerController
+                [ ] Verify required components:
+                    [ ] Rigidbody2D (continuous collision)
+                    [ ] CircleCollider2D (trigger)
+                    [ ] TrailRenderer (optimized)
+                    [ ] Projectile script
+                [ ] Configure physics layers
+                [ ] Set up shared materials
+            [ ] Pool Integration
+                [ ] Initialize projectile pool (100 initial, 200 max)
+                [ ] Implement spawn logic
+                [ ] Configure return-to-pool triggers
+                [ ] Set up pool monitoring
+            [ ] Performance Optimization
+                [ ] Implement object pooling
+                [ ] Configure shared materials
+                [ ] Optimize trail renderer settings
+                [ ] Set up efficient physics layers
+            [ ] Testing & Validation
+                [ ] Unit test projectile behavior
+                [ ] Validate collision detection
+                [ ] Stress test pool system
+                [ ] Monitor memory impact
 
 [~] Enemy Foundation (HIGH PRIORITY)
     [✓] Basic Enemy Type
@@ -120,15 +105,19 @@
     [✓] Error handling
 
 ## Technical Requirements
-[~] Performance Targets
+[~] Performance Targets (Revised)
     [✓] FPS: 60 target
     [✓] Draw Calls: < 100
-    [✓] Memory: < 1024MB
-    [✓] Entity Count: < 200
-    [~] Physics Performance
-        [✓] Collision optimization
-        [✓] Trigger optimization
-        [~] Physics update frequency
+    [~] Memory Management
+        [ ] Base Memory: System Dependent
+        [ ] Warning Threshold: 1536MB
+        [ ] Critical Threshold: 1792MB
+        [ ] Emergency Threshold: 2048MB
+    [~] Pool Performance
+        [ ] Projectile Pool: 100-200 instances
+        [ ] Enemy Pool: 50-100 instances
+        [ ] VFX Pool: 25-50 instances
+        [ ] UI Pool: 50-100 instances
 
 [~] Memory Management
     [✓] Pool System
@@ -146,13 +135,22 @@
         [ ] Memory budgeting
 
 ## Testing Framework
-[✓] Core Test Setup
-    [✓] Edit mode framework
-    [✓] Play mode framework
-    [✓] Performance tests
-    [✓] Integration tests
-    [✓] Test base classes
-    [✓] Test utilities
+[~] Performance Testing
+    [ ] Memory Profiling
+        [ ] Baseline memory validation
+        [ ] Peak usage monitoring
+        [ ] Pool expansion tracking
+        [ ] GC impact analysis
+    [ ] Projectile System Tests
+        [ ] Spawn/despawn cycles
+        [ ] Collision validation
+        [ ] Pool efficiency
+        [ ] Memory footprint
+    [ ] Integration Tests
+        [ ] Full combat scenarios
+        [ ] Multiple pool interaction
+        [ ] System stress testing
+        [ ] Memory leak detection
 
 [~] System Tests (HIGH PRIORITY)
     [✓] Pool System Tests

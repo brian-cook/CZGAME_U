@@ -10,10 +10,14 @@ globs:
 # AGENT RULES COMPLIANCE
 
 ## Overview
-This rule defines the mandatory compliance process for all AI operations in the codebase.
+This rule defines the mandatory compliance process for all AGENT operations in the codebase.
 
 ## Priority
-CRITICAL - DO NOT USE ASSUMPTIONS IN RESPONSES. THIS ENTIRE LIST OF RULES AND GUIDELINES Must be followed for EVERY operation
+CRITICAL - 
+
+!!! ensure that you review all project files.
+
+!!! Do not make assumptions.
 
 ## Process
 1. Pre-Operation Checks:

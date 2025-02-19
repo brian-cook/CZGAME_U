@@ -1,12 +1,8 @@
 {
-    "name": "CZ.Core",
-    "rootNamespace": "CZ.Core",
+    "name": "CZ.Core.Configuration",
+    "rootNamespace": "CZ.Core.Configuration",
     "references": [
-        "GUID:75469ad4d38634e559750d17036d5f7c",
-        "NaughtyAttributes.Core",
-        "CZ.Core.Interfaces",
-        "CZ.Core.Pooling",
-        "CZ.Core.Configuration"
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

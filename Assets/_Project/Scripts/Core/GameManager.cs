@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using NaughtyAttributes;
 using System.Collections;
 using CZ.Core.Pooling;
+using CZ.Core.Configuration;
 
 namespace CZ.Core
 {
@@ -33,10 +34,13 @@ namespace CZ.Core
         #endregion
 
         #region Properties and Fields
+        [SerializeField] private MemoryConfiguration memoryConfig;
+
         // Performance monitoring
         private ProfilerRecorder drawCallsRecorder;
         private ProfilerRecorder memoryRecorder;
         private ProfilerRecorder gcMemoryRecorder;
+        private ProfilerRecorder systemMemoryRecorder;
         private bool isCleaningUp;
         private int consecutiveCleanupAttempts;
         private const int MAX_CLEANUP_ATTEMPTS = 3;
@@ -46,7 +50,9 @@ namespace CZ.Core
         private float lastMemoryCheck;
         private const float MEMORY_CHECK_INTERVAL = 0.5f;
         private float startupMemoryBaseline;
-        
+        private float systemMemoryTotal;
+
+        // Remove individual threshold fields as they're now in MemoryConfiguration
         [BoxGroup("Performance Metrics")]
         [ShowNonSerializedField, ReadOnly]
         private int currentDrawCalls;
@@ -80,12 +86,8 @@ namespace CZ.Core
         private bool isInEmergencyMode;
         public bool IsInEmergencyMode => isInEmergencyMode;
 
-        // Memory thresholds with more granular levels
-        private const float BASELINE_THRESHOLD_MB = 512f;  // Lowered baseline
-        private const float WARNING_THRESHOLD_MB = 768f;   // Earlier warning
-        private const float CRITICAL_THRESHOLD_MB = 896f;  // Earlier critical
-        private const float EMERGENCY_THRESHOLD_MB = 1024f; // Matches max memory requirement
-        
+        // Remove public threshold properties as they're now in MemoryConfiguration
+
         // Game state
         public enum GameState
         {
@@ -192,10 +194,10 @@ namespace CZ.Core
                     Debug.Log($"[GameManager] Setting initial memory baseline to: {memoryBaseline:F2}MB");
                     
                     // Perform initial cleanup if needed
-                    if (initialMemory > BASELINE_THRESHOLD_MB)
+                    if (initialMemory > memoryConfig.BaseThreshold)
                     {
                         Debug.Log("[GameManager] Performing initial memory cleanup...");
-                        StartCoroutine(PerformInitialCleanup(BASELINE_THRESHOLD_MB));
+                        StartCoroutine(PerformInitialCleanup(memoryConfig.BaseThreshold));
                     }
                 }
                 else
@@ -218,12 +220,45 @@ namespace CZ.Core
 
         private bool InitializeMemoryMonitoring()
         {
+            // First, try to get system memory
+            try
+            {
+                systemMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "System Memory");
+                if (systemMemoryRecorder.Valid)
+                {
+                    systemMemoryTotal = ConvertToMB(systemMemoryRecorder.CurrentValue);
+                    if (systemMemoryTotal > 0)
+                    {
+                        // Calculate dynamic thresholds
+                        memoryConfig.BaseThreshold = systemMemoryTotal / 8f;
+                        memoryConfig.WarningThreshold = memoryConfig.BaseThreshold * 1.5f;
+                        memoryConfig.CriticalThreshold = memoryConfig.BaseThreshold * 1.75f;
+                        memoryConfig.EmergencyThreshold = memoryConfig.BaseThreshold * 2.0f;
+                        
+                        Debug.Log($"[GameManager] Dynamic thresholds calculated - Base: {memoryConfig.BaseThreshold:F2}MB, Warning: {memoryConfig.WarningThreshold:F2}MB, Critical: {memoryConfig.CriticalThreshold:F2}MB, Emergency: {memoryConfig.EmergencyThreshold:F2}MB");
+                    }
+                    else
+                    {
+                        UseDefaultThresholds();
+                    }
+                }
+                else
+                {
+                    UseDefaultThresholds();
+                }
+            }
+            catch
+            {
+                UseDefaultThresholds();
+            }
+
+            // Initialize memory monitoring
             string[] memoryCounters = new string[] 
             {
-                "Total Used Memory",       // Primary counter
-                "System Memory",           // Fallback 1
-                "Total System Memory",     // Fallback 2
-                "Total Reserved Memory"    // Fallback 3
+                "Total Used Memory",
+                "System Memory",
+                "Total System Memory",
+                "Total Reserved Memory"
             };
             
             foreach (string counterName in memoryCounters)
@@ -254,6 +289,15 @@ namespace CZ.Core
             }
             
             return false;
+        }
+
+        private void UseDefaultThresholds()
+        {
+            Debug.LogWarning("[GameManager] Using fallback memory thresholds");
+            memoryConfig.WarningThreshold = memoryConfig.BaseThreshold * 1.5f;
+            memoryConfig.CriticalThreshold = memoryConfig.BaseThreshold * 1.75f;
+            memoryConfig.EmergencyThreshold = memoryConfig.BaseThreshold * 2.0f;
+            memoryConfig.BaseThreshold = memoryConfig.WarningThreshold / 1.5f;
         }
 
         private bool InitializeGCMonitoring()
@@ -360,9 +404,9 @@ namespace CZ.Core
                 Debug.Log($"[GameManager] Initial cleanup completed. Memory: {newMemoryUsage:F2}MB (Delta: {delta:F2}MB)");
                 
                 // Calculate relative thresholds based on adjusted baseline
-                float relativeWarning = (WARNING_THRESHOLD_MB / BASELINE_THRESHOLD_MB) * adjustedBaseline;
-                float relativeCritical = (CRITICAL_THRESHOLD_MB / BASELINE_THRESHOLD_MB) * adjustedBaseline;
-                float relativeEmergency = (EMERGENCY_THRESHOLD_MB / BASELINE_THRESHOLD_MB) * adjustedBaseline;
+                float relativeWarning = (memoryConfig.WarningThreshold / memoryConfig.BaseThreshold) * adjustedBaseline;
+                float relativeCritical = (memoryConfig.CriticalThreshold / memoryConfig.BaseThreshold) * adjustedBaseline;
+                float relativeEmergency = (memoryConfig.EmergencyThreshold / memoryConfig.BaseThreshold) * adjustedBaseline;
                 
                 Debug.Log($"[GameManager] Adjusted thresholds - Warning: {relativeWarning:F2}MB, Critical: {relativeCritical:F2}MB, Emergency: {relativeEmergency:F2}MB");
                 
@@ -473,18 +517,12 @@ namespace CZ.Core
             {
                 currentMemoryUsageMB = ConvertToMB(memoryRecorder.LastValue);
                 
-                // Calculate adjusted thresholds based on startup baseline
-                float thresholdScale = Math.Max(1f, startupMemoryBaseline / BASELINE_THRESHOLD_MB);
-                float adjustedWarning = WARNING_THRESHOLD_MB * thresholdScale;
-                float adjustedCritical = CRITICAL_THRESHOLD_MB * thresholdScale;
-                float adjustedEmergency = EMERGENCY_THRESHOLD_MB * thresholdScale;
-                
                 // Calculate memory delta relative to baseline
                 memoryDelta = currentMemoryUsageMB - memoryBaseline;
                 float relativeDelta = memoryDelta / memoryBaseline;
                 
                 // Preemptive cleanup at warning threshold
-                if (currentMemoryUsageMB > adjustedWarning && currentMemoryUsageMB <= adjustedCritical)
+                if (currentMemoryUsageMB > memoryConfig.WarningThreshold && currentMemoryUsageMB <= memoryConfig.CriticalThreshold)
                 {
                     if (Time.time - lastCleanupTime >= CLEANUP_COOLDOWN)
                     {
@@ -493,7 +531,7 @@ namespace CZ.Core
                     }
                 }
                 // Critical cleanup
-                else if (currentMemoryUsageMB > adjustedCritical && currentMemoryUsageMB <= adjustedEmergency)
+                else if (currentMemoryUsageMB > memoryConfig.CriticalThreshold && currentMemoryUsageMB <= memoryConfig.EmergencyThreshold)
                 {
                     if (Time.time - lastCleanupTime >= CLEANUP_COOLDOWN/2)
                     {
@@ -502,7 +540,7 @@ namespace CZ.Core
                     }
                 }
                 // Emergency cleanup
-                else if (currentMemoryUsageMB > adjustedEmergency && !emergencyCleanupRequired)
+                else if (currentMemoryUsageMB > memoryConfig.EmergencyThreshold && !emergencyCleanupRequired)
                 {
                     emergencyCleanupRequired = true;
                     Debug.LogError($"EMERGENCY: Memory usage critical at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})");
@@ -592,7 +630,7 @@ namespace CZ.Core
             float newMemoryUsage = memoryRecorder.Valid ? memoryRecorder.LastValue / (1024f * 1024f) : 0f;
             Debug.Log($"Aggressive cleanup completed. Memory reduced from {initialMemory:F2}MB to {newMemoryUsage:F2}MB");
             
-            if (consecutiveCleanupAttempts >= MAX_CLEANUP_ATTEMPTS && newMemoryUsage > CRITICAL_THRESHOLD_MB)
+            if (consecutiveCleanupAttempts >= MAX_CLEANUP_ATTEMPTS && newMemoryUsage > memoryConfig.CriticalThreshold)
             {
                 emergencyCleanupRequired = true;
                 StartCoroutine(PerformEmergencyCleanup());
@@ -628,7 +666,7 @@ namespace CZ.Core
             
             float newMemoryUsage = memoryRecorder.Valid ? memoryRecorder.LastValue / (1024f * 1024f) : 0f;
             
-            if (newMemoryUsage > CRITICAL_THRESHOLD_MB)
+            if (newMemoryUsage > memoryConfig.CriticalThreshold)
             {
                 Debug.LogError($"CRITICAL: Emergency cleanup failed to reduce memory usage. Restarting scene...");
                 RestartCurrentScene();

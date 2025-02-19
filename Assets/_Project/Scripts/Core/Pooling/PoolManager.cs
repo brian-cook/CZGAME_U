@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.Profiling;
 using System;
+using System.Collections;
+using CZ.Core.Configuration;
 
 namespace CZ.Core.Pooling
 {
@@ -11,6 +13,8 @@ namespace CZ.Core.Pooling
     /// </summary>
     public class PoolManager : MonoBehaviour
     {
+        [SerializeField] private MemoryConfiguration memoryConfig;
+
         private static PoolManager instance;
         public static PoolManager Instance
         {
@@ -45,6 +49,15 @@ namespace CZ.Core.Pooling
         private ProfilerRecorder totalMemoryRecorder;
         private float nextStatsUpdate;
         private const float STATS_UPDATE_INTERVAL = 0.5f; // 500ms
+        
+        // Pool memory thresholds (as percentage of total memory thresholds)
+        private const float POOL_MEMORY_WARNING_RATIO = 0.25f;    // 25% of total memory
+        private const float POOL_MEMORY_CRITICAL_RATIO = 0.35f;   // 35% of total memory
+        private const float POOL_MEMORY_EMERGENCY_RATIO = 0.45f;  // 45% of total memory
+
+        private float poolWarningThreshold;
+        private float poolCriticalThreshold;
+        private float poolEmergencyThreshold;
 
         private int totalActiveObjects;
         private bool isEditorInstance;
@@ -54,36 +67,41 @@ namespace CZ.Core.Pooling
         private void InitializeManager(bool isEditor)
         {
             isEditorInstance = isEditor;
+            
+            if (memoryConfig != null)
+            {
+                poolWarningThreshold = memoryConfig.PoolWarningThreshold;
+                poolCriticalThreshold = memoryConfig.PoolCriticalThreshold;
+                poolEmergencyThreshold = memoryConfig.PoolEmergencyThreshold;
+                
+                Debug.Log($"[PoolManager] Initialized with thresholds - Warning: {poolWarningThreshold:F2}MB, Critical: {poolCriticalThreshold:F2}MB, Emergency: {poolEmergencyThreshold:F2}MB");
+            }
+            else
+            {
+                Debug.LogWarning("[PoolManager] MemoryConfiguration not assigned, using default pool thresholds");
+                poolWarningThreshold = 384f;  // 384MB (25% of 1536MB)
+                poolCriticalThreshold = 627f;  // 627MB (35% of 1792MB)
+                poolEmergencyThreshold = 921f;  // 921MB (45% of 2048MB)
+            }
+
+            // Initialize monitoring
             if (!isEditor)
             {
-                totalMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total_Pools_Memory");
+                totalMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total Used Memory");
+                StartCoroutine(UpdateStats());
             }
         }
 
-        private void Awake()
+        private IEnumerator UpdateStats()
         {
-            if (instance != null && instance != this)
+            while (enabled && !isEditorInstance)
             {
-                DestroyImmediate(gameObject);
-                return;
-            }
-            
-            instance = this;
-            if (!isEditorInstance && Application.isPlaying)
-            {
-                DontDestroyOnLoad(gameObject);
-                totalMemoryRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total_Pools_Memory");
-            }
-        }
-
-        private void Update()
-        {
-            if (isEditorInstance) return;
-            
-            if (Time.time >= nextStatsUpdate)
-            {
-                UpdatePoolStats();
-                nextStatsUpdate = Time.time + STATS_UPDATE_INTERVAL;
+                if (Time.time >= nextStatsUpdate)
+                {
+                    UpdatePoolStats();
+                    nextStatsUpdate = Time.time + STATS_UPDATE_INTERVAL;
+                }
+                yield return new WaitForSeconds(STATS_UPDATE_INTERVAL);
             }
         }
 
@@ -135,12 +153,48 @@ namespace CZ.Core.Pooling
                 totalMemory += stats.memory;
             }
 
-            // Log warnings if total memory exceeds thresholds
-            var totalMemoryMB = totalMemory / (1024 * 1024);
-            if (totalMemoryMB > 256) // 256MB warning threshold for pools
+            // Convert to MB for threshold checks
+            var totalMemoryMB = totalMemory / (1024f * 1024f);
+            
+            // Log warnings based on dynamic thresholds
+            if (totalMemoryMB > poolEmergencyThreshold)
             {
-                Debug.LogWarning($"Total pool memory usage high: {totalMemoryMB}MB");
+                Debug.LogError($"[PoolManager] EMERGENCY: Pool memory usage critical: {totalMemoryMB:F2}MB/{poolEmergencyThreshold:F2}MB");
+                TriggerEmergencyCleanup();
             }
+            else if (totalMemoryMB > poolCriticalThreshold)
+            {
+                Debug.LogWarning($"[PoolManager] CRITICAL: Pool memory usage high: {totalMemoryMB:F2}MB/{poolCriticalThreshold:F2}MB");
+                TriggerPoolCleanup(true);
+            }
+            else if (totalMemoryMB > poolWarningThreshold)
+            {
+                Debug.LogWarning($"[PoolManager] WARNING: Pool memory usage elevated: {totalMemoryMB:F2}MB/{poolWarningThreshold:F2}MB");
+                TriggerPoolCleanup(false);
+            }
+        }
+
+        private void TriggerPoolCleanup(bool aggressive)
+        {
+            foreach (var pool in pools.Values)
+            {
+                var cleanupMethod = pool.GetType().GetMethod(aggressive ? "AggressiveCleanup" : "Cleanup");
+                cleanupMethod?.Invoke(pool, null);
+            }
+        }
+
+        private void TriggerEmergencyCleanup()
+        {
+            // Clear all inactive objects from pools
+            foreach (var pool in pools.Values)
+            {
+                var emergencyCleanupMethod = pool.GetType().GetMethod("EmergencyCleanup");
+                emergencyCleanupMethod?.Invoke(pool, null);
+            }
+            
+            // Force GC collection
+            System.GC.Collect();
+            System.GC.WaitForPendingFinalizers();
         }
 
         /// <summary>
