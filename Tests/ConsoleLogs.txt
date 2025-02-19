@@ -1,2 +1,765 @@
-Assets\_Project\Scripts\Core\Enemy\EnemySpawner.cs(287,49): error CS1061: 'HashSet<BaseEnemy>' does not contain a definition for 'ToArray' and no accessible extension method 'ToArray' accepting a first argument of type 'HashSet<BaseEnemy>' could be found (are you missing a using directive or an assembly reference?)
+[GameManager] Using fallback memory thresholds
+UnityEngine.Debug:LogWarning (object)
+CZ.Core.GameManager:UseDefaultThresholds () (at Assets/_Project/Scripts/Core/GameManager.cs:340)
+CZ.Core.GameManager:InitializeMemoryMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:264)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:176)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:137)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] System-aware thresholds set:
+System Memory: 2048.00MB
+Base: 1024.00MB
+Warning: 1536.00MB
+Critical: 1792.00MB
+Emergency: 2048.00MB
+Pool Warning: 256.00MB
+Pool Critical: 358.40MB
+Pool Emergency: 460.80MB
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:UseDefaultThresholds () (at Assets/_Project/Scripts/Core/GameManager.cs:362)
+CZ.Core.GameManager:InitializeMemoryMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:264)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:176)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:137)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1091.29MB)
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializeMemoryMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:293)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:176)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:137)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 617.05MB)
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializeGCMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:393)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:184)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:137)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Initial memory reading: 1091.29MB
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:195)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:137)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Setting initial memory baseline to: 1091.29MB
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:198)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:137)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Performing initial memory cleanup...
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:203)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:137)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Performing initial memory cleanup...
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager/<PerformInitialCleanup>d__44:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:417)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:204)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:137)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Performance monitoring initialized successfully
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:214)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:137)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[BaseEnemy] Initialized enemy: Enemy
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:InitializeComponents () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:90)
+CZ.Core.Enemy.BaseEnemy:Awake () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:53)
+
+[EnemySpawner] Awake called
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Awake () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:88)
+
+[EnemySpawner] OnEnable called
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:OnEnable () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:52)
+
+[PlayerController] Awake called
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:Awake () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:90)
+
+[PlayerController] Input system initialized
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:Awake () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:99)
+
+[PlayerController] Subscribed to GameManager events
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:Awake () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:105)
+
+[PoolManager] Using calculated thresholds - Warning: 8186.81MB, Critical: 11461.54MB, Emergency: 14736.26MB
+UnityEngine.Debug:LogWarning (object)
+CZ.Core.Pooling.PoolManager:InitializeManager (bool) (at Assets/_Project/Scripts/Core/Pooling/PoolManager.cs:94)
+CZ.Core.Pooling.PoolManager:get_Instance () (at Assets/_Project/Scripts/Core/Pooling/PoolManager.cs:38)
+CZ.Core.Player.PlayerController:InitializeProjectilePool () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:174)
+CZ.Core.Player.PlayerController:Awake () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:113)
+
+[PlayerController] OnEnable - Input Enabled: False, Controls Active: False
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:OnEnable () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:209)
+
+[EnemySpawner] Start called
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:95)
+
+[EnemySpawner] Component State - IsInitialized: False, IsInitializing: False, HasPrefab: True
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:98)
+
+[EnemySpawner] IPositionProvider found successfully
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:108)
+
+[EnemySpawner] Initializing pool with prefab: Enemy
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:113)
+
+[EnemySpawner] Pool initialized with 5 initial enemies and 10 max size.
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:InitializePool () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:212)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:114)
+
+[EnemySpawner] Start completed - IsInitialized: True, IsGamePlaying: False, IsSpawning: False
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:125)
+
+[GameManager] Using fallback memory thresholds
+UnityEngine.Debug:LogWarning (object)
+CZ.Core.GameManager:UseDefaultThresholds () (at Assets/_Project/Scripts/Core/GameManager.cs:340)
+CZ.Core.GameManager:InitializeMemoryMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:264)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:176)
+CZ.Core.GameManager:ResetPerformanceCounters () (at Assets/_Project/Scripts/Core/GameManager.cs:873)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:516)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[GameManager] System-aware thresholds set:
+System Memory: 2048.00MB
+Base: 1024.00MB
+Warning: 1536.00MB
+Critical: 1792.00MB
+Emergency: 2048.00MB
+Pool Warning: 256.00MB
+Pool Critical: 358.40MB
+Pool Emergency: 460.80MB
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:UseDefaultThresholds () (at Assets/_Project/Scripts/Core/GameManager.cs:362)
+CZ.Core.GameManager:InitializeMemoryMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:264)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:176)
+CZ.Core.GameManager:ResetPerformanceCounters () (at Assets/_Project/Scripts/Core/GameManager.cs:873)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:516)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1122.62MB)
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializeMemoryMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:293)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:176)
+CZ.Core.GameManager:ResetPerformanceCounters () (at Assets/_Project/Scripts/Core/GameManager.cs:873)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:516)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 620.29MB)
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializeGCMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:393)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:184)
+CZ.Core.GameManager:ResetPerformanceCounters () (at Assets/_Project/Scripts/Core/GameManager.cs:873)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:516)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[GameManager] Initial memory reading: 1122.62MB
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:195)
+CZ.Core.GameManager:ResetPerformanceCounters () (at Assets/_Project/Scripts/Core/GameManager.cs:873)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:516)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[GameManager] Setting initial memory baseline to: 1122.62MB
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:198)
+CZ.Core.GameManager:ResetPerformanceCounters () (at Assets/_Project/Scripts/Core/GameManager.cs:873)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:516)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[GameManager] Performing initial memory cleanup...
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:203)
+CZ.Core.GameManager:ResetPerformanceCounters () (at Assets/_Project/Scripts/Core/GameManager.cs:873)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:516)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[GameManager] Performance monitoring initialized successfully
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:214)
+CZ.Core.GameManager:ResetPerformanceCounters () (at Assets/_Project/Scripts/Core/GameManager.cs:873)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:516)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Performance Counters Reset
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:ResetPerformanceCounters () (at Assets/_Project/Scripts/Core/GameManager.cs:876)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:516)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[PlayerController] Input enabled due to game state change to Playing
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:HandleGameStateChanged (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:385)
+CZ.Core.GameManager:set_CurrentGameState (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/GameManager.cs:115)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:526)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[PlayerController] Game state changed to Playing, input enabled: True
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:HandleGameStateChanged (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:403)
+CZ.Core.GameManager:set_CurrentGameState (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/GameManager.cs:115)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:526)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[EnemySpawner] Game state changed to Playing (Previous isGamePlaying: False)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:HandleGameStateChanged (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:136)
+CZ.Core.GameManager:set_CurrentGameState (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/GameManager.cs:115)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:526)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[EnemySpawner] Starting spawning due to game state change to Playing
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:HandleGameStateChanged (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:146)
+CZ.Core.GameManager:set_CurrentGameState (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/GameManager.cs:115)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:526)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[GameManager] Game started - Input and gameplay systems enabled
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs:529)
+CZ.Core.GameManager/<AutoStartGame>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:498)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[EnemySpawner] Target update complete - Updated: 0, Failed: 0, Target: (0.00, -2.00, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Scheduled next target update in 0.05s
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:318)
+
+[BaseEnemy] Initialized enemy: Enemy(Clone)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:InitializeComponents () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:90)
+CZ.Core.Enemy.BaseEnemy:Awake () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:53)
+UnityEngine.GameObject:SetActive (bool)
+CZ.Core.Pooling.ObjectPool`1<CZ.Core.Enemy.BaseEnemy>:Get () (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:145)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:376)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:325)
+
+[BaseEnemy] Enemy spawned: Enemy(Clone)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:202)
+CZ.Core.Pooling.ObjectPool`1<CZ.Core.Enemy.BaseEnemy>:Get () (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:146)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:376)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:325)
+
+[BaseEnemy] Target updated to: (0.00, -2.00, 0.00), Distance: 2.00
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:390)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:325)
+
+[EnemySpawner] Spawned enemy at (5.24, -0.37, 0.00). Active count: 1
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:392)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:325)
+
+[BaseEnemy] Target updated to: (0.22, -2.00, 0.00), Distance: 5.22
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 1, Failed: 0, Target: (0.22, -2.00, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.47, -2.00, 0.00), Distance: 4.89
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 1, Failed: 0, Target: (0.47, -2.00, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.57, -2.00, 0.00), Distance: 4.62
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 1, Failed: 0, Target: (0.57, -2.00, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.60, -2.00, 0.00), Distance: 3.83
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 1, Failed: 0, Target: (0.60, -2.00, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (1.66, -2.00, 0.00), Distance: 2.19
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 1, Failed: 0, Target: (1.66, -2.00, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.73, -2.00, 0.00), Distance: 0.80
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 1, Failed: 0, Target: (2.73, -2.00, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.87, -1.94, 0.00), Distance: 3.46
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:390)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:325)
+
+[EnemySpawner] Spawned enemy at (-4.66, -3.59, 0.00). Active count: 2
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:392)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:325)
+
+[BaseEnemy] Target updated to: (2.88, -1.89, 0.00), Distance: 0.76
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.88, -1.89, 0.00), Distance: 7.72
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (2.88, -1.89, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.88, -1.73, 0.00), Distance: 0.80
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.88, -1.73, 0.00), Distance: 7.70
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (2.88, -1.73, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.87, -1.49, 0.00), Distance: 0.78
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.87, -1.49, 0.00), Distance: 7.65
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (2.87, -1.49, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.87, -1.32, 0.00), Distance: 0.82
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.87, -1.32, 0.00), Distance: 7.56
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (2.87, -1.32, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.78, -1.16, 0.00), Distance: 0.77
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.78, -1.16, 0.00), Distance: 7.42
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (2.78, -1.16, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.56, -0.97, 0.00), Distance: 0.75
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.56, -0.97, 0.00), Distance: 7.13
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (2.56, -0.97, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.40, -0.82, 0.00), Distance: 0.75
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.40, -0.82, 0.00), Distance: 6.87
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (2.40, -0.82, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.24, -0.66, 0.00), Distance: 0.76
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.24, -0.66, 0.00), Distance: 6.67
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (2.24, -0.66, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.02, -0.45, 0.00), Distance: 0.78
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (2.02, -0.45, 0.00), Distance: 6.35
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (2.02, -0.45, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[GameManager] Initial cleanup completed. Memory: 1124.08MB (Delta: 1.46MB)
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager/<PerformInitialCleanup>d__44:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:474)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[GameManager] Adjusted thresholds - Warning: 1536.00MB, Critical: 1792.00MB, Emergency: 2048.00MB
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager/<PerformInitialCleanup>d__44:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:481)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[BaseEnemy] Target updated to: (1.74, -0.17, 0.00), Distance: 0.94
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (1.74, -0.17, 0.00), Distance: 6.01
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (1.74, -0.17, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (1.46, -0.14, 0.00), Distance: 1.11
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (1.46, -0.14, 0.00), Distance: 5.62
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (1.46, -0.14, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (1.23, -0.14, 0.00), Distance: 1.21
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (1.23, -0.14, 0.00), Distance: 5.26
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (1.23, -0.14, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.92, -0.14, 0.00), Distance: 1.36
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.92, -0.14, 0.00), Distance: 4.84
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (0.92, -0.14, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.70, -0.14, 0.00), Distance: 1.43
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.70, -0.14, 0.00), Distance: 4.49
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (0.70, -0.14, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.39, -0.14, 0.00), Distance: 1.57
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.39, -0.14, 0.00), Distance: 4.09
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (0.39, -0.14, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.09, -0.14, 0.00), Distance: 1.70
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (0.09, -0.14, 0.00), Distance: 3.69
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (0.09, -0.14, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.14, -0.14, 0.00), Distance: 1.76
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.14, -0.14, 0.00), Distance: 3.37
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 2, Failed: 0, Target: (-0.14, -0.14, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.29, -0.14, 0.00), Distance: 0.32
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:390)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:325)
+
+[EnemySpawner] Spawned enemy at (8.04, 4.43, 0.00). Active count: 3
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:392)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:325)
+
+[BaseEnemy] Target updated to: (-0.42, -0.10, 0.00), Distance: 1.88
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.42, -0.10, 0.00), Distance: 3.04
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.42, -0.10, 0.00), Distance: 9.58
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 3, Failed: 0, Target: (-0.42, -0.10, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.64, 0.12, 0.00), Distance: 1.89
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.64, 0.12, 0.00), Distance: 2.87
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.64, 0.12, 0.00), Distance: 9.57
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 3, Failed: 0, Target: (-0.64, 0.12, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.80, 0.28, 0.00), Distance: 1.98
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.80, 0.28, 0.00), Distance: 2.82
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[BaseEnemy] Target updated to: (-0.80, 0.28, 0.00), Distance: 9.57
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:173)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:350)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+[EnemySpawner] Target update complete - Updated: 3, Failed: 0, Target: (-0.80, 0.28, 0.00)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:362)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:314)
+
+Tag: Enemy is not defined.
+UnityEngine.Component:CompareTag (string)
+CZ.Core.Player.Projectile:OnTriggerEnter2D (UnityEngine.Collider2D) (at Assets/_Project/Scripts/Core/Player/Projectile.cs:108)
+
+[EnemySpawner] OnDisable called
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:OnDisable () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:58)
+
+[BaseEnemy] Enemy despawned: Enemy(Clone)
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:OnDespawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:212)
+CZ.Core.Pooling.ObjectPool`1<CZ.Core.Enemy.BaseEnemy>:Return (CZ.Core.Enemy.BaseEnemy) (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:157)
+CZ.Core.Enemy.EnemySpawner:DespawnAllEnemies () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:294)
+CZ.Core.Enemy.EnemySpawner:OnDestroy () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:439)
+
+[PlayerController] OnDisable - Input system disabled
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:OnDisable () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:237)
 

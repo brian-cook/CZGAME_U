@@ -104,14 +104,18 @@ namespace CZ.Core.Player
         {
             if (!isActive) return;
 
-            // Check if we hit an enemy
+            // Check for IDamageable interface first
+            var damageable = other.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                damageable.TakeDamage(damage);
+                ReturnToPool();
+                return;
+            }
+
+            // Fallback to tag check if needed
             if (other.CompareTag("Enemy"))
             {
-                var damageable = other.GetComponent<IDamageable>();
-                if (damageable != null)
-                {
-                    damageable.TakeDamage(damage);
-                }
                 ReturnToPool();
             }
         }
