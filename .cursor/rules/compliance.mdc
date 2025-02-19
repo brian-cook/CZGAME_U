@@ -1,4 +1,8 @@
 ---
+description: 
+globs: 
+---
+---
 description: AI Rules
 globs: 
 ---
@@ -9,7 +13,7 @@ globs:
 This rule defines the mandatory compliance process for all AI operations in the codebase.
 
 ## Priority
-CRITICAL - DO NOT USE ASSUMPTIONS IN RESPONSES THIS ENTIRE LIST OF RULES AND GUIDELINES Must be followed for EVERY operation
+CRITICAL - DO NOT USE ASSUMPTIONS IN RESPONSES. THIS ENTIRE LIST OF RULES AND GUIDELINES Must be followed for EVERY operation
 
 ## Process
 1. Pre-Operation Checks:

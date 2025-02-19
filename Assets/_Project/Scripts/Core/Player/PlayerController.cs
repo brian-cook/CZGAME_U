@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 using NaughtyAttributes;
 using CZ.Core;
 using CZ.Core.Input;
+using CZ.Core.Pooling;
+using CZ.Core.Interfaces;
 using static NaughtyAttributes.EInfoBoxType;
 using System.Linq;
 
@@ -10,7 +12,7 @@ namespace CZ.Core.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(CircleCollider2D))]
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : MonoBehaviour, IPositionProvider
     {
         #region Components
         private Rigidbody2D rb;
@@ -18,6 +20,7 @@ namespace CZ.Core.Player
         private TrailRenderer movementTrail;
         private static Material sharedTrailMaterial;
         private GameControls controls;
+        private ObjectPool<Projectile> projectilePool;
         #endregion
 
         #region Configuration
@@ -36,6 +39,16 @@ namespace CZ.Core.Player
         [InfoBox("Linear drag applied to slow down movement", Normal)]
         private float linearDrag = 3f;
 
+        [BoxGroup("Attack Settings")]
+        [SerializeField]
+        [InfoBox("Projectile prefab for auto-attack", Normal)]
+        private Projectile projectilePrefab;
+
+        [BoxGroup("Attack Settings")]
+        [SerializeField, MinValue(0.1f), MaxValue(2f)]
+        [InfoBox("Time between auto-attacks in seconds", Normal)]
+        private float attackCooldown = 0.5f;
+
         [BoxGroup("Debug Settings")]
         [SerializeField]
         private bool enableDebugLogs = false;
@@ -46,6 +59,8 @@ namespace CZ.Core.Player
         private bool isMoving;
         private bool isInitialized;
         private bool isInputEnabled;
+        private float lastAttackTime;
+        private Vector2 lastMoveDirection = Vector2.right;
         #endregion
 
         #region Test Support
@@ -79,6 +94,7 @@ namespace CZ.Core.Player
             // Subscribe to input events
             controls.Player.Move.performed += OnMove;
             controls.Player.Move.canceled += OnMove;
+            controls.Player.Attack.performed += OnAttack;
             
             Debug.Log("[PlayerController] Input system initialized");
             
@@ -92,6 +108,9 @@ namespace CZ.Core.Player
             {
                 Debug.LogError("[PlayerController] GameManager instance not found!");
             }
+
+            // Initialize projectile pool
+            InitializeProjectilePool();
         }
 
         private void SetupComponents()
@@ -144,6 +163,31 @@ namespace CZ.Core.Player
             if (enableDebugLogs) Debug.Log("[PlayerController] Components initialized successfully");
         }
 
+        private void InitializeProjectilePool()
+        {
+            if (projectilePrefab == null)
+            {
+                Debug.LogError("[PlayerController] Projectile prefab not assigned!");
+                return;
+            }
+
+            projectilePool = PoolManager.Instance.CreatePool(
+                createFunc: () => {
+                    var proj = Instantiate(projectilePrefab);
+                    proj.gameObject.SetActive(false);
+                    return proj;
+                },
+                initialSize: 100,
+                maxSize: 200,
+                poolName: "ProjectilePool"
+            );
+
+            if (enableDebugLogs)
+            {
+                Debug.Log("[PlayerController] Projectile pool initialized");
+            }
+        }
+
         private void OnEnable()
         {
             if (!isInitialized)
@@ -171,6 +215,7 @@ namespace CZ.Core.Player
             {
                 controls.Player.Move.performed -= OnMove;
                 controls.Player.Move.canceled -= OnMove;
+                controls.Player.Attack.performed -= OnAttack;
                 controls.Player.Disable();
                 controls.Disable();
             }
@@ -212,6 +257,7 @@ namespace CZ.Core.Player
                 // Ensure Player actions are disabled first
                 controls.Player.Move.performed -= OnMove;
                 controls.Player.Move.canceled -= OnMove;
+                controls.Player.Attack.performed -= OnAttack;
                 controls.Player.Disable();
                 
                 // Then disable and dispose the entire controls
@@ -273,7 +319,11 @@ namespace CZ.Core.Player
             moveInput = context.ReadValue<Vector2>();
             isMoving = moveInput.sqrMagnitude > 0.01f;
             
-            // Only enable trail when moving
+            if (isMoving)
+            {
+                lastMoveDirection = moveInput.normalized;
+            }
+            
             if (movementTrail != null)
             {
                 movementTrail.emitting = isMoving;
@@ -282,6 +332,44 @@ namespace CZ.Core.Player
             if (enableDebugLogs && isMoving)
             {
                 Debug.Log($"[PlayerController] Move input: {moveInput}");
+            }
+        }
+
+        private void OnAttack(InputAction.CallbackContext context)
+        {
+            if (!isInputEnabled || !context.performed) return;
+
+            float currentTime = Time.time;
+            if (currentTime - lastAttackTime >= attackCooldown)
+            {
+                FireProjectile();
+                lastAttackTime = currentTime;
+            }
+        }
+
+        private void FireProjectile()
+        {
+            if (projectilePool == null)
+            {
+                Debug.LogError("[PlayerController] Projectile pool not initialized!");
+                return;
+            }
+
+            var projectile = projectilePool.Get();
+            if (projectile != null)
+            {
+                projectile.transform.position = transform.position;
+                Vector2 fireDirection = moveInput.sqrMagnitude > 0.01f ? moveInput.normalized : lastMoveDirection;
+                projectile.Initialize(fireDirection);
+
+                if (enableDebugLogs)
+                {
+                    Debug.Log($"[PlayerController] Fired projectile in direction: {fireDirection}");
+                }
+            }
+            else
+            {
+                Debug.LogError("[PlayerController] Failed to get projectile from pool!");
             }
         }
         #endregion
@@ -316,7 +404,7 @@ namespace CZ.Core.Player
         }
         #endregion
 
-        #region Public Methods
+        #region IPositionProvider Implementation
         public Vector3 GetPosition()
         {
             return transform.position;

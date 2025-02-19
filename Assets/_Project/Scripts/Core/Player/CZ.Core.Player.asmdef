@@ -2,10 +2,12 @@
     "name": "CZ.Core.Player",
     "rootNamespace": "CZ.Core.Player",
     "references": [
+        "GUID:75469ad4d38634e559750d17036d5f7c",
         "CZ.Core",
         "CZ.Core.Input",
-        "Unity.InputSystem",
-        "GUID:776d03a35f1b52c4a9aed9f56d7b4229"
+        "CZ.Core.Pooling",
+        "CZ.Core.Interfaces",
+        "NaughtyAttributes.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

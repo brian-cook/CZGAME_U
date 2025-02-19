@@ -2,13 +2,14 @@ using UnityEngine;
 using CZ.Core.Pooling;
 using Unity.Profiling;
 using NaughtyAttributes;
+using CZ.Core.Interfaces;
 
 namespace CZ.Core.Enemy
 {
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(CircleCollider2D))]
     [RequireComponent(typeof(Rigidbody2D))]
-    public class BaseEnemy : MonoBehaviour, IPoolable
+    public class BaseEnemy : MonoBehaviour, IPoolable, IDamageable
     {
         #region Components
         private SpriteRenderer spriteRenderer;
@@ -174,9 +175,9 @@ namespace CZ.Core.Enemy
             }
         }
 
-        public void TakeDamage(int amount)
+        public void TakeDamage(int damage)
         {
-            health -= amount;
+            health -= damage;
             if (health <= 0)
             {
                 // Return to pool instead of destroying

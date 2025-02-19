@@ -1,12 +1,8 @@
 {
-    "name": "CZ.Core.Enemy",
-    "rootNamespace": "CZ.Core.Enemy",
+    "name": "CZ.Core.Interfaces",
+    "rootNamespace": "CZ.Core.Interfaces",
     "references": [
-        "CZ.Core",
-        "CZ.Core.Pooling",
-        "CZ.Core.Interfaces",
-        "CZ.Core.Player",
-        "NaughtyAttributes.Core"
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

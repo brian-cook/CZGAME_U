@@ -1,5 +1,6 @@
 using UnityEngine;
 using CZ.Core.Pooling;
+using CZ.Core.Interfaces;
 using CZ.Core.Player;
 using Unity.Profiling;
 using NaughtyAttributes;
@@ -32,7 +33,7 @@ namespace CZ.Core.Enemy
         private int activeEnemies;
         private bool isInitialized;
         private bool isInitializing;
-        private PlayerController playerController;
+        private IPositionProvider targetPositionProvider;
         private bool isGamePlaying;
         
         [Header("Update Settings")]
@@ -94,14 +95,15 @@ namespace CZ.Core.Enemy
             // Verify component state
             Debug.Log($"[EnemySpawner] Component State - IsInitialized: {isInitialized}, IsInitializing: {isInitializing}, HasPrefab: {enemyPrefab != null}");
             
-            playerController = Object.FindFirstObjectByType<PlayerController>();
-            if (playerController == null)
+            var player = Object.FindFirstObjectByType<PlayerController>();
+            targetPositionProvider = player as IPositionProvider;
+            if (targetPositionProvider == null)
             {
-                Debug.LogWarning("[EnemySpawner] PlayerController not found in scene!");
+                Debug.LogWarning("[EnemySpawner] IPositionProvider not found in scene!");
             }
             else
             {
-                Debug.Log("[EnemySpawner] PlayerController found successfully");
+                Debug.Log("[EnemySpawner] IPositionProvider found successfully");
             }
             
             if (enemyPrefab != null)
@@ -287,12 +289,12 @@ namespace CZ.Core.Enemy
         
         private void Update()
         {
-            if (!isInitialized || !isSpawning || !isGamePlaying || playerController == null)
+            if (!isInitialized || !isSpawning || !isGamePlaying || targetPositionProvider == null)
             {
                 return;
             }
             
-            Vector3 currentPlayerPos = playerController.GetPosition();
+            Vector3 currentPlayerPos = targetPositionProvider.GetPosition();
             
             // Ensure we always update targets when the player moves
             bool shouldUpdateTargets = Time.time >= nextTargetUpdateTime;
@@ -316,9 +318,9 @@ namespace CZ.Core.Enemy
         
         private void UpdateEnemyTargets(Vector3 currentPlayerPos)
         {
-            if (playerController == null)
+            if (targetPositionProvider == null)
             {
-                Debug.LogError("[EnemySpawner] Cannot update targets - PlayerController is null!");
+                Debug.LogError("[EnemySpawner] Cannot update targets - IPositionProvider is null!");
                 return;
             }
             
