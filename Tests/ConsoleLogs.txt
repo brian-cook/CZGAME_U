@@ -1,3 +1,161 @@
-Unable to parse file Assets/_Project/UI/Settings/DefaultPanelSettings.asset: [Parser Failure at line 37: Expect ':' between key and value within mapping]
+No Theme Style Sheet set to PanelSettings DefaultPanelSettings, UI will not render properly
+UnityEngine.UIElements.PanelSettings:OnEnable ()
 
+[GameManager] Using fallback memory thresholds
+UnityEngine.Debug:LogWarning (object)
+CZ.Core.GameManager:UseDefaultThresholds () (at Assets/_Project/Scripts/Core/GameManager.cs:342)
+CZ.Core.GameManager:InitializeMemoryMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:266)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:178)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:139)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] System-aware thresholds set:
+System Memory: 2048.00MB
+Base: 1024.00MB
+Warning: 1536.00MB
+Critical: 1792.00MB
+Emergency: 2048.00MB
+Pool Warning: 256.00MB
+Pool Critical: 358.40MB
+Pool Emergency: 460.80MB
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:UseDefaultThresholds () (at Assets/_Project/Scripts/Core/GameManager.cs:364)
+CZ.Core.GameManager:InitializeMemoryMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:266)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:178)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:139)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1090.02MB)
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializeMemoryMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:295)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:178)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:139)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 615.25MB)
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializeGCMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:395)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:186)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:139)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Initial memory reading: 1090.02MB
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:197)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:139)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Setting initial memory baseline to: 1090.02MB
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:200)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:139)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Performing initial memory cleanup...
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:205)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:139)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Performing initial memory cleanup...
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager/<PerformInitialCleanup>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:419)
+UnityEngine.MonoBehaviour:StartCoroutine (System.Collections.IEnumerator)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:206)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:139)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[GameManager] Performance monitoring initialized successfully
+UnityEngine.Debug:Log (object)
+CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scripts/Core/GameManager.cs:216)
+CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:139)
+CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:35)
+
+[BaseEnemy] Configured collider - Radius: 0.05, IsTrigger: False
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:InitializeComponents () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:175)
+CZ.Core.Enemy.BaseEnemy:Awake () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:85)
+
+[BaseEnemy] Initialized enemy: Enemy
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.BaseEnemy:InitializeComponents () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:180)
+CZ.Core.Enemy.BaseEnemy:Awake () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:85)
+
+[EnemySpawner] Awake called
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Awake () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:88)
+
+[EnemySpawner] OnEnable called
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:OnEnable () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:52)
+
+NullReferenceException: Object reference not set to an instance of an object.
+CZ.Core.UI.ResourceCounter..ctor (CZ.Core.Resource.ResourceType type, CZ.Core.Resource.ResourceConfiguration config, UnityEngine.UIElements.VisualTreeAsset template) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:142)
+CZ.Core.UI.ResourceUI.InitializeResourceCounters () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:81)
+CZ.Core.UI.ResourceUI.InitializeUI () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:71)
+CZ.Core.UI.ResourceUI.Awake () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:33)
+
+[ResourceManager] Resource pools initialized
+UnityEngine.Debug:Log (object)
+CZ.Core.Resource.ResourceManager:InitializeResourcePools () (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:134)
+CZ.Core.Resource.ResourceManager:Awake () (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:66)
+UnityEngine.GameObject:AddComponent<CZ.Core.Resource.ResourceManager> ()
+CZ.Core.Resource.ResourceManager:get_Instance () (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:24)
+CZ.Core.UI.ResourceUI:OnDisable () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:46)
+
+[PlayerController] Awake called
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:Awake () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:93)
+
+[PlayerController] Input system initialized
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:Awake () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:105)
+
+[PlayerController] Subscribed to GameManager events
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:Awake () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:111)
+
+[PoolManager] Using calculated thresholds - Warning: 8186.81MB, Critical: 11461.54MB, Emergency: 14736.26MB
+UnityEngine.Debug:LogWarning (object)
+CZ.Core.Pooling.PoolManager:InitializeManager (bool) (at Assets/_Project/Scripts/Core/Pooling/PoolManager.cs:125)
+CZ.Core.Pooling.PoolManager:get_Instance () (at Assets/_Project/Scripts/Core/Pooling/PoolManager.cs:69)
+CZ.Core.Player.PlayerController:InitializeProjectilePool () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:180)
+CZ.Core.Player.PlayerController:Awake () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:119)
+
+[PlayerController] OnEnable - Input Enabled: False, Controls Active: False
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:OnEnable () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:215)
+
+[EnemySpawner] Start called
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:95)
+
+[EnemySpawner] Component State - IsInitialized: False, IsInitializing: False, HasPrefab: True
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:98)
+
+[EnemySpawner] IPositionProvider found successfully
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:108)
+
+[EnemySpawner] Initializing pool with prefab: Enemy
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:113)
+
+[EnemySpawner] Pool initialized with 5 initial enemies and 10 max size.
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:InitializePool () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:212)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:114)
+
+[EnemySpawner] Start completed - IsInitialized: True, IsGamePlaying: False, IsSpawning: False
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:125)
+
+[EnemySpawner] OnDisable called
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.EnemySpawner:OnDisable () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:58)
+
+[PlayerController] OnDisable - Input system disabled
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:OnDisable () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:246)
 

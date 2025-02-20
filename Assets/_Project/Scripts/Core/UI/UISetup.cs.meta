@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8c571cc4834750646a7a9af41c95ce7e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - uiDocument: {instanceID: 0}
+  - resourceUI: {instanceID: 0}
+  - panelSettings: {fileID: 11400000, guid: f76fce8d0d98d7443b589a0d6ab7fae5, type: 2}
+  - resourceConfig: {fileID: 11400000, guid: YOUR_RESOURCE_CONFIG_GUID, type: 2}
+  - resourceCounterTemplate: {fileID: 9197481963319205126, guid: e80e166324dbde048aab449052c32ace, type: 3}
+  executionOrder: -50
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
