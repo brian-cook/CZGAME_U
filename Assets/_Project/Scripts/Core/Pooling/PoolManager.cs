@@ -4,6 +4,12 @@ using Unity.Profiling;
 using System;
 using System.Collections;
 using CZ.Core.Configuration;
+using System.Linq;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+#endif
 
 namespace CZ.Core.Pooling
 {
@@ -25,10 +31,35 @@ namespace CZ.Core.Pooling
                     // Handle edit mode differently
                     if (!Application.isPlaying)
                     {
-                        // In edit mode, just create a temporary instance without DontDestroyOnLoad
-                        var go = new GameObject("PoolManager_EditorOnly");
-                        instance = go.AddComponent<PoolManager>();
-                        instance.InitializeManager(true);
+                        // Look for existing editor instance first
+                        var editorInstances = FindObjectsByType<PoolManager>(FindObjectsSortMode.None)
+                            .Where(p => p.gameObject.name.Contains("PoolManager_EditorOnly"))
+                            .ToList();
+                        
+                        // Clean up duplicate editor instances if found
+                        if (editorInstances.Count > 1)
+                        {
+                            Debug.LogWarning("[PoolManager] Found multiple editor instances. Cleaning up duplicates...");
+                            for (int i = 1; i < editorInstances.Count; i++)
+                            {
+                                DestroyImmediate(editorInstances[i].gameObject);
+                            }
+                        }
+                        
+                        instance = editorInstances.FirstOrDefault();
+                        
+                        if (instance == null)
+                        {
+                            // Create new editor instance only if none exists
+                            var go = new GameObject("PoolManager_EditorOnly");
+                            instance = go.AddComponent<PoolManager>();
+                            instance.InitializeManager(true);
+                            
+                            #if UNITY_EDITOR
+                            Debug.Log("[PoolManager] Created editor-only instance");
+                            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+                            #endif
+                        }
                     }
                     else
                     {
@@ -283,6 +314,7 @@ namespace CZ.Core.Pooling
         {
             if (this == instance)
             {
+                // Only clear the instance reference if this is the current instance
                 instance = null;
             }
             
@@ -292,5 +324,69 @@ namespace CZ.Core.Pooling
                 totalMemoryRecorder.Dispose();
             }
         }
+
+        private void OnValidate()
+        {
+            #if UNITY_EDITOR
+            // Ensure we're the only editor instance
+            if (!Application.isPlaying && gameObject.name.Contains("PoolManager_EditorOnly"))
+            {
+                var editorInstances = FindObjectsByType<PoolManager>(FindObjectsSortMode.None)
+                    .Where(p => p.gameObject.name.Contains("PoolManager_EditorOnly") && p != this)
+                    .ToList();
+                
+                if (editorInstances.Any())
+                {
+                    Debug.LogWarning("[PoolManager] Duplicate editor instance detected during validation. Please clean up using GameObject -> Clean PoolManager Editor Instances.");
+                }
+            }
+            #endif
+        }
+
+        #if UNITY_EDITOR
+        [InitializeOnLoadMethod]
+        private static void RegisterEditorCallbacks()
+        {
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            EditorSceneManager.sceneOpened += OnSceneOpened;
+        }
+
+        private static void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.ExitingEditMode)
+            {
+                CleanupEditorInstances();
+            }
+        }
+
+        private static void OnSceneOpened(UnityEngine.SceneManagement.Scene scene, OpenSceneMode mode)
+        {
+            CleanupEditorInstances();
+        }
+
+        private static void CleanupEditorInstances()
+        {
+            var editorInstances = FindObjectsByType<PoolManager>(FindObjectsSortMode.None)
+                .Where(p => p.gameObject.name.Contains("PoolManager_EditorOnly"))
+                .ToList();
+            
+            if (editorInstances.Count > 1)
+            {
+                Debug.Log("[PoolManager] Cleaning up duplicate editor instances...");
+                for (int i = 1; i < editorInstances.Count; i++)
+                {
+                    DestroyImmediate(editorInstances[i].gameObject);
+                }
+                EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+            }
+        }
+
+        [MenuItem("GameObject/Clean PoolManager Editor Instances", false, 0)]
+        private static void CleanupEditorInstancesMenuItem()
+        {
+            CleanupEditorInstances();
+            Debug.Log("[PoolManager] Editor instances cleaned up via menu item.");
+        }
+        #endif
     }
 } 
