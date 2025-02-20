@@ -17,7 +17,7 @@ namespace CZ.Core.Resource
             {
                 if (instance == null)
                 {
-                    instance = FindObjectOfType<ResourceManager>();
+                    instance = FindAnyObjectByType<ResourceManager>();
                     if (instance == null)
                     {
                         var go = new GameObject("ResourceManager");

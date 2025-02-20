@@ -23,10 +23,12 @@ namespace CZ.Core.Resource
         [Header("Resource Configuration")]
         [SerializeField] 
         private ResourceType resourceType;
+        public ResourceType ResourceType => resourceType;
 
         [SerializeField, MinValue(1)]
         [InfoBox("Value of this resource", EInfoBoxType.Normal)]
         private int resourceValue = 1;
+        public int ResourceValue => resourceValue;
 
         [SerializeField, MinValue(0.1f)]
         [InfoBox("Collection radius for magnetic effect", EInfoBoxType.Normal)]

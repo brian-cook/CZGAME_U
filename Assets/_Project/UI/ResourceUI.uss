@@ -1,0 +1,33 @@
+.resource-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.resource-counter {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 8px;
+    padding: 5px 10px;
+    margin-right: 10px;
+}
+
+.resource-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    margin-right: 5px;
+}
+
+.resource-value {
+    color: white;
+    font-size: 18px;
+    -unity-font-style: bold;
+    min-width: 40px;
+    -unity-text-align: middle-left;
+} 

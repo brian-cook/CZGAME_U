@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &4567890123456789012
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1234567890123456789, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: m_Name
+      value: CurrencyResource
+      objectReference: {fileID: 0}
+    - target: {fileID: 2345678901234567890, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2345678901234567890, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456789012345678901, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456789012345678901, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: m_Color.g
+      value: 0.84
+      objectReference: {fileID: 0}
+    - target: {fileID: 3456789012345678901, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6789012345678901234, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: resourceType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6789012345678901234, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: resourceValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6789012345678901234, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: resourceColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6789012345678901234, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: resourceColor.g
+      value: 0.84
+      objectReference: {fileID: 0}
+    - target: {fileID: 6789012345678901234, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: resourceColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6789012345678901234, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: pulseSpeed
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6789012345678901234, guid: BASE_RESOURCE_GUID, type: 3}
+      propertyPath: pulseIntensity
+      value: 0.35
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: BASE_RESOURCE_GUID, type: 3} 
