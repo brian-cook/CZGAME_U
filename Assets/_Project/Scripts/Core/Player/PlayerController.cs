@@ -61,6 +61,7 @@ namespace CZ.Core.Player
         private bool isInputEnabled;
         private float lastAttackTime;
         private Vector2 lastMoveDirection = Vector2.right;
+        private Vector2 mousePosition;
         #endregion
 
         #region Test Support
@@ -95,6 +96,7 @@ namespace CZ.Core.Player
             controls.Player.Move.performed += OnMove;
             controls.Player.Move.canceled += OnMove;
             controls.Player.Attack.performed += OnAttack;
+            controls.Player.MousePosition.performed += OnMousePosition;
             
             Debug.Log("[PlayerController] Input system initialized");
             
@@ -216,6 +218,7 @@ namespace CZ.Core.Player
                 controls.Player.Move.performed -= OnMove;
                 controls.Player.Move.canceled -= OnMove;
                 controls.Player.Attack.performed -= OnAttack;
+                controls.Player.MousePosition.performed -= OnMousePosition;
                 controls.Player.Disable();
                 controls.Disable();
             }
@@ -258,6 +261,7 @@ namespace CZ.Core.Player
                 controls.Player.Move.performed -= OnMove;
                 controls.Player.Move.canceled -= OnMove;
                 controls.Player.Attack.performed -= OnAttack;
+                controls.Player.MousePosition.performed -= OnMousePosition;
                 controls.Player.Disable();
                 
                 // Then disable and dispose the entire controls
@@ -347,6 +351,12 @@ namespace CZ.Core.Player
             }
         }
 
+        private void OnMousePosition(InputAction.CallbackContext context)
+        {
+            if (!isInputEnabled) return;
+            mousePosition = context.ReadValue<Vector2>();
+        }
+
         private void FireProjectile()
         {
             if (projectilePool == null)
@@ -359,12 +369,16 @@ namespace CZ.Core.Player
             if (projectile != null)
             {
                 projectile.transform.position = transform.position;
-                Vector2 fireDirection = moveInput.sqrMagnitude > 0.01f ? moveInput.normalized : lastMoveDirection;
+                
+                // Convert mouse position to world space
+                Vector2 worldMousePos = Camera.main.ScreenToWorldPoint(mousePosition);
+                Vector2 fireDirection = (worldMousePos - (Vector2)transform.position).normalized;
+                
                 projectile.Initialize(fireDirection);
 
                 if (enableDebugLogs)
                 {
-                    Debug.Log($"[PlayerController] Fired projectile in direction: {fireDirection}");
+                    Debug.Log($"[PlayerController] Fired projectile towards mouse at {worldMousePos}, direction: {fireDirection}");
                 }
             }
             else

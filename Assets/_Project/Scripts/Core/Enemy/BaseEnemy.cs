@@ -33,6 +33,15 @@ namespace CZ.Core.Enemy
         
         [SerializeField, MinValue(1)]
         private int health = 100;
+
+        [Header("Collision Configuration")]
+        [SerializeField, MinValue(0.1f), MaxValue(1f)]
+        [Tooltip("Radius of the collision circle relative to sprite size")]
+        private float collisionRadius = 0.25f;
+
+        [SerializeField]
+        [Tooltip("Whether the collider should be a trigger")]
+        private bool useTriggerCollider = false;
         #endregion
 
         #region State
@@ -82,8 +91,22 @@ namespace CZ.Core.Enemy
             // Configure CircleCollider2D
             if (circleCollider != null)
             {
-                circleCollider.radius = 0.5f;
-                circleCollider.isTrigger = false;
+                // Set collision radius based on sprite size and configuration
+                if (spriteRenderer != null)
+                {
+                    float spriteSize = Mathf.Max(spriteRenderer.sprite.bounds.size.x, spriteRenderer.sprite.bounds.size.y);
+                    circleCollider.radius = spriteSize * collisionRadius;
+                }
+                else
+                {
+                    circleCollider.radius = collisionRadius;
+                }
+                
+                circleCollider.isTrigger = useTriggerCollider;
+                
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Debug.Log($"[BaseEnemy] Configured collider - Radius: {circleCollider.radius:F2}, IsTrigger: {useTriggerCollider}");
+                #endif
             }
 
             isInitialized = true;
