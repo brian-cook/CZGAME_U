@@ -119,6 +119,8 @@ namespace CZ.Core
         
         // Events
         public event Action<GameState> OnGameStateChanged;
+
+        private bool isMonitoring = false;
         #endregion
 
         #region Initialization
@@ -505,6 +507,8 @@ namespace CZ.Core
         {
             if (CurrentGameState != GameState.Playing)
             {
+                Debug.Log("[GameManager] Initializing game start sequence...");
+
                 // Verify memory state before starting
                 if (isInEmergencyMode)
                 {
@@ -514,19 +518,138 @@ namespace CZ.Core
 
                 // Reset performance counters for new game session
                 ResetPerformanceCounters();
-                
-                // Enable input system
-                if (UnityEngine.InputSystem.InputSystem.devices.Count == 0)
+
+                // Handle editor vs play mode differently
+                #if UNITY_EDITOR
+                if (!UnityEditor.EditorApplication.isPlaying)
                 {
-                    Debug.LogWarning("[GameManager] No input devices found. Attempting to initialize input system.");
-                    UnityEngine.InputSystem.InputSystem.Update();
+                    Debug.Log("[GameManager] Starting game in editor mode...");
+                    UnityEditor.EditorApplication.isPlaying = true;
+                    return;
+                }
+                #endif
+
+                // Validate all game systems
+                if (!ValidateGameSystems())
+                {
+                    Debug.LogError("[GameManager] Game system validation failed");
+                    return;
+                }
+
+                // Direct state transition for editor button
+                SetGameState(GameState.Playing);
+            }
+        }
+
+        private void SetGameState(GameState newState)
+        {
+            try
+            {
+                Debug.Log($"[GameManager] Transitioning game state from {CurrentGameState} to {newState}");
+                
+                // Pre-transition setup
+                switch (newState)
+                {
+                    case GameState.Playing:
+                        // Ensure input system is ready
+                        UnityEngine.InputSystem.InputSystem.Update();
+                        
+                        // Start monitoring if transitioning to Playing
+                        if (!isMonitoring)
+                        {
+                            isMonitoring = true;
+                            StartCoroutine(GameStateMonitor());
+                        }
+                        break;
+                        
+                    case GameState.Paused:
+                        Time.timeScale = 0f;
+                        break;
+                        
+                    case GameState.MainMenu:
+                    case GameState.GameOver:
+                        Time.timeScale = 1f;
+                        isMonitoring = false;
+                        break;
+                }
+
+                // Update state
+                CurrentGameState = newState;
+                
+                // Post-transition setup
+                if (newState == GameState.Playing)
+                {
+                    Debug.Log("[GameManager] Game started successfully - All systems initialized and enabled");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[GameManager] Error during state transition: {e.Message}");
+                CurrentGameState = GameState.MainMenu;
+                Time.timeScale = 1f;
+            }
+        }
+
+        private IEnumerator GameStateMonitor()
+        {
+            Debug.Log("[GameManager] Starting game state monitoring");
+            
+            while (isMonitoring && CurrentGameState == GameState.Playing)
+            {
+                // Monitor game state
+                if (!ValidateGameSystems())
+                {
+                    Debug.LogError("[GameManager] Critical system failure detected during gameplay");
+                    SetGameState(GameState.MainMenu);
+                    yield break;
                 }
                 
-                // Set game state to playing which enables systems
-                CurrentGameState = GameState.Playing;
-                
-                // Log game start for debugging
-                Debug.Log("[GameManager] Game started - Input and gameplay systems enabled");
+                yield return new WaitForSeconds(1f);
+            }
+            
+            Debug.Log("[GameManager] Game state monitoring ended");
+        }
+
+        private bool ValidateGameSystems()
+        {
+            try
+            {
+                Debug.Log("[GameManager] Validating game systems...");
+
+                // Validate input system first
+                UnityEngine.InputSystem.InputSystem.Update();
+                if (UnityEngine.InputSystem.InputSystem.devices.Count == 0)
+                {
+                    Debug.LogWarning("[GameManager] No input devices found. Attempting to initialize input system...");
+                    
+                    // Force multiple updates to ensure initialization
+                    for (int i = 0; i < 3; i++)
+                    {
+                        UnityEngine.InputSystem.InputSystem.Update();
+                        System.Threading.Thread.Sleep(10);
+                    }
+                    
+                    if (UnityEngine.InputSystem.InputSystem.devices.Count == 0)
+                    {
+                        Debug.LogError("[GameManager] Input system failed to initialize after multiple attempts");
+                        return false;
+                    }
+                }
+
+                // Validate essential systems
+                if (PoolManager.Instance == null)
+                {
+                    Debug.LogError("[GameManager] PoolManager not initialized");
+                    return false;
+                }
+
+                Debug.Log("[GameManager] All game systems validated successfully");
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[GameManager] Error during system validation: {e.Message}");
+                return false;
             }
         }
 

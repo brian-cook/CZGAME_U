@@ -188,3 +188,117 @@ if (testValue > 0)
 
 Last Updated: 2024-02-15
 Reference: Unity 6.0 
+
+# Unity 6 Troubleshooting Guide
+
+## NaughtyAttributes Integration
+### Common Issues and Solutions
+
+1. Button Callbacks Not Working in Editor
+```
+Problem: [Button] attribute methods don't work properly when called from Unity editor
+Solution: Implement proper editor vs play mode handling
+```
+
+Example Fix:
+```csharp
+[Button("Action")]
+public void EditorAction()
+{
+    #if UNITY_EDITOR
+    if (!UnityEditor.EditorApplication.isPlaying)
+    {
+        UnityEditor.EditorApplication.isPlaying = true;
+        return;
+    }
+    #endif
+
+    // Regular play mode logic
+    ExecuteAction();
+}
+```
+
+2. Coroutine Issues with Button Methods
+```
+Problem: Coroutines don't execute properly when called from [Button] methods
+Solution: Use state management pattern instead of coroutines
+```
+
+Example Fix:
+```csharp
+// Instead of:
+[Button] void Action() { StartCoroutine(ActionRoutine()); }
+
+// Use:
+[Button] void Action() { SetState(NewState); }
+```
+
+3. State Transition Issues
+```
+Problem: State changes don't propagate properly from editor buttons
+Solution: Implement explicit state management
+```
+
+Example Fix:
+```csharp
+private void SetState(GameState newState)
+{
+    // Pre-transition setup
+    PrepareStateChange(newState);
+    
+    // Update state
+    currentState = newState;
+    
+    // Post-transition setup
+    FinalizeStateChange(newState);
+}
+```
+
+4. System Validation Failures
+```
+Problem: Systems not properly initialized when using editor buttons
+Solution: Implement comprehensive validation
+```
+
+Example Fix:
+```csharp
+private bool ValidateSystems()
+{
+    // Check editor state
+    #if UNITY_EDITOR
+    if (!UnityEditor.EditorApplication.isPlaying)
+    {
+        return false;
+    }
+    #endif
+
+    // Validate required systems
+    return ValidateRequiredSystems();
+}
+```
+
+### Best Practices for Unity 6 Integration
+
+1. Editor Mode Considerations
+- Always check EditorApplication.isPlaying
+- Handle play mode transitions explicitly
+- Use proper cleanup in editor context
+- Maintain state consistency
+
+2. State Management
+- Use explicit state machines
+- Avoid coroutine dependencies
+- Implement proper validation
+- Handle transitions atomically
+
+3. System Initialization
+- Validate before state changes
+- Use explicit initialization
+- Handle editor vs play mode differently
+- Maintain proper cleanup
+
+4. Error Handling
+- Provide clear error messages
+- Handle editor-specific errors
+- Implement proper fallbacks
+- Maintain state consistency
