@@ -98,7 +98,7 @@ namespace CZ.Core.Input
                     ""type"": ""Value"",
                     ""id"": ""7c8e0307-0000-0000-0000-000000000000"",
                     ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
+                    ""processors"": ""StickDeadzone"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },
@@ -117,6 +117,15 @@ namespace CZ.Core.Input
                     ""id"": ""8d3e4f57-1b2c-4e3a-b4d5-c6a7d8e9f0b1"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""GamepadAim"",
+                    ""type"": ""Value"",
+                    ""id"": ""4d3e5f67-2b3c-4e4a-b5d6-c7a8d9e0f1b2"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": ""StickDeadzone"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 }
@@ -253,6 +262,83 @@ namespace CZ.Core.Input
                     ""action"": ""MousePosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Left Stick"",
+                    ""id"": ""3d4e5f67-2b3c-4e4a-b5d6-c7a8d9e0f1b2"",
+                    ""path"": ""2DVector(mode=2)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""5d4e5f67-2b3c-4e4a-b5d6-c7a8d9e0f1b2"",
+                    ""path"": ""<Gamepad>/leftStick/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""6d4e5f67-2b3c-4e4a-b5d6-c7a8d9e0f1b2"",
+                    ""path"": ""<Gamepad>/leftStick/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""7d4e5f67-2b3c-4e4a-b5d6-c7a8d9e0f1b2"",
+                    ""path"": ""<Gamepad>/leftStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""8d4e5f67-2b3c-4e4a-b5d6-c7a8d9e0f1b2"",
+                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9d4e5f67-2b3c-4e4a-b5d6-c7a8d9e0f1b2"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ad4e5f67-2b3c-4e4a-b5d6-c7a8d9e0f1b2"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": ""StickDeadzone(min=0.2)"",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""GamepadAim"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -273,6 +359,17 @@ namespace CZ.Core.Input
                     ""isOR"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Gamepad"",
+            ""bindingGroup"": ""Gamepad"",
+            ""devices"": [
+                {
+                    ""devicePath"": ""<Gamepad>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                }
+            ]
         }
     ]
 }");
@@ -281,6 +378,7 @@ namespace CZ.Core.Input
             m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
             m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
             m_Player_MousePosition = m_Player.FindAction("MousePosition", throwIfNotFound: true);
+            m_Player_GamepadAim = m_Player.FindAction("GamepadAim", throwIfNotFound: true);
         }
 
         ~@GameControls()
@@ -364,6 +462,7 @@ namespace CZ.Core.Input
         private readonly InputAction m_Player_Move;
         private readonly InputAction m_Player_Attack;
         private readonly InputAction m_Player_MousePosition;
+        private readonly InputAction m_Player_GamepadAim;
         /// <summary>
         /// Provides access to input actions defined in input action map "Player".
         /// </summary>
@@ -387,6 +486,10 @@ namespace CZ.Core.Input
             /// Provides access to the underlying input action "Player/MousePosition".
             /// </summary>
             public InputAction @MousePosition => m_Wrapper.m_Player_MousePosition;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/GamepadAim".
+            /// </summary>
+            public InputAction @GamepadAim => m_Wrapper.m_Player_GamepadAim;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -422,6 +525,9 @@ namespace CZ.Core.Input
                 @MousePosition.started += instance.OnMousePosition;
                 @MousePosition.performed += instance.OnMousePosition;
                 @MousePosition.canceled += instance.OnMousePosition;
+                @GamepadAim.started += instance.OnGamepadAim;
+                @GamepadAim.performed += instance.OnGamepadAim;
+                @GamepadAim.canceled += instance.OnGamepadAim;
             }
 
             /// <summary>
@@ -442,6 +548,9 @@ namespace CZ.Core.Input
                 @MousePosition.started -= instance.OnMousePosition;
                 @MousePosition.performed -= instance.OnMousePosition;
                 @MousePosition.canceled -= instance.OnMousePosition;
+                @GamepadAim.started -= instance.OnGamepadAim;
+                @GamepadAim.performed -= instance.OnGamepadAim;
+                @GamepadAim.canceled -= instance.OnGamepadAim;
             }
 
             /// <summary>
@@ -488,6 +597,19 @@ namespace CZ.Core.Input
                 return asset.controlSchemes[m_KeyboardMouseSchemeIndex];
             }
         }
+        private int m_GamepadSchemeIndex = -1;
+        /// <summary>
+        /// Provides access to the input control scheme.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
+        public InputControlScheme GamepadScheme
+        {
+            get
+            {
+                if (m_GamepadSchemeIndex == -1) m_GamepadSchemeIndex = asset.FindControlSchemeIndex("Gamepad");
+                return asset.controlSchemes[m_GamepadSchemeIndex];
+            }
+        }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Player" which allows adding and removing callbacks.
         /// </summary>
@@ -516,6 +638,13 @@ namespace CZ.Core.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMousePosition(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "GamepadAim" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnGamepadAim(InputAction.CallbackContext context);
         }
     }
 }

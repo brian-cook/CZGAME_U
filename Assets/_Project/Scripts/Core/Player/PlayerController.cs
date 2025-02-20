@@ -62,6 +62,8 @@ namespace CZ.Core.Player
         private float lastAttackTime;
         private Vector2 lastMoveDirection = Vector2.right;
         private Vector2 mousePosition;
+        private Vector2 gamepadAimInput;
+        private bool isUsingGamepad;
         #endregion
 
         #region Test Support
@@ -97,6 +99,8 @@ namespace CZ.Core.Player
             controls.Player.Move.canceled += OnMove;
             controls.Player.Attack.performed += OnAttack;
             controls.Player.MousePosition.performed += OnMousePosition;
+            controls.Player.GamepadAim.performed += OnGamepadAim;
+            controls.Player.GamepadAim.canceled += OnGamepadAim;
             
             Debug.Log("[PlayerController] Input system initialized");
             
@@ -219,6 +223,8 @@ namespace CZ.Core.Player
                 controls.Player.Move.canceled -= OnMove;
                 controls.Player.Attack.performed -= OnAttack;
                 controls.Player.MousePosition.performed -= OnMousePosition;
+                controls.Player.GamepadAim.performed -= OnGamepadAim;
+                controls.Player.GamepadAim.canceled -= OnGamepadAim;
                 controls.Player.Disable();
                 controls.Disable();
             }
@@ -262,6 +268,8 @@ namespace CZ.Core.Player
                 controls.Player.Move.canceled -= OnMove;
                 controls.Player.Attack.performed -= OnAttack;
                 controls.Player.MousePosition.performed -= OnMousePosition;
+                controls.Player.GamepadAim.performed -= OnGamepadAim;
+                controls.Player.GamepadAim.canceled -= OnGamepadAim;
                 controls.Player.Disable();
                 
                 // Then disable and dispose the entire controls
@@ -357,6 +365,19 @@ namespace CZ.Core.Player
             mousePosition = context.ReadValue<Vector2>();
         }
 
+        private void OnGamepadAim(InputAction.CallbackContext context)
+        {
+            if (!isInputEnabled) return;
+            
+            gamepadAimInput = context.ReadValue<Vector2>();
+            isUsingGamepad = gamepadAimInput.sqrMagnitude > 0.01f;
+            
+            if (enableDebugLogs && isUsingGamepad)
+            {
+                Debug.Log($"[PlayerController] Gamepad aim input: {gamepadAimInput}");
+            }
+        }
+
         private void FireProjectile()
         {
             if (projectilePool == null)
@@ -370,16 +391,28 @@ namespace CZ.Core.Player
             {
                 projectile.transform.position = transform.position;
                 
-                // Convert mouse position to world space
-                Vector2 worldMousePos = Camera.main.ScreenToWorldPoint(mousePosition);
-                Vector2 fireDirection = (worldMousePos - (Vector2)transform.position).normalized;
+                Vector2 fireDirection;
+                if (isUsingGamepad && gamepadAimInput.sqrMagnitude > 0.01f)
+                {
+                    // Use gamepad aim direction
+                    fireDirection = gamepadAimInput.normalized;
+                    if (enableDebugLogs)
+                    {
+                        Debug.Log($"[PlayerController] Fired projectile using gamepad aim: {fireDirection}");
+                    }
+                }
+                else
+                {
+                    // Use mouse aim direction
+                    Vector2 worldMousePos = Camera.main.ScreenToWorldPoint(mousePosition);
+                    fireDirection = (worldMousePos - (Vector2)transform.position).normalized;
+                    if (enableDebugLogs)
+                    {
+                        Debug.Log($"[PlayerController] Fired projectile using mouse aim at {worldMousePos}, direction: {fireDirection}");
+                    }
+                }
                 
                 projectile.Initialize(fireDirection);
-
-                if (enableDebugLogs)
-                {
-                    Debug.Log($"[PlayerController] Fired projectile towards mouse at {worldMousePos}, direction: {fireDirection}");
-                }
             }
             else
             {
