@@ -15,6 +15,7 @@ namespace CZ.Core.Enemy
         private SpriteRenderer spriteRenderer;
         private CircleCollider2D circleCollider;
         private Rigidbody2D rb;
+        private Material materialInstance;
         #endregion
 
         #region Configuration
@@ -31,8 +32,23 @@ namespace CZ.Core.Enemy
         [SerializeField, MinValue(0.1f)]
         private float targetUpdateTimeout = 2f;
         
+        [Header("Health Configuration")]
         [SerializeField, MinValue(1)]
-        private int health = 100;
+        [InfoBox("Initial health of the enemy", EInfoBoxType.Normal)]
+        private int maxHealth = 100;
+
+        [SerializeField, MinValue(0f), MaxValue(2f)]
+        [InfoBox("Duration of damage flash effect", EInfoBoxType.Normal)]
+        private float damageFlashDuration = 0.2f;
+
+        [SerializeField]
+        [InfoBox("Color to flash when taking damage", EInfoBoxType.Normal)]
+        private Color damageFlashColor = Color.red;
+
+        [Header("Death Configuration")]
+        [SerializeField, MinValue(0f), MaxValue(2f)]
+        [InfoBox("Duration of death fade effect", EInfoBoxType.Normal)]
+        private float deathFadeDuration = 0.5f;
 
         [Header("Collision Configuration")]
         [SerializeField, MinValue(0.1f), MaxValue(1f)]
@@ -50,10 +66,17 @@ namespace CZ.Core.Enemy
         private Vector3 lastKnownTargetPosition;
         private float lastTargetUpdateTime;
         private bool hasValidTarget;
+        private int currentHealth;
+        private bool isDying;
+        private float deathTimer;
+        private float damageFlashTimer;
+        private Color originalColor;
         #endregion
 
         #region Properties
         public GameObject GameObject => gameObject;
+        public bool IsDead => currentHealth <= 0;
+        public float HealthPercentage => maxHealth > 0 ? (float)currentHealth / maxHealth : 0f;
         #endregion
 
         #region Unity Lifecycle
@@ -67,6 +90,41 @@ namespace CZ.Core.Enemy
             if (!isInitialized) return;
             MoveTowardsTarget();
         }
+
+        private void Update()
+        {
+            if (!isInitialized) return;
+
+            // Handle damage flash effect
+            if (damageFlashTimer > 0)
+            {
+                damageFlashTimer -= Time.deltaTime;
+                float flashIntensity = Mathf.Clamp01(damageFlashTimer / damageFlashDuration);
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = Color.Lerp(originalColor, damageFlashColor, flashIntensity);
+                }
+            }
+
+            // Handle death effect
+            if (isDying)
+            {
+                deathTimer += Time.deltaTime;
+                float fadeProgress = deathTimer / deathFadeDuration;
+                
+                if (spriteRenderer != null)
+                {
+                    Color fadeColor = spriteRenderer.color;
+                    fadeColor.a = Mathf.Lerp(1f, 0f, fadeProgress);
+                    spriteRenderer.color = fadeColor;
+                }
+
+                if (fadeProgress >= 1f)
+                {
+                    CompleteDeathSequence();
+                }
+            }
+        }
         #endregion
 
         #region Initialization
@@ -78,6 +136,15 @@ namespace CZ.Core.Enemy
             spriteRenderer = GetComponent<SpriteRenderer>();
             circleCollider = GetComponent<CircleCollider2D>();
             rb = GetComponent<Rigidbody2D>();
+
+            // Store original color and create material instance
+            if (spriteRenderer != null)
+            {
+                originalColor = spriteRenderer.color;
+                materialInstance = new Material(spriteRenderer.material);
+                materialInstance.hideFlags = HideFlags.HideAndDontSave;
+                spriteRenderer.material = materialInstance;
+            }
 
             // Configure Rigidbody2D
             if (rb != null)
@@ -200,12 +267,68 @@ namespace CZ.Core.Enemy
 
         public void TakeDamage(int damage)
         {
-            health -= damage;
-            if (health <= 0)
+            if (isDying || !isInitialized) return;
+
+            currentHealth = Mathf.Max(0, currentHealth - damage);
+            
+            // Trigger damage flash
+            damageFlashTimer = damageFlashDuration;
+            
+            if (currentHealth <= 0 && !isDying)
             {
-                // Return to pool instead of destroying
-                gameObject.SetActive(false);
+                StartDeathSequence();
             }
+            
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[BaseEnemy] Took {damage} damage. Current health: {currentHealth}/{maxHealth}");
+            #endif
+        }
+
+        private void StartDeathSequence()
+        {
+            if (isDying) return;
+            
+            isDying = true;
+            deathTimer = 0f;
+            
+            // Disable physics and collision
+            if (rb != null)
+            {
+                rb.simulated = false;
+            }
+            if (circleCollider != null)
+            {
+                circleCollider.enabled = false;
+            }
+            
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[BaseEnemy] Starting death sequence for: {gameObject.name}");
+            #endif
+        }
+
+        private void CompleteDeathSequence()
+        {
+            // Clean up material instance
+            if (materialInstance != null)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(materialInstance);
+                }
+                else
+                {
+                    DestroyImmediate(materialInstance);
+                }
+                materialInstance = null;
+            }
+            
+            // Reset state and return to pool
+            isDying = false;
+            gameObject.SetActive(false);
+            
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[BaseEnemy] Death sequence completed for: {gameObject.name}");
+            #endif
         }
 
         public void OnSpawn()
@@ -216,10 +339,31 @@ namespace CZ.Core.Enemy
             }
             
             // Reset state
-            health = 100;
+            currentHealth = maxHealth;
+            isDying = false;
+            deathTimer = 0f;
+            damageFlashTimer = 0f;
             hasValidTarget = false;
             lastTargetUpdateTime = 0f;
-            rb.linearVelocity = Vector2.zero;
+            
+            // Reset physics
+            if (rb != null)
+            {
+                rb.simulated = true;
+                rb.linearVelocity = Vector2.zero;
+            }
+            
+            // Reset collider
+            if (circleCollider != null)
+            {
+                circleCollider.enabled = true;
+            }
+            
+            // Reset visuals
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = originalColor;
+            }
             
             gameObject.SetActive(true);
             Debug.Log($"[BaseEnemy] Enemy spawned: {gameObject.name}");
@@ -227,13 +371,62 @@ namespace CZ.Core.Enemy
 
         public void OnDespawn()
         {
+            // Clean up material instance if it exists
+            if (materialInstance != null)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(materialInstance);
+                }
+                else
+                {
+                    DestroyImmediate(materialInstance);
+                }
+                materialInstance = null;
+            }
+            
             hasValidTarget = false;
             targetPosition = Vector3.zero;
             lastKnownTargetPosition = Vector3.zero;
-            rb.linearVelocity = Vector2.zero;
+            isDying = false;
+            currentHealth = maxHealth;
+            
+            if (rb != null)
+            {
+                rb.simulated = true;
+                rb.linearVelocity = Vector2.zero;
+            }
+            
+            if (circleCollider != null)
+            {
+                circleCollider.enabled = true;
+            }
+            
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = originalColor;
+            }
+            
             gameObject.SetActive(false);
             Debug.Log($"[BaseEnemy] Enemy despawned: {gameObject.name}");
         }
         #endregion
+
+        private void OnDestroy()
+        {
+            // Clean up material instance
+            if (materialInstance != null)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(materialInstance);
+                }
+                else
+                {
+                    DestroyImmediate(materialInstance);
+                }
+                materialInstance = null;
+            }
+        }
     }
 } 
