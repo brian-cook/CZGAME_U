@@ -33,20 +33,24 @@ namespace CZ.Core.UI
             InitializeUI();
         }
 
+        private void Start()
+        {
+            // Try to find ResourceManager after all Awake calls are complete
+            if (ResourceManager.Instance == null)
+            {
+                Debug.LogError("[ResourceUI] ResourceManager not found in scene. Please ensure ResourceManager is set up in the initial scene.");
+                SetResourceCountersInteractable(false);
+            }
+        }
+
         private void OnEnable()
         {
-            if (ResourceManager.Instance != null)
-            {
-                ResourceManager.Instance.OnResourceCollected += HandleResourceCollected;
-            }
+            SubscribeToResourceManager();
         }
 
         private void OnDisable()
         {
-            if (ResourceManager.Instance != null)
-            {
-                ResourceManager.Instance.OnResourceCollected -= HandleResourceCollected;
-            }
+            UnsubscribeFromResourceManager();
         }
         #endregion
 
@@ -81,6 +85,45 @@ namespace CZ.Core.UI
                 var counter = new ResourceCounter(type, resourceConfig, resourceCounterTemplate);
                 resourceContainer.Add(counter.Root);
                 resourceCounters.Add(type, counter);
+            }
+        }
+        #endregion
+
+        #region Resource Manager Integration
+        private void SubscribeToResourceManager()
+        {
+            var resourceManager = ResourceManager.Instance;
+            if (resourceManager != null)
+            {
+                resourceManager.OnResourceCollected += HandleResourceCollected;
+                SetResourceCountersInteractable(true);
+                Debug.Log("[ResourceUI] Successfully subscribed to ResourceManager events");
+            }
+            else
+            {
+                Debug.LogWarning("[ResourceUI] ResourceManager not available - resource collection events will not be processed");
+                SetResourceCountersInteractable(false);
+            }
+        }
+
+        private void UnsubscribeFromResourceManager()
+        {
+            var resourceManager = ResourceManager.Instance;
+            if (resourceManager != null)
+            {
+                resourceManager.OnResourceCollected -= HandleResourceCollected;
+                Debug.Log("[ResourceUI] Unsubscribed from ResourceManager events");
+            }
+        }
+
+        private void SetResourceCountersInteractable(bool interactable)
+        {
+            if (resourceCounters != null)
+            {
+                foreach (var counter in resourceCounters.Values)
+                {
+                    counter.SetInteractable(interactable);
+                }
             }
         }
         #endregion
@@ -176,6 +219,24 @@ namespace CZ.Core.UI
                     Root.experimental.animation
                         .Scale(1f, 100);
                 });
+        }
+
+        public void SetInteractable(bool interactable)
+        {
+            Root.SetEnabled(interactable);
+            
+            // Visual feedback for disabled state
+            if (!interactable)
+            {
+                Root.style.opacity = 0.5f;
+                icon.style.backgroundColor = Color.gray;
+                valueLabel.text = "--";
+            }
+            else
+            {
+                Root.style.opacity = 1f;
+                UpdateDisplay();
+            }
         }
     }
 } 

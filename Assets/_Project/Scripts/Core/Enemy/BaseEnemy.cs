@@ -3,6 +3,7 @@ using CZ.Core.Pooling;
 using Unity.Profiling;
 using NaughtyAttributes;
 using CZ.Core.Interfaces;
+using CZ.Core.Resource;
 
 namespace CZ.Core.Enemy
 {
@@ -58,6 +59,19 @@ namespace CZ.Core.Enemy
         [SerializeField]
         [Tooltip("Whether the collider should be a trigger")]
         private bool useTriggerCollider = false;
+
+        [Header("Resource Drop Configuration")]
+        [SerializeField, MinValue(0)]
+        private int minExperienceDrop = 1;
+        
+        [SerializeField, MinValue(0)]
+        private int maxExperienceDrop = 3;
+        
+        [SerializeField, Range(0f, 1f)]
+        private float healthDropChance = 0.1f;
+        
+        [SerializeField, Range(0f, 1f)]
+        private float powerUpDropChance = 0.05f;
         #endregion
 
         #region State
@@ -308,27 +322,36 @@ namespace CZ.Core.Enemy
 
         private void CompleteDeathSequence()
         {
-            // Clean up material instance
-            if (materialInstance != null)
+            if (ResourceManager.Instance != null)
             {
-                if (Application.isPlaying)
+                // Spawn experience
+                int experienceDrop = Random.Range(minExperienceDrop, maxExperienceDrop + 1);
+                ResourceManager.Instance.SpawnResource(ResourceType.Experience, transform.position, experienceDrop);
+
+                // Random chance for health drop
+                if (Random.value < healthDropChance)
                 {
-                    Destroy(materialInstance);
+                    ResourceManager.Instance.SpawnResource(ResourceType.Health, transform.position);
                 }
-                else
+
+                // Random chance for power-up
+                if (Random.value < powerUpDropChance)
                 {
-                    DestroyImmediate(materialInstance);
+                    ResourceManager.Instance.SpawnResource(ResourceType.PowerUp, transform.position);
                 }
-                materialInstance = null;
             }
-            
-            // Reset state and return to pool
-            isDying = false;
-            gameObject.SetActive(false);
-            
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Debug.Log($"[BaseEnemy] Death sequence completed for: {gameObject.name}");
-            #endif
+
+            // Return to pool
+            var pool = PoolManager.Instance.GetPool<BaseEnemy>();
+            if (pool != null)
+            {
+                pool.Return(this);
+            }
+            else
+            {
+                Debug.LogError("[BaseEnemy] Failed to return to pool - pool not found!");
+                gameObject.SetActive(false);
+            }
         }
 
         public void OnSpawn()

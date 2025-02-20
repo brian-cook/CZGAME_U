@@ -30,7 +30,7 @@ namespace CZ.Core.Player
         [BoxGroup("Projectile Settings")]
         [SerializeField, MinValue(1), MaxValue(50)]
         [InfoBox("Damage dealt by the projectile", EInfoBoxType.Normal)]
-        private int damage = 10;
+        private int damage = 50;
         #endregion
 
         #region State

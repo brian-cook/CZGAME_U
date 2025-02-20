@@ -111,4 +111,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectileSpeed: 15
   lifetime: 2
-  damage: 10
+  damage: 50

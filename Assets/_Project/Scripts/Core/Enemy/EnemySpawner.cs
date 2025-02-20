@@ -197,7 +197,8 @@ namespace CZ.Core.Enemy
                 int initialPoolSize = Mathf.Min(maxEnemiesPerWave, 5); // Start with smaller initial size
                 int maxPoolSize = Mathf.Min(maxEnemiesPerWave * 2, 20); // Cap maximum size
                 
-                enemyPool = new ObjectPool<BaseEnemy>(
+                // Use PoolManager instead of local pool
+                enemyPool = PoolManager.Instance.CreatePool(
                     createFunc: () => {
                         var obj = Instantiate(enemyPrefab).GetComponent<BaseEnemy>();
                         obj.gameObject.SetActive(false);
@@ -205,7 +206,7 @@ namespace CZ.Core.Enemy
                     },
                     initialSize: initialPoolSize,
                     maxSize: maxPoolSize,
-                    "EnemyPool"
+                    poolName: "EnemyPool"
                 );
                 
                 isInitialized = true;
