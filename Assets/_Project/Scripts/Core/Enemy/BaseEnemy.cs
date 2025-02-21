@@ -62,17 +62,41 @@ namespace CZ.Core.Enemy
         private bool useTriggerCollider = false;
 
         [Header("Resource Drop Configuration")]
-        [SerializeField, MinValue(0)]
+        [SerializeField, MinValue(1)]
+        [InfoBox("Minimum experience points dropped", EInfoBoxType.Normal)]
         private int minExperienceDrop = 1;
         
-        [SerializeField, MinValue(0)]
-        private int maxExperienceDrop = 3;
+        [SerializeField, MinValue(1)]
+        [InfoBox("Maximum experience points dropped", EInfoBoxType.Normal)]
+        private int maxExperienceDrop = 1;
         
-        [SerializeField, Range(0f, 1f)]
-        private float healthDropChance = 0.1f;
+        [SerializeField, Range(0, 100)]
+        [InfoBox("Chance to drop experience (0-100%)", EInfoBoxType.Normal)]
+        private float experienceDropChance = 0;
         
-        [SerializeField, Range(0f, 1f)]
-        private float powerUpDropChance = 0.05f;
+        [SerializeField, MinValue(1)]
+        [InfoBox("Amount of health to drop", EInfoBoxType.Normal)]
+        private int healthDropValue = 1;
+        
+        [SerializeField, Range(0, 100)]
+        [InfoBox("Chance to drop health (0-100%)", EInfoBoxType.Normal)]
+        private float healthDropChance = 0;
+        
+        [SerializeField, MinValue(1)]
+        [InfoBox("Amount of power up to drop", EInfoBoxType.Normal)]
+        private int powerUpDropValue = 1;
+        
+        [SerializeField, Range(0, 100)]
+        [InfoBox("Chance to drop power up (0-100%)", EInfoBoxType.Normal)]
+        private float powerUpDropChance = 0;
+        
+        [SerializeField, MinValue(1)]
+        [InfoBox("Amount of currency to drop", EInfoBoxType.Normal)]
+        private int currencyDropValue = 1;
+        
+        [SerializeField, Range(0, 100)]
+        [InfoBox("Chance to drop currency (0-100%)", EInfoBoxType.Normal)]
+        private float currencyDropChance = 0;
         #endregion
 
         #region State
@@ -342,40 +366,58 @@ namespace CZ.Core.Enemy
                     try
                     {
                         // Spawn experience with validation and offset
-                        int experienceDrop = Random.Range(minExperienceDrop, maxExperienceDrop + 1);
-                        Vector3 expPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-                        var expResource = ResourceManager.Instance.SpawnResource(ResourceType.Experience, expPosition, experienceDrop);
-                        if (expResource != null)
+                        float expRoll = Random.value * 100f;
+                        if (expRoll <= experienceDropChance)
                         {
-                            resourcesSpawned = true;
-                            Debug.Log($"[BaseEnemy] Spawned experience resource at {expPosition} with value {experienceDrop}");
+                            int experienceDrop = Random.Range(minExperienceDrop, maxExperienceDrop + 1);
+                            Vector3 expPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+                            var expResource = ResourceManager.Instance.SpawnResource(ResourceType.Experience, expPosition, experienceDrop);
+                            if (expResource != null)
+                            {
+                                resourcesSpawned = true;
+                                Debug.Log($"[BaseEnemy] Spawned experience resource at {expPosition} with value {experienceDrop}");
+                            }
                         }
 
                         // Random chance for health drop with validation and offset
-                        float healthRoll = Random.value;
+                        float healthRoll = Random.value * 100f;
                         Debug.Log($"[BaseEnemy] Health drop roll: {healthRoll} vs chance: {healthDropChance}");
                         if (healthRoll <= healthDropChance)
                         {
                             Vector3 healthPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-                            var healthResource = ResourceManager.Instance.SpawnResource(ResourceType.Health, healthPosition);
+                            var healthResource = ResourceManager.Instance.SpawnResource(ResourceType.Health, healthPosition, healthDropValue);
                             if (healthResource != null)
                             {
                                 resourcesSpawned = true;
-                                Debug.Log($"[BaseEnemy] Spawned health resource at {healthPosition}");
+                                Debug.Log($"[BaseEnemy] Spawned health resource at {healthPosition} with value {healthDropValue}");
                             }
                         }
 
                         // Random chance for power-up with validation and offset
-                        float powerUpRoll = Random.value;
+                        float powerUpRoll = Random.value * 100f;
                         Debug.Log($"[BaseEnemy] PowerUp drop roll: {powerUpRoll} vs chance: {powerUpDropChance}");
                         if (powerUpRoll <= powerUpDropChance)
                         {
                             Vector3 powerUpPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-                            var powerUpResource = ResourceManager.Instance.SpawnResource(ResourceType.PowerUp, powerUpPosition);
+                            var powerUpResource = ResourceManager.Instance.SpawnResource(ResourceType.PowerUp, powerUpPosition, powerUpDropValue);
                             if (powerUpResource != null)
                             {
                                 resourcesSpawned = true;
-                                Debug.Log($"[BaseEnemy] Spawned power-up resource at {powerUpPosition}");
+                                Debug.Log($"[BaseEnemy] Spawned power-up resource at {powerUpPosition} with value {powerUpDropValue}");
+                            }
+                        }
+
+                        // Random chance for currency with validation and offset
+                        float currencyRoll = Random.value * 100f;
+                        Debug.Log($"[BaseEnemy] Currency drop roll: {currencyRoll} vs chance: {currencyDropChance}");
+                        if (currencyRoll <= currencyDropChance)
+                        {
+                            Vector3 currencyPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+                            var currencyResource = ResourceManager.Instance.SpawnResource(ResourceType.Currency, currencyPosition, currencyDropValue);
+                            if (currencyResource != null)
+                            {
+                                resourcesSpawned = true;
+                                Debug.Log($"[BaseEnemy] Spawned currency resource at {currencyPosition} with value {currencyDropValue}");
                             }
                         }
 
