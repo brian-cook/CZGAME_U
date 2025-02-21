@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 2515269377005038414}
   - component: {fileID: 21126496462663819}
   - component: {fileID: 2831261611181924627}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PowerUpResource
-  m_TagString: Untagged
+  m_TagString: Resource
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -79,15 +79,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
-  m_Color: {r: 0.18431373, g: 0.36078432, b: 0.8000001, a: 1}
+  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Color: {r: 0.16470589, g: 0.4627451, b: 0.8392157, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!58 &2515269377005038414
@@ -165,11 +165,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81c5e999bc2ce8a4d8c85cd7ae56297a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resourceType: 0
+  resourceType: 2
   resourceValue: 1
   collectionRadius: 1.5
   collectionSpeed: 8
   lifetime: 15
-  resourceColor: {r: 0.18534178, g: 0.36203247, b: 0.8018868, a: 1}
+  resourceColor: {r: 0.16470589, g: 0.4627451, b: 0.8392157, a: 1}
   pulseSpeed: 2
   pulseIntensity: 0.3

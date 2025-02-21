@@ -3,6 +3,7 @@ using UnityEngine.UIElements;
 using CZ.Core.Resource;
 using System.Collections.Generic;
 using NaughtyAttributes;
+using System.Collections;
 
 namespace CZ.Core.UI
 {
@@ -25,6 +26,7 @@ namespace CZ.Core.UI
         private Dictionary<ResourceType, ResourceCounter> resourceCounters;
         private VisualElement root;
         private VisualElement resourceContainer;
+        private bool isQuitting;
         #endregion
 
         #region Unity Lifecycle
@@ -35,28 +37,72 @@ namespace CZ.Core.UI
 
         private void Start()
         {
-            // Try to find ResourceManager after all Awake calls are complete
             if (ResourceManager.Instance == null)
             {
-                Debug.LogError("[ResourceUI] ResourceManager not found in scene. Please ensure ResourceManager is set up in the initial scene.");
-                SetResourceCountersInteractable(false);
+                Debug.LogWarning("[ResourceUI] ResourceManager not found, will retry connection...");
+                StartCoroutine(WaitForResourceManager());
+                return;
+            }
+            
+            InitializeUI();
+        }
+
+        private IEnumerator WaitForResourceManager()
+        {
+            float timeout = 5f;
+            float elapsed = 0f;
+            
+            while (ResourceManager.Instance == null && elapsed < timeout && !isQuitting)
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            if (ResourceManager.Instance != null && !isQuitting)
+            {
+                Debug.Log("[ResourceUI] ResourceManager found, initializing UI...");
+                InitializeUI();
+            }
+            else if (!isQuitting)
+            {
+                Debug.LogError("[ResourceUI] ResourceManager not found after timeout. UI will not be initialized.");
             }
         }
 
         private void OnEnable()
         {
-            SubscribeToResourceManager();
+            if (!isQuitting)
+            {
+                SubscribeToResourceManager();
+            }
         }
 
         private void OnDisable()
         {
-            UnsubscribeFromResourceManager();
+            if (!isQuitting)
+            {
+                UnsubscribeFromResourceManager();
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            isQuitting = true;
+            CleanupUI();
         }
         #endregion
 
         #region Initialization
         private void InitializeUI()
         {
+            if (isQuitting) return;
+
+            if (ResourceManager.Instance == null)
+            {
+                Debug.LogError("[ResourceUI] Cannot initialize UI without ResourceManager!");
+                return;
+            }
+
             if (uiDocument == null)
             {
                 Debug.LogError("[ResourceUI] UIDocument not assigned!");
@@ -73,10 +119,15 @@ namespace CZ.Core.UI
             }
 
             InitializeResourceCounters();
+            SubscribeToResourceManager();
+            
+            Debug.Log("[ResourceUI] UI initialized successfully");
         }
 
         private void InitializeResourceCounters()
         {
+            if (isQuitting) return;
+
             resourceCounters = new Dictionary<ResourceType, ResourceCounter>();
 
             // Create counters for each resource type
@@ -92,6 +143,8 @@ namespace CZ.Core.UI
         #region Resource Manager Integration
         private void SubscribeToResourceManager()
         {
+            if (isQuitting) return;
+
             var resourceManager = ResourceManager.Instance;
             if (resourceManager != null)
             {
@@ -108,22 +161,44 @@ namespace CZ.Core.UI
 
         private void UnsubscribeFromResourceManager()
         {
-            var resourceManager = ResourceManager.Instance;
-            if (resourceManager != null)
+            // Skip if already quitting or ResourceManager is null
+            if (isQuitting || ResourceManager.Instance == null) return;
+
+            try
             {
-                resourceManager.OnResourceCollected -= HandleResourceCollected;
+                ResourceManager.Instance.OnResourceCollected -= HandleResourceCollected;
                 Debug.Log("[ResourceUI] Unsubscribed from ResourceManager events");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[ResourceUI] Error during unsubscribe: {e.Message}");
             }
         }
 
-        private void SetResourceCountersInteractable(bool interactable)
+        private void CleanupUI()
         {
             if (resourceCounters != null)
             {
                 foreach (var counter in resourceCounters.Values)
                 {
-                    counter.SetInteractable(interactable);
+                    counter.SetInteractable(false);
                 }
+                resourceCounters.Clear();
+            }
+
+            if (resourceContainer != null)
+            {
+                resourceContainer.Clear();
+            }
+        }
+
+        private void SetResourceCountersInteractable(bool interactable)
+        {
+            if (isQuitting || resourceCounters == null) return;
+
+            foreach (var counter in resourceCounters.Values)
+            {
+                counter.SetInteractable(interactable);
             }
         }
         #endregion

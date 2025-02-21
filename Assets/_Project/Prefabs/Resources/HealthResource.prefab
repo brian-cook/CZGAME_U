@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 2515269377005038414}
   - component: {fileID: 21126496462663819}
   - component: {fileID: 2831261611181924627}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HealthResource
-  m_TagString: Untagged
+  m_TagString: Resource
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -79,15 +79,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
-  m_Color: {r: 0.8313726, g: 0.25490198, b: 0.19215688, a: 1}
+  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Color: {r: 0.8396226, g: 0.16789784, b: 0.16789784, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!58 &2515269377005038414
@@ -165,11 +165,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81c5e999bc2ce8a4d8c85cd7ae56297a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resourceType: 0
+  resourceType: 1
   resourceValue: 10
   collectionRadius: 1.5
   collectionSpeed: 8
   lifetime: 15
-  resourceColor: {r: 0.8301887, g: 0.25435883, b: 0.19188325, a: 1}
+  resourceColor: {r: 0.8396226, g: 0.16789784, b: 0.16789784, a: 1}
   pulseSpeed: 2
   pulseIntensity: 0.3

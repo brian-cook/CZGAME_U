@@ -17,6 +17,7 @@ namespace CZ.Core.Enemy
         private CircleCollider2D circleCollider;
         private Rigidbody2D rb;
         private Material materialInstance;
+        private static Material sharedMaterial;
         #endregion
 
         #region Configuration
@@ -154,10 +155,18 @@ namespace CZ.Core.Enemy
             // Store original color and create material instance
             if (spriteRenderer != null)
             {
-                originalColor = spriteRenderer.color;
-                materialInstance = new Material(spriteRenderer.material);
-                materialInstance.hideFlags = HideFlags.HideAndDontSave;
+                originalColor = Color.white; // Default color
+                if (sharedMaterial == null)
+                {
+                    sharedMaterial = new Material(Shader.Find("Sprites/Default"))
+                    {
+                        hideFlags = HideFlags.DontSave
+                    };
+                }
+                materialInstance = new Material(sharedMaterial);
+                materialInstance.hideFlags = HideFlags.DontSave;
                 spriteRenderer.material = materialInstance;
+                spriteRenderer.color = originalColor;
             }
 
             // Configure Rigidbody2D
@@ -322,35 +331,104 @@ namespace CZ.Core.Enemy
 
         private void CompleteDeathSequence()
         {
-            if (ResourceManager.Instance != null)
+            try
             {
-                // Spawn experience
-                int experienceDrop = Random.Range(minExperienceDrop, maxExperienceDrop + 1);
-                ResourceManager.Instance.SpawnResource(ResourceType.Experience, transform.position, experienceDrop);
+                Vector3 spawnPosition = transform.position;
+                bool resourcesSpawned = false;
 
-                // Random chance for health drop
-                if (Random.value < healthDropChance)
+                // Only attempt to spawn resources if ResourceManager is properly initialized
+                if (ResourceManager.Instance != null)
                 {
-                    ResourceManager.Instance.SpawnResource(ResourceType.Health, transform.position);
+                    try
+                    {
+                        // Spawn experience with validation
+                        int experienceDrop = Random.Range(minExperienceDrop, maxExperienceDrop + 1);
+                        var expResource = ResourceManager.Instance.SpawnResource(ResourceType.Experience, spawnPosition, experienceDrop);
+                        if (expResource != null)
+                        {
+                            resourcesSpawned = true;
+                            Debug.Log($"[BaseEnemy] Spawned experience resource at {spawnPosition}");
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[BaseEnemy] Failed to spawn experience resource");
+                        }
+
+                        // Random chance for health drop with validation
+                        if (Random.value < healthDropChance)
+                        {
+                            var healthResource = ResourceManager.Instance.SpawnResource(ResourceType.Health, spawnPosition);
+                            if (healthResource != null)
+                            {
+                                resourcesSpawned = true;
+                                Debug.Log($"[BaseEnemy] Spawned health resource at {spawnPosition}");
+                            }
+                            else
+                            {
+                                Debug.LogWarning("[BaseEnemy] Failed to spawn health resource");
+                            }
+                        }
+
+                        // Random chance for power-up with validation
+                        if (Random.value < powerUpDropChance)
+                        {
+                            var powerUpResource = ResourceManager.Instance.SpawnResource(ResourceType.PowerUp, spawnPosition);
+                            if (powerUpResource != null)
+                            {
+                                resourcesSpawned = true;
+                                Debug.Log($"[BaseEnemy] Spawned power-up resource at {spawnPosition}");
+                            }
+                            else
+                            {
+                                Debug.LogWarning("[BaseEnemy] Failed to spawn power-up resource");
+                            }
+                        }
+
+                        if (!resourcesSpawned)
+                        {
+                            Debug.LogWarning("[BaseEnemy] No resources were successfully spawned during death sequence");
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogError($"[BaseEnemy] Error spawning resources: {e.Message}\nStack trace: {e.StackTrace}");
+                    }
                 }
-
-                // Random chance for power-up
-                if (Random.value < powerUpDropChance)
+                else
                 {
-                    ResourceManager.Instance.SpawnResource(ResourceType.PowerUp, transform.position);
+                    Debug.LogError("[BaseEnemy] ResourceManager not available for spawning resources");
                 }
             }
-
-            // Return to pool
-            var pool = PoolManager.Instance.GetPool<BaseEnemy>();
-            if (pool != null)
+            finally
             {
-                pool.Return(this);
-            }
-            else
-            {
-                Debug.LogError("[BaseEnemy] Failed to return to pool - pool not found!");
-                gameObject.SetActive(false);
+                // Always attempt to return to pool
+                try
+                {
+                    if (PoolManager.Instance != null)
+                    {
+                        var pool = PoolManager.Instance.GetPool<BaseEnemy>();
+                        if (pool != null)
+                        {
+                            pool.Return(this);
+                            Debug.Log($"[BaseEnemy] Successfully returned to pool: {gameObject.name}");
+                        }
+                        else
+                        {
+                            Debug.LogError($"[BaseEnemy] Failed to return to pool - pool not found for: {gameObject.name}");
+                            gameObject.SetActive(false);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("[BaseEnemy] PoolManager not available for returning to pool");
+                        gameObject.SetActive(false);
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"[BaseEnemy] Error returning to pool: {e.Message}\nStack trace: {e.StackTrace}");
+                    gameObject.SetActive(false);
+                }
             }
         }
 
@@ -385,6 +463,20 @@ namespace CZ.Core.Enemy
             // Reset visuals
             if (spriteRenderer != null)
             {
+                // Ensure material is properly set
+                if (materialInstance == null)
+                {
+                    if (sharedMaterial == null)
+                    {
+                        sharedMaterial = new Material(Shader.Find("Sprites/Default"))
+                        {
+                            hideFlags = HideFlags.DontSave
+                        };
+                    }
+                    materialInstance = new Material(sharedMaterial);
+                    materialInstance.hideFlags = HideFlags.DontSave;
+                }
+                spriteRenderer.material = materialInstance;
                 spriteRenderer.color = originalColor;
             }
             

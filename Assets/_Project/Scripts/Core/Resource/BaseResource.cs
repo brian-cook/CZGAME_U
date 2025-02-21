@@ -200,14 +200,16 @@ namespace CZ.Core.Resource
 
         private void ReturnToPool()
         {
-            var pool = PoolManager.Instance.GetPool<BaseResource>();
-            if (pool != null)
+            if (ResourceManager.Instance == null)
             {
-                pool.Return(this);
+                Debug.LogError("[BaseResource] Failed to return to pool - ResourceManager not found!");
+                gameObject.SetActive(false);
+                return;
             }
-            else
+
+            if (!ResourceManager.Instance.ReturnResourceToPool(this))
             {
-                Debug.LogError("[BaseResource] Failed to return to pool - pool not found!");
+                Debug.LogError($"[BaseResource] Failed to return {resourceType} resource to pool!");
                 gameObject.SetActive(false);
             }
         }

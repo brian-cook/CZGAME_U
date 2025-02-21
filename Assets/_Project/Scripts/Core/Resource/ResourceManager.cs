@@ -4,6 +4,8 @@ using CZ.Core.Pooling;
 using NaughtyAttributes;
 using Unity.Profiling;
 using System;
+using System.Collections;
+using UnityEditor;
 
 namespace CZ.Core.Resource
 {
@@ -12,6 +14,7 @@ namespace CZ.Core.Resource
         #region Singleton
         private static ResourceManager instance;
         private static bool isQuitting;
+        private static bool isInitialized;
         
         public static ResourceManager Instance
         {
@@ -23,7 +26,7 @@ namespace CZ.Core.Resource
                     return null;
                 }
 
-                if (instance == null)
+                if (instance == null && !isQuitting)
                 {
                     instance = FindAnyObjectByType<ResourceManager>();
                     
@@ -80,7 +83,6 @@ namespace CZ.Core.Resource
 
         #region State
         private Dictionary<ResourceType, ObjectPool<BaseResource>> resourcePools;
-        private bool isInitialized;
         private static readonly ProfilerMarker s_cleanupMarker = new(ProfilerCategory.Scripts, "ResourceManager.Cleanup");
         private static readonly ProfilerMarker s_initMarker = new(ProfilerCategory.Scripts, "ResourceManager.Initialize");
         #endregion
@@ -97,20 +99,154 @@ namespace CZ.Core.Resource
                 return;
             }
 
-            // Reset quitting state on new instance
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+            
             isQuitting = false;
             
-            // Validate prefabs
             if (!ValidatePrefabs())
             {
                 Debug.LogError("[ResourceManager] Required prefabs are missing! Check inspector assignments.");
                 Debug.LogError($"[ResourceManager] Experience: {experiencePrefab != null}, Health: {healthPrefab != null}, PowerUp: {powerUpPrefab != null}, Currency: {currencyPrefab != null}");
+                instance = null;
                 return;
             }
 
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-            InitializeResourcePools();
+            StartCoroutine(InitializeWhenPoolManagerReady());
+        }
+
+        private IEnumerator InitializeWhenPoolManagerReady()
+        {
+            Debug.Log("[ResourceManager] Starting initialization sequence...");
+            
+            float timeout = 5f;
+            float elapsed = 0f;
+            
+            while (PoolManager.Instance == null && elapsed < timeout)
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            if (PoolManager.Instance == null)
+            {
+                Debug.LogError("[ResourceManager] Failed to initialize - PoolManager not available after timeout!");
+                isInitialized = false;
+                yield break;
+            }
+            
+            Debug.Log("[ResourceManager] PoolManager ready, initializing resource pools...");
+            
+            try
+            {
+                resourcePools = new Dictionary<ResourceType, ObjectPool<BaseResource>>();
+                
+                // Create pools with unique identifiers for each resource type
+                if (experiencePrefab != null)
+                {
+                    var expPool = CreateTypeSpecificPool(
+                        ResourceType.Experience,
+                        experiencePrefab,
+                        experiencePoolInitial,
+                        experiencePoolMax
+                    );
+                    if (expPool != null)
+                    {
+                        resourcePools.Add(ResourceType.Experience, expPool);
+                        Debug.Log($"[ResourceManager] Created Experience pool with size {experiencePoolInitial}");
+                    }
+                }
+                
+                if (healthPrefab != null)
+                {
+                    var healthPool = CreateTypeSpecificPool(
+                        ResourceType.Health,
+                        healthPrefab,
+                        healthPoolInitial,
+                        healthPoolMax
+                    );
+                    if (healthPool != null)
+                    {
+                        resourcePools.Add(ResourceType.Health, healthPool);
+                        Debug.Log($"[ResourceManager] Created Health pool with size {healthPoolInitial}");
+                    }
+                }
+                
+                if (powerUpPrefab != null)
+                {
+                    var powerUpPool = CreateTypeSpecificPool(
+                        ResourceType.PowerUp,
+                        powerUpPrefab,
+                        powerUpPoolInitial,
+                        powerUpPoolMax
+                    );
+                    if (powerUpPool != null)
+                    {
+                        resourcePools.Add(ResourceType.PowerUp, powerUpPool);
+                        Debug.Log($"[ResourceManager] Created PowerUp pool with size {powerUpPoolInitial}");
+                    }
+                }
+                
+                if (currencyPrefab != null)
+                {
+                    var currencyPool = CreateTypeSpecificPool(
+                        ResourceType.Currency,
+                        currencyPrefab,
+                        currencyPoolInitial,
+                        currencyPoolMax
+                    );
+                    if (currencyPool != null)
+                    {
+                        resourcePools.Add(ResourceType.Currency, currencyPool);
+                        Debug.Log($"[ResourceManager] Created Currency pool with size {currencyPoolInitial}");
+                    }
+                }
+
+                isInitialized = resourcePools.Count > 0;
+                
+                if (isInitialized)
+                {
+                    Debug.Log($"[ResourceManager] Successfully initialized {resourcePools.Count} resource pools");
+                    // Initialize all pool objects
+                    foreach (var pool in resourcePools.Values)
+                    {
+                        for (int i = 0; i < pool.CurrentCount; i++)
+                        {
+                            var obj = pool.Get();
+                            if (obj != null)
+                            {
+                                obj.gameObject.SetActive(false);
+                                pool.Return(obj);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogError("[ResourceManager] Failed to initialize any resource pools!");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[ResourceManager] Error during pool initialization: {e.Message}\nStack trace: {e.StackTrace}");
+                CleanupPools();
+                isInitialized = false;
+            }
+        }
+
+        private ObjectPool<BaseResource> CreateTypeSpecificPool(ResourceType type, BaseResource prefab, int initialSize, int maxSize)
+        {
+            string poolName = $"ResourcePool_{type}";
+            return PoolManager.Instance.CreatePool(
+                createFunc: () => {
+                    var resource = Instantiate(prefab);
+                    resource.name = $"{type}Resource(Clone)";
+                    return resource;
+                },
+                initialSize: initialSize,
+                maxSize: maxSize,
+                poolName: poolName
+            );
         }
 
         private bool ValidatePrefabs()
@@ -154,147 +290,66 @@ namespace CZ.Core.Resource
             UnityEngine.SceneManagement.SceneManager.sceneUnloaded -= HandleSceneUnloaded;
         }
 
-        private void OnDestroy()
-        {
-            using var _ = s_cleanupMarker.Auto();
-
-            if (instance == this)
-            {
-                CleanupPools();
-                isInitialized = false;
-                instance = null;
-            }
-        }
-
         private void OnApplicationQuit()
         {
             isQuitting = true;
             if (instance == this)
             {
+                using var _ = s_cleanupMarker.Auto();
+                Debug.Log("[ResourceManager] Starting application quit cleanup...");
+                
+                try
+                {
+                    // Cleanup pools first
+                    CleanupPools();
+                    
+                    // Clear instance and state
+                    instance = null;
+                    isInitialized = false;
+                    
+                    Debug.Log("[ResourceManager] Cleanup completed successfully");
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"[ResourceManager] Error during quit cleanup: {e.Message}");
+                }
+            }
+        }
+
+        private void OnDestroy()
+        {
+            using var _ = s_cleanupMarker.Auto();
+
+            if (instance == this && !isQuitting)
+            {
+                Debug.Log("[ResourceManager] Starting destroy cleanup...");
                 CleanupPools();
+                isInitialized = false;
                 instance = null;
+                Debug.Log("[ResourceManager] Destroy cleanup completed");
             }
         }
 
         private void CleanupPools()
         {
-            if (resourcePools != null)
+            if (resourcePools == null) return;
+
+            foreach (var pool in resourcePools.Values)
             {
-                foreach (var pool in resourcePools.Values)
+                if (pool != null)
                 {
-                    if (pool != null)
+                    try
                     {
-                        try
-                        {
-                            pool.Clear();
-                            Debug.Log($"[ResourceManager] Successfully cleared pool");
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.LogError($"[ResourceManager] Error clearing pool: {e.Message}");
-                        }
+                        pool.Clear();
+                        Debug.Log($"[ResourceManager] Successfully cleared pool");
                     }
-                }
-                resourcePools.Clear();
-            }
-        }
-        #endregion
-
-        #region Initialization
-        private void InitializeResourcePools()
-        {
-            using var _ = s_initMarker.Auto();
-            
-            if (isInitialized)
-            {
-                Debug.LogWarning("[ResourceManager] Pools already initialized!");
-                return;
-            }
-
-            try
-            {
-                resourcePools = new Dictionary<ResourceType, ObjectPool<BaseResource>>();
-
-                // Initialize Experience Pool
-                if (experiencePrefab != null)
-                {
-                    var experiencePool = PoolManager.Instance.CreatePool(
-                        createFunc: () => Instantiate(experiencePrefab),
-                        initialSize: experiencePoolInitial,
-                        maxSize: experiencePoolMax,
-                        poolName: "ExperiencePool"
-                    );
-                    if (experiencePool != null)
+                    catch (System.Exception e)
                     {
-                        resourcePools.Add(ResourceType.Experience, experiencePool);
-                        Debug.Log("[ResourceManager] Experience pool initialized successfully");
+                        Debug.LogError($"[ResourceManager] Error clearing pool: {e.Message}");
                     }
-                }
-
-                // Initialize Health Pool
-                if (healthPrefab != null)
-                {
-                    var healthPool = PoolManager.Instance.CreatePool(
-                        createFunc: () => Instantiate(healthPrefab),
-                        initialSize: healthPoolInitial,
-                        maxSize: healthPoolMax,
-                        poolName: "HealthPool"
-                    );
-                    if (healthPool != null)
-                    {
-                        resourcePools.Add(ResourceType.Health, healthPool);
-                        Debug.Log("[ResourceManager] Health pool initialized successfully");
-                    }
-                }
-
-                // Initialize PowerUp Pool
-                if (powerUpPrefab != null)
-                {
-                    var powerUpPool = PoolManager.Instance.CreatePool(
-                        createFunc: () => Instantiate(powerUpPrefab),
-                        initialSize: powerUpPoolInitial,
-                        maxSize: powerUpPoolMax,
-                        poolName: "PowerUpPool"
-                    );
-                    if (powerUpPool != null)
-                    {
-                        resourcePools.Add(ResourceType.PowerUp, powerUpPool);
-                        Debug.Log("[ResourceManager] PowerUp pool initialized successfully");
-                    }
-                }
-
-                // Initialize Currency Pool
-                if (currencyPrefab != null)
-                {
-                    var currencyPool = PoolManager.Instance.CreatePool(
-                        createFunc: () => Instantiate(currencyPrefab),
-                        initialSize: currencyPoolInitial,
-                        maxSize: currencyPoolMax,
-                        poolName: "CurrencyPool"
-                    );
-                    if (currencyPool != null)
-                    {
-                        resourcePools.Add(ResourceType.Currency, currencyPool);
-                        Debug.Log("[ResourceManager] Currency pool initialized successfully");
-                    }
-                }
-
-                isInitialized = resourcePools.Count > 0;
-                if (isInitialized)
-                {
-                    Debug.Log($"[ResourceManager] Successfully initialized {resourcePools.Count} resource pools");
-                }
-                else
-                {
-                    Debug.LogError("[ResourceManager] Failed to initialize any resource pools!");
                 }
             }
-            catch (Exception e)
-            {
-                Debug.LogError($"[ResourceManager] Error during pool initialization: {e.Message}");
-                CleanupPools();
-                isInitialized = false;
-            }
+            resourcePools.Clear();
         }
         #endregion
 
@@ -303,34 +358,77 @@ namespace CZ.Core.Resource
         {
             if (!isInitialized)
             {
-                Debug.LogError("[ResourceManager] Attempting to spawn resource before initialization!");
+                Debug.LogError($"[ResourceManager] Cannot spawn resource of type {type} - Manager not initialized!");
+                return null;
+            }
+
+            if (isQuitting)
+            {
+                Debug.LogWarning($"[ResourceManager] Cannot spawn resource of type {type} - Application is quitting");
                 return null;
             }
 
             if (!resourcePools.TryGetValue(type, out var pool))
             {
-                Debug.LogError($"[ResourceManager] No pool found for resource type: {type}");
+                Debug.LogError($"[ResourceManager] No pool found for resource type: {type}. Available pools: {string.Join(", ", resourcePools.Keys)}");
                 return null;
             }
 
-            var resource = pool.Get();
-            if (resource != null)
+            try
             {
-                resource.transform.position = position;
-                return resource;
-            }
+                var resource = pool.Get();
+                if (resource != null)
+                {
+                    resource.transform.position = position;
+                    resource.gameObject.SetActive(true);
+                    Debug.Log($"[ResourceManager] Successfully spawned resource of type {type} at {position}. Pool count: {pool.CurrentCount}");
+                    return resource;
+                }
 
-            Debug.LogWarning($"[ResourceManager] Failed to get resource from pool: {type}");
-            return null;
+                Debug.Log($"[ResourceManager] Failed to get resource from pool: {type}. Pool count: {pool.CurrentCount}");
+                return null;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[ResourceManager] Error spawning resource: {e.Message}\nStack trace: {e.StackTrace}");
+                return null;
+            }
         }
 
         public void SpawnResourceBurst(ResourceType type, Vector3 position, int count, float radius)
         {
-            for (int i = 0; i < count; i++)
+            if (!isInitialized || isQuitting)
             {
-                Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * radius;
-                Vector3 spawnPosition = position + new Vector3(randomOffset.x, randomOffset.y, 0);
-                SpawnResource(type, spawnPosition);
+                Debug.LogWarning("[ResourceManager] Cannot spawn resource burst - manager not ready or quitting");
+                return;
+            }
+
+            try
+            {
+                int successfulSpawns = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * radius;
+                    Vector3 spawnPosition = position + new Vector3(randomOffset.x, randomOffset.y, 0);
+                    var resource = SpawnResource(type, spawnPosition);
+                    if (resource != null)
+                    {
+                        successfulSpawns++;
+                    }
+                }
+
+                if (successfulSpawns < count)
+                {
+                    Debug.LogWarning($"[ResourceManager] Resource burst partially failed - spawned {successfulSpawns}/{count} resources");
+                }
+                else
+                {
+                    Debug.Log($"[ResourceManager] Successfully spawned resource burst - {count} resources of type {type}");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[ResourceManager] Error during resource burst: {e.Message}");
             }
         }
         #endregion
@@ -342,6 +440,25 @@ namespace CZ.Core.Resource
         public void CollectResource(ResourceType type, int value)
         {
             OnResourceCollected?.Invoke(type, value);
+        }
+        #endregion
+
+        #region Pool Management
+        public bool ReturnResourceToPool(BaseResource resource)
+        {
+            if (!isInitialized || resource == null)
+            {
+                return false;
+            }
+
+            if (resourcePools.TryGetValue(resource.ResourceType, out var pool))
+            {
+                pool.Return(resource);
+                return true;
+            }
+
+            Debug.LogError($"[ResourceManager] No pool found for resource type: {resource.ResourceType}");
+            return false;
         }
         #endregion
 
