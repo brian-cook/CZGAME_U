@@ -9,6 +9,7 @@ namespace CZ.Core.UI
     [RequireComponent(typeof(ResourceUI))]
     public class UISetup : MonoBehaviour
     {
+        #region Configuration
         [Header("UI Components")]
         [SerializeField, Required]
         private UIDocument uiDocument;
@@ -26,10 +27,15 @@ namespace CZ.Core.UI
         [SerializeField, Required]
         private VisualTreeAsset resourceCounterTemplate;
 
+        private bool isInitialized;
+        #endregion
+
         private void Awake()
         {
+            if (isInitialized) return;
             ValidateComponents();
             SetupUIComponents();
+            isInitialized = true;
         }
 
         private void ValidateComponents()
@@ -76,40 +82,53 @@ namespace CZ.Core.UI
         private void SetupUIComponents()
         {
             // Configure UIDocument
-            uiDocument.panelSettings = panelSettings;
+            if (uiDocument != null && panelSettings != null)
+            {
+                uiDocument.panelSettings = panelSettings;
+            }
             
-            // Set up ResourceUI references using reflection
-            var resourceUIType = resourceUI.GetType();
-            
-            // Set UIDocument reference
-            var uiDocField = resourceUIType.GetField("uiDocument", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (uiDocField != null)
+            // Set up ResourceUI with required references
+            if (resourceUI != null)
             {
-                uiDocField.SetValue(resourceUI, uiDocument);
-            }
+                var resourceUIType = resourceUI.GetType();
+                
+                // Set UIDocument reference
+                var uiDocField = resourceUIType.GetField("uiDocument", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (uiDocField != null)
+                {
+                    uiDocField.SetValue(resourceUI, uiDocument);
+                }
 
-            // Set ResourceConfiguration reference
-            var configField = resourceUIType.GetField("resourceConfig", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (configField != null)
+                // Set ResourceConfiguration reference
+                var configField = resourceUIType.GetField("resourceConfig", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (configField != null)
+                {
+                    configField.SetValue(resourceUI, resourceConfig);
+                }
+
+                // Set ResourceCounterTemplate reference
+                var templateField = resourceUIType.GetField("resourceCounterTemplate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (templateField != null)
+                {
+                    templateField.SetValue(resourceUI, resourceCounterTemplate);
+                }
+
+                // Disable automatic initialization in ResourceUI
+                resourceUI.enabled = false;
+                resourceUI.enabled = true;
+
+                Debug.Log("[UISetup] UI Components configured successfully");
+            }
+            else
             {
-                configField.SetValue(resourceUI, resourceConfig);
+                Debug.LogWarning("[UISetup] ResourceUI component not found, skipping configuration");
             }
-
-            // Set ResourceCounterTemplate reference
-            var templateField = resourceUIType.GetField("resourceCounterTemplate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (templateField != null)
-            {
-                templateField.SetValue(resourceUI, resourceCounterTemplate);
-            }
-
-            Debug.Log("[UISetup] UI Components configured successfully");
         }
 
         [Button("Setup UI Components")]
         private void EditorSetupUIComponents()
         {
             if (Application.isPlaying) return;
-            
             ValidateComponents();
             SetupUIComponents();
         }

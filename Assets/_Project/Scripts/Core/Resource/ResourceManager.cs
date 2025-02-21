@@ -241,6 +241,20 @@ namespace CZ.Core.Resource
                 createFunc: () => {
                     var resource = Instantiate(prefab);
                     resource.name = $"{type}Resource(Clone)";
+                    
+                    // Ensure the resource is properly configured
+                    var spriteRenderer = resource.GetComponent<SpriteRenderer>();
+                    if (spriteRenderer != null)
+                    {
+                        // Preserve the prefab's color
+                        spriteRenderer.color = prefab.GetComponent<SpriteRenderer>().color;
+                        Debug.Log($"[ResourceManager] Created {type} resource with color: {spriteRenderer.color}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[ResourceManager] Failed to get SpriteRenderer for {type} resource");
+                    }
+                    
                     return resource;
                 },
                 initialSize: initialSize,
@@ -439,7 +453,21 @@ namespace CZ.Core.Resource
 
         public void CollectResource(ResourceType type, int value)
         {
-            OnResourceCollected?.Invoke(type, value);
+            try
+            {
+                if (isQuitting)
+                {
+                    Debug.LogWarning($"[ResourceManager] Cannot collect resource - Application is quitting");
+                    return;
+                }
+
+                Debug.Log($"[ResourceManager] Collecting resource: {type} with value {value}");
+                OnResourceCollected?.Invoke(type, value);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[ResourceManager] Error during resource collection: {e.Message}");
+            }
         }
         #endregion
 

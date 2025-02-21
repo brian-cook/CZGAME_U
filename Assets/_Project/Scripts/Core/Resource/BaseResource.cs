@@ -79,8 +79,12 @@ namespace CZ.Core.Resource
 
             if (spriteRenderer != null)
             {
-                baseColor = resourceColor;
+                // Respect the prefab's color settings
+                baseColor = spriteRenderer.color;
+                
+                // Ensure the color is applied
                 spriteRenderer.color = baseColor;
+                Debug.Log($"[BaseResource] Initialized {resourceType} with color: {baseColor}");
             }
 
             if (circleCollider != null)
@@ -108,14 +112,14 @@ namespace CZ.Core.Resource
                     resourceTrail.endWidth = 0f;
                     resourceTrail.emitting = false;
 
+                    // Use the same color as the sprite
                     if (sharedTrailMaterial == null)
                     {
-                        sharedTrailMaterial = new Material(Shader.Find("Sprites/Default"))
-                        {
-                            hideFlags = HideFlags.DontSave
-                        };
+                        sharedTrailMaterial = new Material(Shader.Find("Sprites/Default"));
                     }
                     resourceTrail.material = sharedTrailMaterial;
+                    resourceTrail.startColor = baseColor;
+                    resourceTrail.endColor = new Color(baseColor.r, baseColor.g, baseColor.b, 0f);
                 }
             }
 
@@ -193,9 +197,27 @@ namespace CZ.Core.Resource
 
         private void OnCollected()
         {
-            // Here we'll add the resource value to the player's resources
-            // This will be implemented when we add the resource management system
-            ReturnToPool();
+            if (ResourceManager.Instance != null)
+            {
+                try
+                {
+                    ResourceManager.Instance.CollectResource(resourceType, resourceValue);
+                    Debug.Log($"[BaseResource] Resource collected: {resourceType} with value {resourceValue}");
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"[BaseResource] Error during resource collection: {e.Message}");
+                }
+                finally
+                {
+                    ReturnToPool();
+                }
+            }
+            else
+            {
+                Debug.LogError("[BaseResource] Failed to collect resource - ResourceManager not found!");
+                ReturnToPool();
+            }
         }
 
         private void ReturnToPool()
@@ -230,9 +252,17 @@ namespace CZ.Core.Resource
             target = null;
             transform.localScale = initialScale;
 
+            // Ensure color is correctly set on spawn
             if (spriteRenderer != null)
             {
                 spriteRenderer.color = baseColor;
+                
+                // Update trail colors
+                if (resourceTrail != null)
+                {
+                    resourceTrail.startColor = baseColor;
+                    resourceTrail.endColor = new Color(baseColor.r, baseColor.g, baseColor.b, 0f);
+                }
             }
 
             if (rb != null)
@@ -246,6 +276,7 @@ namespace CZ.Core.Resource
             }
 
             gameObject.SetActive(true);
+            Debug.Log($"[BaseResource] Spawned {resourceType} with color: {baseColor}");
         }
 
         public void OnDespawn()

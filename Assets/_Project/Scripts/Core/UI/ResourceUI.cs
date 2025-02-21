@@ -27,24 +27,119 @@ namespace CZ.Core.UI
         private VisualElement root;
         private VisualElement resourceContainer;
         private bool isQuitting;
+        private bool isInitialized;
         #endregion
 
         #region Unity Lifecycle
-        private void Awake()
+        private void OnEnable()
         {
-            InitializeUI();
+            if (!isInitialized)
+            {
+                InitializeUI();
+            }
+            SubscribeToResourceManager();
         }
 
-        private void Start()
+        private void OnDisable()
         {
+            if (!isQuitting)
+            {
+                UnsubscribeFromResourceManager();
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            isQuitting = true;
+            CleanupUI();
+        }
+        #endregion
+
+        #region Initialization
+        private void InitializeUI()
+        {
+            if (isQuitting || isInitialized) return;
+
             if (ResourceManager.Instance == null)
             {
                 Debug.LogWarning("[ResourceUI] ResourceManager not found, will retry connection...");
                 StartCoroutine(WaitForResourceManager());
                 return;
             }
+
+            if (uiDocument == null)
+            {
+                Debug.LogError("[ResourceUI] UIDocument not assigned!");
+                return;
+            }
+
+            // Clear existing UI if any
+            CleanupUI();
+
+            root = uiDocument.rootVisualElement;
+            resourceContainer = root.Q<VisualElement>("ResourceContainer");
             
-            InitializeUI();
+            if (resourceContainer == null)
+            {
+                Debug.LogError("[ResourceUI] Resource container not found in UI Document!");
+                return;
+            }
+
+            InitializeResourceCounters();
+            isInitialized = true;
+            Debug.Log("[ResourceUI] UI initialized successfully");
+        }
+
+        private void InitializeResourceCounters()
+        {
+            if (isQuitting) return;
+
+            if (resourceConfig == null)
+            {
+                Debug.LogError("[ResourceUI] ResourceConfiguration is missing!");
+                return;
+            }
+
+            if (resourceCounterTemplate == null)
+            {
+                Debug.LogError("[ResourceUI] ResourceCounterTemplate is missing!");
+                return;
+            }
+
+            // Create new dictionary if null
+            resourceCounters = new Dictionary<ResourceType, ResourceCounter>();
+
+            // Create counters for each resource type
+            foreach (ResourceType type in System.Enum.GetValues(typeof(ResourceType)))
+            {
+                try
+                {
+                    var counter = new ResourceCounter(type, resourceConfig, resourceCounterTemplate);
+                    
+                    if (counter.Root == null)
+                    {
+                        Debug.LogError($"[ResourceUI] Failed to create counter for {type} - Root is null");
+                        continue;
+                    }
+
+                    if (counter.IsValid)
+                    {
+                        resourceContainer.Add(counter.Root);
+                        resourceCounters.Add(type, counter);
+                        Debug.Log($"[ResourceUI] Created and added counter for {type} with initial value: {counter.CurrentValue}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[ResourceUI] Counter for {type} is invalid - skipping");
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"[ResourceUI] Error creating counter for {type}: {e.Message}");
+                }
+            }
+
+            Debug.Log($"[ResourceUI] Initialized {resourceCounters.Count} resource counters");
         }
 
         private IEnumerator WaitForResourceManager()
@@ -66,76 +161,6 @@ namespace CZ.Core.UI
             else if (!isQuitting)
             {
                 Debug.LogError("[ResourceUI] ResourceManager not found after timeout. UI will not be initialized.");
-            }
-        }
-
-        private void OnEnable()
-        {
-            if (!isQuitting)
-            {
-                SubscribeToResourceManager();
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (!isQuitting)
-            {
-                UnsubscribeFromResourceManager();
-            }
-        }
-
-        private void OnApplicationQuit()
-        {
-            isQuitting = true;
-            CleanupUI();
-        }
-        #endregion
-
-        #region Initialization
-        private void InitializeUI()
-        {
-            if (isQuitting) return;
-
-            if (ResourceManager.Instance == null)
-            {
-                Debug.LogError("[ResourceUI] Cannot initialize UI without ResourceManager!");
-                return;
-            }
-
-            if (uiDocument == null)
-            {
-                Debug.LogError("[ResourceUI] UIDocument not assigned!");
-                return;
-            }
-
-            root = uiDocument.rootVisualElement;
-            resourceContainer = root.Q<VisualElement>("ResourceContainer");
-            
-            if (resourceContainer == null)
-            {
-                Debug.LogError("[ResourceUI] Resource container not found in UI Document!");
-                return;
-            }
-
-            InitializeResourceCounters();
-            SubscribeToResourceManager();
-            
-            Debug.Log("[ResourceUI] UI initialized successfully");
-        }
-
-        private void InitializeResourceCounters()
-        {
-            if (isQuitting) return;
-
-            resourceCounters = new Dictionary<ResourceType, ResourceCounter>();
-
-            // Create counters for each resource type
-            foreach (ResourceType type in System.Enum.GetValues(typeof(ResourceType)))
-            {
-                var counter = new ResourceCounter(type, resourceConfig, resourceCounterTemplate);
-                resourceContainer.Add(counter.Root);
-                resourceCounters.Add(type, counter);
             }
         }
         #endregion
@@ -161,7 +186,6 @@ namespace CZ.Core.UI
 
         private void UnsubscribeFromResourceManager()
         {
-            // Skip if already quitting or ResourceManager is null
             if (isQuitting || ResourceManager.Instance == null) return;
 
             try
@@ -190,6 +214,8 @@ namespace CZ.Core.UI
             {
                 resourceContainer.Clear();
             }
+
+            isInitialized = false;
         }
 
         private void SetResourceCountersInteractable(bool interactable)
@@ -206,15 +232,27 @@ namespace CZ.Core.UI
         #region Resource Handling
         private void HandleResourceCollected(ResourceType type, int value)
         {
-            if (resourceCounters.TryGetValue(type, out var counter))
+            if (!isInitialized || isQuitting)
+            {
+                Debug.LogWarning($"[ResourceUI] Ignoring resource collection - UI not initialized or quitting. Type: {type}, Value: {value}");
+                return;
+            }
+
+            if (resourceCounters != null && resourceCounters.TryGetValue(type, out var counter))
             {
                 counter.AddValue(value);
+                Debug.Log($"[ResourceUI] Updated counter for {type} with value {value}. New total: {counter.CurrentValue}");
+            }
+            else
+            {
+                Debug.LogError($"[ResourceUI] Failed to update counter - Counter not found for type: {type}");
             }
         }
 
         [Button("Reset Counters")]
         public void ResetAllCounters()
         {
+            if (resourceCounters == null) return;
             foreach (var counter in resourceCounters.Values)
             {
                 counter.Reset();
@@ -242,70 +280,129 @@ namespace CZ.Core.UI
         private Label valueLabel;
         private VisualElement icon;
         private int currentValue;
+        public int CurrentValue => currentValue;
         private ResourceType resourceType;
+        public bool IsValid => Root != null && valueLabel != null && icon != null;
 
         public ResourceCounter(ResourceType type, ResourceConfiguration config, VisualTreeAsset template)
         {
-            resourceType = type;
-            Root = template.Instantiate();
-            Root.name = $"{type}Counter";
-
-            // Setup UI elements
-            valueLabel = Root.Q<Label>("Value");
-            icon = Root.Q<VisualElement>("Icon");
-
-            // Configure appearance
-            Color color = type switch
+            if (template == null)
             {
-                ResourceType.Experience => config.experienceColor,
-                ResourceType.Health => config.healthColor,
-                ResourceType.PowerUp => config.powerUpColor,
-                ResourceType.Currency => config.currencyColor,
-                _ => Color.white
-            };
+                Debug.LogError($"[ResourceCounter] Template is null for {type}");
+                return;
+            }
 
-            icon.style.backgroundColor = color;
-            UpdateDisplay();
+            if (config == null)
+            {
+                Debug.LogError($"[ResourceCounter] Config is null for {type}");
+                return;
+            }
+
+            resourceType = type;
+            currentValue = 0;
+
+            try
+            {
+                Root = template.Instantiate();
+                Root.name = $"{type}Counter";
+
+                // Setup UI elements
+                valueLabel = Root.Q<Label>("Value");
+                icon = Root.Q<VisualElement>("Icon");
+
+                if (!IsValid)
+                {
+                    Debug.LogError($"[ResourceCounter] Failed to find required UI elements for {type}");
+                    return;
+                }
+
+                // Configure appearance
+                Color color = type switch
+                {
+                    ResourceType.Experience => config.experienceColor,
+                    ResourceType.Health => config.healthColor,
+                    ResourceType.PowerUp => config.powerUpColor,
+                    ResourceType.Currency => config.currencyColor,
+                    _ => Color.white
+                };
+
+                icon.style.backgroundColor = color;
+                valueLabel.text = "0";
+                Debug.Log($"[ResourceCounter] Initialized counter for {type} with color: {color}");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[ResourceCounter] Error during initialization of {type}: {e.Message}");
+                Root = null;
+                valueLabel = null;
+                icon = null;
+            }
         }
 
         public void AddValue(int value)
         {
+            if (!IsValid)
+            {
+                Debug.LogError($"[ResourceCounter] Cannot add value - counter for {resourceType} is invalid");
+                return;
+            }
+
+            if (value < 0)
+            {
+                Debug.LogWarning($"[ResourceCounter] Attempted to add negative value: {value} to {resourceType}");
+                return;
+            }
+
             currentValue += value;
             UpdateDisplay();
             PlayCollectionAnimation();
+            Debug.Log($"[ResourceCounter] Added {value} to {resourceType}. New total: {currentValue}");
         }
 
         public void Reset()
         {
             currentValue = 0;
             UpdateDisplay();
+            Debug.Log($"[ResourceCounter] Reset counter for {resourceType}");
         }
 
         private void UpdateDisplay()
         {
+            if (!IsValid)
+            {
+                Debug.LogError($"[ResourceCounter] Cannot update display - counter for {resourceType} is invalid");
+                return;
+            }
+
             valueLabel.text = currentValue.ToString();
+            Debug.Log($"[ResourceCounter] Updated display for {resourceType} to: {currentValue}");
         }
 
         private void PlayCollectionAnimation()
         {
-            Root.experimental.animation
-                .Scale(1.2f, 100)
-                .OnCompleted(() => {
-                    Root.experimental.animation
-                        .Scale(1f, 100);
-                });
+            if (Root != null)
+            {
+                Root.experimental.animation
+                    .Scale(1.2f, 100)
+                    .OnCompleted(() => {
+                        Root.experimental.animation
+                            .Scale(1f, 100);
+                    });
+            }
         }
 
         public void SetInteractable(bool interactable)
         {
+            if (Root == null) return;
+
             Root.SetEnabled(interactable);
             
             // Visual feedback for disabled state
             if (!interactable)
             {
                 Root.style.opacity = 0.5f;
-                icon.style.backgroundColor = Color.gray;
-                valueLabel.text = "--";
+                if (icon != null) icon.style.backgroundColor = Color.gray;
+                if (valueLabel != null) valueLabel.text = "--";
             }
             else
             {

@@ -341,53 +341,45 @@ namespace CZ.Core.Enemy
                 {
                     try
                     {
-                        // Spawn experience with validation
+                        // Spawn experience with validation and offset
                         int experienceDrop = Random.Range(minExperienceDrop, maxExperienceDrop + 1);
-                        var expResource = ResourceManager.Instance.SpawnResource(ResourceType.Experience, spawnPosition, experienceDrop);
+                        Vector3 expPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+                        var expResource = ResourceManager.Instance.SpawnResource(ResourceType.Experience, expPosition, experienceDrop);
                         if (expResource != null)
                         {
                             resourcesSpawned = true;
-                            Debug.Log($"[BaseEnemy] Spawned experience resource at {spawnPosition}");
-                        }
-                        else
-                        {
-                            Debug.LogWarning("[BaseEnemy] Failed to spawn experience resource");
+                            Debug.Log($"[BaseEnemy] Spawned experience resource at {expPosition} with value {experienceDrop}");
                         }
 
-                        // Random chance for health drop with validation
-                        if (Random.value < healthDropChance)
+                        // Random chance for health drop with validation and offset
+                        float healthRoll = Random.value;
+                        Debug.Log($"[BaseEnemy] Health drop roll: {healthRoll} vs chance: {healthDropChance}");
+                        if (healthRoll <= healthDropChance)
                         {
-                            var healthResource = ResourceManager.Instance.SpawnResource(ResourceType.Health, spawnPosition);
+                            Vector3 healthPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+                            var healthResource = ResourceManager.Instance.SpawnResource(ResourceType.Health, healthPosition);
                             if (healthResource != null)
                             {
                                 resourcesSpawned = true;
-                                Debug.Log($"[BaseEnemy] Spawned health resource at {spawnPosition}");
-                            }
-                            else
-                            {
-                                Debug.LogWarning("[BaseEnemy] Failed to spawn health resource");
+                                Debug.Log($"[BaseEnemy] Spawned health resource at {healthPosition}");
                             }
                         }
 
-                        // Random chance for power-up with validation
-                        if (Random.value < powerUpDropChance)
+                        // Random chance for power-up with validation and offset
+                        float powerUpRoll = Random.value;
+                        Debug.Log($"[BaseEnemy] PowerUp drop roll: {powerUpRoll} vs chance: {powerUpDropChance}");
+                        if (powerUpRoll <= powerUpDropChance)
                         {
-                            var powerUpResource = ResourceManager.Instance.SpawnResource(ResourceType.PowerUp, spawnPosition);
+                            Vector3 powerUpPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+                            var powerUpResource = ResourceManager.Instance.SpawnResource(ResourceType.PowerUp, powerUpPosition);
                             if (powerUpResource != null)
                             {
                                 resourcesSpawned = true;
-                                Debug.Log($"[BaseEnemy] Spawned power-up resource at {spawnPosition}");
-                            }
-                            else
-                            {
-                                Debug.LogWarning("[BaseEnemy] Failed to spawn power-up resource");
+                                Debug.Log($"[BaseEnemy] Spawned power-up resource at {powerUpPosition}");
                             }
                         }
 
-                        if (!resourcesSpawned)
-                        {
-                            Debug.LogWarning("[BaseEnemy] No resources were successfully spawned during death sequence");
-                        }
+                        Debug.Log($"[BaseEnemy] Death sequence resource spawning complete. Resources spawned: {resourcesSpawned}");
                     }
                     catch (System.Exception e)
                     {
@@ -402,33 +394,7 @@ namespace CZ.Core.Enemy
             finally
             {
                 // Always attempt to return to pool
-                try
-                {
-                    if (PoolManager.Instance != null)
-                    {
-                        var pool = PoolManager.Instance.GetPool<BaseEnemy>();
-                        if (pool != null)
-                        {
-                            pool.Return(this);
-                            Debug.Log($"[BaseEnemy] Successfully returned to pool: {gameObject.name}");
-                        }
-                        else
-                        {
-                            Debug.LogError($"[BaseEnemy] Failed to return to pool - pool not found for: {gameObject.name}");
-                            gameObject.SetActive(false);
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError("[BaseEnemy] PoolManager not available for returning to pool");
-                        gameObject.SetActive(false);
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogError($"[BaseEnemy] Error returning to pool: {e.Message}\nStack trace: {e.StackTrace}");
-                    gameObject.SetActive(false);
-                }
+                ReturnToPool();
             }
         }
 
@@ -541,6 +507,37 @@ namespace CZ.Core.Enemy
                     DestroyImmediate(materialInstance);
                 }
                 materialInstance = null;
+            }
+        }
+
+        private void ReturnToPool()
+        {
+            try
+            {
+                if (PoolManager.Instance != null)
+                {
+                    var pool = PoolManager.Instance.GetPool<BaseEnemy>();
+                    if (pool != null)
+                    {
+                        pool.Return(this);
+                        Debug.Log($"[BaseEnemy] Successfully returned to pool: {gameObject.name}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[BaseEnemy] Failed to return to pool - pool not found for: {gameObject.name}");
+                        gameObject.SetActive(false);
+                    }
+                }
+                else
+                {
+                    Debug.LogError("[BaseEnemy] PoolManager not available for returning to pool");
+                    gameObject.SetActive(false);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[BaseEnemy] Error returning to pool: {e.Message}\nStack trace: {e.StackTrace}");
+                gameObject.SetActive(false);
             }
         }
     }
