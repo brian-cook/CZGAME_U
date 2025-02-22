@@ -51,7 +51,21 @@ MonoBehaviour:
   stoppingDistance: 1
   velocityLerpSpeed: 8
   targetUpdateTimeout: 2
-  health: 100
+  maxHealth: 100
+  damageFlashDuration: 0.2
+  damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  deathFadeDuration: 0.5
+  collisionRadius: 0.25
+  useTriggerCollider: 0
+  minExperienceDrop: 1
+  maxExperienceDrop: 1
+  experienceDropChance: 0
+  healthDropValue: 1
+  healthDropChance: 100
+  powerUpDropValue: 1
+  powerUpDropChance: 100
+  currencyDropValue: 1
+  currencyDropChance: 100
 --- !u!212 &3452107642329762167
 SpriteRenderer:
   m_ObjectHideFlags: 0

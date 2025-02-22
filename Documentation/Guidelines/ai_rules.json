@@ -21,7 +21,7 @@
     },
     "cursor_first_operations": {
         "priority": "critical",
-        "description": "All changes should be implemented through Cursor when possible",
+        "description": "All changes should be implemented through Cursor when possible and not against Unity 6.0 best practices.",
         "requirements": {
             "prefer_cursor_edits": true,
             "unity_instructions_fallback": true,

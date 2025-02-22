@@ -1,10 +1,14 @@
 ---
+description: 
+globs: 
+---
+---
 description: ALL TASKS
-globs: *
+globs: *.*
 ---
 ---
 description: AI Rules
-globs: *
+globs: *.*
 ---
 
 # AGENT RULES COMPLIANCE
