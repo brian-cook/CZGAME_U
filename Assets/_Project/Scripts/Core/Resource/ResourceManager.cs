@@ -253,8 +253,8 @@ namespace CZ.Core.Resource
                         // Set type-specific color from configuration
                         Color color = type switch
                         {
-                            ResourceType.Experience => resourceConfig.experienceColor,
                             ResourceType.Health => resourceConfig.healthColor,
+                            ResourceType.Experience => resourceConfig.experienceColor,
                             ResourceType.PowerUp => resourceConfig.powerUpColor,
                             ResourceType.Currency => resourceConfig.currencyColor,
                             _ => Color.white
@@ -274,8 +274,8 @@ namespace CZ.Core.Resource
                         baseResource.SetResourceType(type);
                         baseResource.SetResourceValue(type switch
                         {
-                            ResourceType.Experience => resourceConfig.baseExperienceValue,
                             ResourceType.Health => resourceConfig.baseHealthValue,
+                            ResourceType.Experience => resourceConfig.baseExperienceValue,
                             ResourceType.PowerUp => 1,
                             ResourceType.Currency => resourceConfig.baseCurrencyValue,
                             _ => 1

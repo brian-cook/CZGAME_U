@@ -319,8 +319,8 @@ namespace CZ.Core.UI
                 // Configure appearance
                 Color color = type switch
                 {
-                    ResourceType.Experience => config.experienceColor,
                     ResourceType.Health => config.healthColor,
+                    ResourceType.Experience => config.experienceColor,
                     ResourceType.PowerUp => config.powerUpColor,
                     ResourceType.Currency => config.currencyColor,
                     _ => Color.white

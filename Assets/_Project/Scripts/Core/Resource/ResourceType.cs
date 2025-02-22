@@ -2,8 +2,8 @@ namespace CZ.Core.Resource
 {
     public enum ResourceType
     {
-        Experience,
         Health,
+        Experience,
         PowerUp,
         Currency
     }

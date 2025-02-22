@@ -32,8 +32,8 @@ namespace CZ.Core.Resource
             // Set max stack size based on resource type
             MaxStackSize = type switch
             {
-                ResourceType.Experience => config.experienceStackSize,
                 ResourceType.Health => config.healthStackSize,
+                ResourceType.Experience => config.experienceStackSize,
                 ResourceType.Currency => config.currencyStackSize,
                 _ => 1 // PowerUps don't stack
             };

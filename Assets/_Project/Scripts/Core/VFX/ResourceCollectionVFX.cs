@@ -19,8 +19,8 @@ namespace CZ.Core.VFX
         {
             Color color = resourceType switch
             {
-                ResourceType.Experience => config.experienceColor,
                 ResourceType.Health => config.healthColor,
+                ResourceType.Experience => config.experienceColor,
                 ResourceType.PowerUp => config.powerUpColor,
                 ResourceType.Currency => config.currencyColor,
                 _ => Color.white
