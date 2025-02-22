@@ -145,8 +145,7 @@ namespace CZ.Core.Resource
             CreatePool(ResourceType.Health, healthPrefab);
             CreatePool(ResourceType.PowerUp, powerUpPrefab);
             CreatePool(ResourceType.Currency, currencyPrefab);
-            // Experience pool is disabled for now
-            // CreatePool(ResourceType.Experience, experiencePrefab);
+            CreatePool(ResourceType.Experience, experiencePrefab);
 
             isInitialized = true;
             Debug.Log("Resource pools initialized successfully");

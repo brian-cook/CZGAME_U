@@ -59,7 +59,7 @@ MonoBehaviour:
   useTriggerCollider: 0
   minExperienceDrop: 1
   maxExperienceDrop: 1
-  experienceDropChance: 0
+  experienceDropChance: 100
   healthDropValue: 1
   healthDropChance: 100
   powerUpDropValue: 1
