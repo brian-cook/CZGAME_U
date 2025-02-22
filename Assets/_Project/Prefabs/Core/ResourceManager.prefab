@@ -48,6 +48,7 @@ MonoBehaviour:
   healthPrefab: {fileID: 5914807645243408902, guid: 6467d2b211e1bad469ac93cf03482dec, type: 3}
   powerUpPrefab: {fileID: 2009647017823522490, guid: b8b6709d799c0b74ca36e13ab6b3fa4e, type: 3}
   currencyPrefab: {fileID: 3802774890918477733, guid: 740176748875a074cbc48b73cd0d58c0, type: 3}
+  resourceConfig: {fileID: 11400000, guid: ca20c0291b845c142bafbf4b49d53c9f, type: 2}
   experiencePoolInitial: 50
   experiencePoolMax: 100
   healthPoolInitial: 25

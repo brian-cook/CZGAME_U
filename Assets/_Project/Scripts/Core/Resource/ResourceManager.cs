@@ -55,6 +55,10 @@ namespace CZ.Core.Resource
         [SerializeField, Required, InfoBox("Currency resource prefab")]
         private BaseResource currencyPrefab;
 
+        [Header("Resource Configuration")]
+        [SerializeField, Required]
+        private ResourceConfiguration resourceConfig;
+
         [Header("Pool Configuration")]
         [SerializeField, MinValue(10), InfoBox("Initial size of experience pool")] 
         private int experiencePoolInitial = 50;
@@ -246,13 +250,36 @@ namespace CZ.Core.Resource
                     var spriteRenderer = resource.GetComponent<SpriteRenderer>();
                     if (spriteRenderer != null)
                     {
-                        // Preserve the prefab's color
-                        spriteRenderer.color = prefab.GetComponent<SpriteRenderer>().color;
-                        Debug.Log($"[ResourceManager] Created {type} resource with color: {spriteRenderer.color}");
+                        // Set type-specific color from configuration
+                        Color color = type switch
+                        {
+                            ResourceType.Experience => resourceConfig.experienceColor,
+                            ResourceType.Health => resourceConfig.healthColor,
+                            ResourceType.PowerUp => resourceConfig.powerUpColor,
+                            ResourceType.Currency => resourceConfig.currencyColor,
+                            _ => Color.white
+                        };
+                        spriteRenderer.color = color;
+                        Debug.Log($"[ResourceManager] Created {type} resource with color: {color}");
                     }
                     else
                     {
                         Debug.LogError($"[ResourceManager] Failed to get SpriteRenderer for {type} resource");
+                    }
+
+                    // Set type-specific value
+                    var baseResource = resource.GetComponent<BaseResource>();
+                    if (baseResource != null)
+                    {
+                        baseResource.SetResourceType(type);
+                        baseResource.SetResourceValue(type switch
+                        {
+                            ResourceType.Experience => resourceConfig.baseExperienceValue,
+                            ResourceType.Health => resourceConfig.baseHealthValue,
+                            ResourceType.PowerUp => 1,
+                            ResourceType.Currency => resourceConfig.baseCurrencyValue,
+                            _ => 1
+                        });
                     }
                     
                     return resource;

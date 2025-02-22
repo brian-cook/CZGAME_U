@@ -297,5 +297,19 @@ namespace CZ.Core.Resource
             gameObject.SetActive(false);
         }
         #endregion
+
+        #region Resource Configuration
+        public void SetResourceType(ResourceType type)
+        {
+            resourceType = type;
+            Debug.Log($"[BaseResource] Set resource type to: {type}");
+        }
+
+        public void SetResourceValue(int value)
+        {
+            resourceValue = Mathf.Max(1, value);
+            Debug.Log($"[BaseResource] Set resource value to: {resourceValue}");
+        }
+        #endregion
     }
 } 
