@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1234567890123456789
+--- !u!1 &5185032833570682344
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2345678901234567890}
-  - component: {fileID: 3456789012345678901}
+  - component: {fileID: 271356620507121505}
+  - component: {fileID: 8983644222792446554}
   m_Layer: 0
   m_Name: ResourceManager
   m_TagString: Untagged
@@ -17,35 +17,37 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2345678901234567890
+--- !u!4 &271356620507121505
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1234567890123456789}
+  m_GameObject: {fileID: 5185032833570682344}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3456789012345678901
+--- !u!114 &8983644222792446554
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1234567890123456789}
+  m_GameObject: {fileID: 5185032833570682344}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81c5e999bc2ce8a4d8c85cd7ae56297a, type: 3}
+  m_Script: {fileID: 11500000, guid: df2406497104a9d468ea35c2572525c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  experiencePrefab: {fileID: 2831261611181924627, guid: EXPERIENCE_PREFAB_GUID, type: 3}
-  healthPrefab: {fileID: 2831261611181924627, guid: HEALTH_PREFAB_GUID, type: 3}
-  powerUpPrefab: {fileID: 2831261611181924627, guid: POWERUP_PREFAB_GUID, type: 3}
-  currencyPrefab: {fileID: 2831261611181924627, guid: CURRENCY_PREFAB_GUID, type: 3}
+  experiencePrefab: {fileID: 9046836526358233658, guid: 8aa7c377ed7f09b44b27cd81034a4167, type: 3}
+  healthPrefab: {fileID: 5914807645243408902, guid: 6467d2b211e1bad469ac93cf03482dec, type: 3}
+  powerUpPrefab: {fileID: 2009647017823522490, guid: b8b6709d799c0b74ca36e13ab6b3fa4e, type: 3}
+  currencyPrefab: {fileID: 3802774890918477733, guid: 740176748875a074cbc48b73cd0d58c0, type: 3}
   experiencePoolInitial: 50
   experiencePoolMax: 100
   healthPoolInitial: 25
@@ -53,4 +55,4 @@ MonoBehaviour:
   powerUpPoolInitial: 15
   powerUpPoolMax: 30
   currencyPoolInitial: 25
-  currencyPoolMax: 50 
+  currencyPoolMax: 50
