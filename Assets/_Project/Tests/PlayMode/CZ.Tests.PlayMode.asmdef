@@ -12,6 +12,7 @@
         "Unity.InputSystem.TestFramework",
         "CZ.Core.Enemy",
         "CZ.Core.Pooling",
+        "CZ.Core.Interfaces",
         "Unity.Profiling.Core",
         "Unity.Test-Framework.Performance",
         "CZ.Core.Player",

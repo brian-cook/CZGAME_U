@@ -1,5 +1,4 @@
 using UnityEngine;
-using CZ.Core.Pooling;
 using Unity.Profiling;
 using NaughtyAttributes;
 using CZ.Core.Interfaces;
@@ -79,10 +78,8 @@ namespace CZ.Core.Resource
 
             if (spriteRenderer != null)
             {
-                // Respect the prefab's color settings
-                baseColor = spriteRenderer.color;
-                
-                // Ensure the color is applied
+                // Store the original color from the prefab
+                baseColor = resourceColor;
                 spriteRenderer.color = baseColor;
                 Debug.Log($"[BaseResource] Initialized {resourceType} with color: {baseColor}");
             }
@@ -98,10 +95,9 @@ namespace CZ.Core.Resource
                 rb.gravityScale = 0f;
                 rb.interpolation = RigidbodyInterpolation2D.Interpolate;
                 rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             }
 
-            // Setup trail with shared material
+            // Add trail renderer if needed
             if (resourceTrail == null)
             {
                 resourceTrail = gameObject.AddComponent<TrailRenderer>();
@@ -181,6 +177,25 @@ namespace CZ.Core.Resource
                 StartCollection();
             }
         }
+
+        private void OnEnable()
+        {
+            // Ensure type and color are preserved when object is enabled
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = resourceColor;
+                if (resourceTrail != null)
+                {
+                    var gradient = new Gradient();
+                    gradient.SetKeys(
+                        new GradientColorKey[] { new GradientColorKey(resourceColor, 0.0f), new GradientColorKey(resourceColor, 1.0f) },
+                        new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) }
+                    );
+                    resourceTrail.colorGradient = gradient;
+                }
+            }
+            Debug.Log($"Resource enabled: Type={resourceType}, Color={resourceColor}");
+        }
         #endregion
 
         #region Collection
@@ -252,17 +267,14 @@ namespace CZ.Core.Resource
             target = null;
             transform.localScale = initialScale;
 
-            // Ensure color is correctly set on spawn
+            // Ensure color and type are correctly set on spawn
             if (spriteRenderer != null)
             {
-                spriteRenderer.color = baseColor;
+                // Use the resource's configured color
+                spriteRenderer.color = resourceColor;
+                baseColor = resourceColor;
                 
-                // Update trail colors
-                if (resourceTrail != null)
-                {
-                    resourceTrail.startColor = baseColor;
-                    resourceTrail.endColor = new Color(baseColor.r, baseColor.g, baseColor.b, 0f);
-                }
+                Debug.Log($"[BaseResource] Spawned {resourceType} with color: {baseColor}");
             }
 
             if (rb != null)
@@ -273,10 +285,12 @@ namespace CZ.Core.Resource
             if (resourceTrail != null)
             {
                 resourceTrail.emitting = false;
+                // Update trail colors
+                resourceTrail.startColor = baseColor;
+                resourceTrail.endColor = new Color(baseColor.r, baseColor.g, baseColor.b, 0f);
             }
 
             gameObject.SetActive(true);
-            Debug.Log($"[BaseResource] Spawned {resourceType} with color: {baseColor}");
         }
 
         public void OnDespawn()

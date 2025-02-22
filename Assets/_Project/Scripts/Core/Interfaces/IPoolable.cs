@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CZ.Core.Pooling
+namespace CZ.Core.Interfaces
 {
     /// <summary>
     /// Interface for objects that can be pooled.

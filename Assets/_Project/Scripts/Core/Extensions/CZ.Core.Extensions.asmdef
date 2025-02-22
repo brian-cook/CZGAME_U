@@ -1,14 +1,8 @@
 {
-    "name": "CZ.Core.Enemy",
-    "rootNamespace": "CZ.Core.Enemy",
+    "name": "CZ.Core.Extensions",
+    "rootNamespace": "CZ.Core.Extensions",
     "references": [
-        "GUID:75469ad4d38634e559750d17036d5f7c",
-        "CZ.Core",
-        "CZ.Core.Pooling",
-        "CZ.Core.Interfaces",
-        "CZ.Core.Player",
-        "CZ.Core.Resource",
-        "NaughtyAttributes.Core"
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

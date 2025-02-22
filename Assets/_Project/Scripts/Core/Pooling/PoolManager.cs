@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using CZ.Core.Configuration;
 using System.Linq;
+using CZ.Core.Interfaces;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -149,29 +150,38 @@ namespace CZ.Core.Pooling
         /// <summary>
         /// Creates or gets an existing pool
         /// </summary>
-        public ObjectPool<T> CreatePool<T>(Func<T> createFunc, int initialSize, int maxSize, string poolName) where T : IPoolable
+        public ObjectPool<T> CreatePool<T>(Func<T> createFunc, int initialSize, int maxSize, string poolName) where T : MonoBehaviour, IPoolable
         {
             var type = typeof(T);
             if (pools.ContainsKey(type))
             {
-                Debug.LogWarning($"Pool for type {type.Name} already exists");
+                Debug.LogWarning($"[PoolManager] Pool for type {type.Name} already exists");
                 return (ObjectPool<T>)pools[type];
             }
 
-            var pool = new ObjectPool<T>(createFunc, initialSize, maxSize, poolName);
-            pools.Add(type, pool);
-            return pool;
+            try
+            {
+                var pool = new ObjectPool<T>(createFunc, initialSize, maxSize, poolName);
+                pools.Add(type, pool);
+                Debug.Log($"[PoolManager] Created new pool for {type.Name} with size {initialSize}/{maxSize}");
+                return pool;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[PoolManager] Failed to create pool for {type.Name}: {e.Message}");
+                return null;
+            }
         }
 
         /// <summary>
         /// Gets an existing pool
         /// </summary>
-        public ObjectPool<T> GetPool<T>() where T : IPoolable
+        public ObjectPool<T> GetPool<T>() where T : MonoBehaviour, IPoolable
         {
             var type = typeof(T);
             if (!pools.ContainsKey(type))
             {
-                Debug.LogError($"No pool found for type {type.Name}");
+                Debug.LogError($"[PoolManager] No pool found for type {type.Name}");
                 return null;
             }
 

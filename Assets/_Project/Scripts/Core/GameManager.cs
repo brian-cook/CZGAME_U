@@ -6,6 +6,7 @@ using NaughtyAttributes;
 using System.Collections;
 using CZ.Core.Pooling;
 using CZ.Core.Configuration;
+using CZ.Core.Interfaces;
 
 namespace CZ.Core
 {

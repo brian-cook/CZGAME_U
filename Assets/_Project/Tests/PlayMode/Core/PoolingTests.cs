@@ -1,5 +1,6 @@
 using UnityEngine;
 using CZ.Core.Pooling;
+using CZ.Core.Interfaces;
 using Unity.Profiling;
 using System.Collections;
 

@@ -3,6 +3,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using CZ.Core.Pooling;
+using CZ.Core.Interfaces;
 using Unity.Profiling;
 using Unity.Profiling.LowLevel;
 using Unity.Profiling.LowLevel.Unsafe;

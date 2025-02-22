@@ -7,6 +7,7 @@
         "Unity.PerformanceTesting",
         "CZ.Core",
         "CZ.Core.Pooling",
+        "CZ.Core.Interfaces",
         "Unity.Profiling.Core"
     ],
     "includePlatforms": [

@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Unity.Profiling;
 using System;
+using CZ.Core.Interfaces;
 
 namespace CZ.Core.Pooling
 {
@@ -107,23 +108,23 @@ namespace CZ.Core.Pooling
             T obj;
             isExpanding = false;
             
-            // Early exit if we're at max size
-            if (TotalCount >= maxSize)
-            {
-                Debug.LogError($"Pool '{poolName}' at max size limit ({maxSize}). Cannot expand further.");
-                return default;
-            }
-            
+            // First try to reuse an inactive object
             if (pool.Count > 0)
             {
                 obj = pool.Dequeue();
+                System.Threading.Interlocked.Increment(ref activeCount);
+                obj.GameObject.SetActive(true);
+                obj.OnSpawn();
+                return obj;
             }
-            else if (ShouldExpandPool())
+            
+            // If no inactive objects and below max size, create new
+            if (TotalCount < maxSize && ShouldExpandPool())
             {
                 isExpanding = true;
                 obj = createFunc();
                 
-                // Update peak count with thread safety consideration
+                // Update peak count with thread safety
                 int newPeakCount = TotalCount + 1;
                 if (newPeakCount > peakCount)
                 {
@@ -133,18 +134,17 @@ namespace CZ.Core.Pooling
                 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning($"Pool '{poolName}' expanded. Size: {TotalCount + 1}, Peak: {peakCount}, Memory: {totalMemoryRecorder.LastValue / (1024f * 1024f):F2}MB");
                 #endif
-            }
-            else
-            {
-                var currentMemory = totalMemoryRecorder.LastValue / (1024f * 1024f);
-                Debug.LogError($"Pool '{poolName}' cannot expand. Size: {TotalCount}, Max: {maxSize}, Memory: {currentMemory:F2}MB/{memoryThresholdMB}MB");
-                return default;
+                
+                System.Threading.Interlocked.Increment(ref activeCount);
+                obj.GameObject.SetActive(true);
+                obj.OnSpawn();
+                return obj;
             }
             
-            System.Threading.Interlocked.Increment(ref activeCount);
-            obj.GameObject.SetActive(true);
-            obj.OnSpawn();
-            return obj;
+            // At max size, log warning and return null
+            var currentMemory = totalMemoryRecorder.LastValue / (1024f * 1024f);
+            Debug.LogWarning($"Pool '{poolName}' at capacity. Size: {TotalCount}, Max: {maxSize}, Memory: {currentMemory:F2}MB/{memoryThresholdMB}MB. Waiting for object return.");
+            return default;
         }
         
         /// <summary>
@@ -152,19 +152,66 @@ namespace CZ.Core.Pooling
         /// </summary>
         public void Return(T obj)
         {
-            if (obj == null) return;
-            
+            if (obj == null)
+            {
+                Debug.LogError($"Pool '{poolName}' attempted to return null object");
+                return;
+            }
+
+            // Validate object type matches pool
+            if (!ValidateObjectType(obj))
+            {
+                Debug.LogError($"Pool '{poolName}' received object of incorrect type");
+                return;
+            }
+
             obj.OnDespawn();
             obj.GameObject.SetActive(false);
-            pool.Enqueue(obj);
-            System.Threading.Interlocked.Decrement(ref activeCount);
             
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (pool.Count > maxSize)
+            // Ensure we don't exceed max size
+            if (pool.Count < maxSize)
             {
-                Debug.LogError($"Pool '{poolName}' exceeded max size during return operation. Current: {pool.Count}, Max: {maxSize}");
+                pool.Enqueue(obj);
             }
-            #endif
+            else
+            {
+                Debug.LogWarning($"Pool '{poolName}' destroying excess object to maintain size limit");
+                UnityEngine.Object.Destroy(obj.GameObject);
+            }
+            
+            System.Threading.Interlocked.Decrement(ref activeCount);
+        }
+        
+        private bool ValidateObjectType(T obj)
+        {
+            try
+            {
+                // Type-specific validation using reflection to avoid direct dependencies
+                if (obj != null)
+                {
+                    var objType = obj.GetType();
+                    var resourceTypeProp = objType.GetProperty("ResourceType");
+                    
+                    if (resourceTypeProp != null)
+                    {
+                        var resourceType = resourceTypeProp.GetValue(obj)?.ToString();
+                        var poolTypeName = poolName.Replace("Resource_", "");
+                        
+                        var isValid = string.Equals(resourceType, poolTypeName, StringComparison.OrdinalIgnoreCase);
+                        if (!isValid)
+                        {
+                            Debug.LogError($"[ObjectPool] Type mismatch in pool '{poolName}'. Expected: {poolTypeName}, Got: {resourceType}");
+                        }
+                        return isValid;
+                    }
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[ObjectPool] Error during type validation: {e.Message}");
+                return false;
+            }
         }
         
         /// <summary>
