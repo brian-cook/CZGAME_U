@@ -19,9 +19,11 @@ This rule defines the mandatory compliance process for all AGENT operations in t
 ## Priority
 CRITICAL - 
 
-!!! ensure that you review all project files.
+!Critical Priority! ensure that agent reviews all project files. !!!
 
-!!! Do not make assumptions.
+!Critical Priority! Agent should never make assumptions. !!!
+
+!!! Follow Unity 6 (6000.0.38f1) - which is a full release - and packages documented best practices
 
 ## Process
 1. Pre-Operation Checks:

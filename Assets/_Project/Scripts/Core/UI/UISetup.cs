@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using NaughtyAttributes;
 using CZ.Core.Resource;
+using CZ.Core.Logging;
 
 namespace CZ.Core.UI
 {
@@ -43,40 +44,40 @@ namespace CZ.Core.UI
             if (uiDocument == null)
             {
                 uiDocument = GetComponent<UIDocument>();
-                Debug.LogWarning("[UISetup] UIDocument was not assigned, found component on GameObject");
+                CZLogger.LogWarning("UIDocument was not assigned, found component on GameObject", LogCategory.UI);
             }
 
             if (resourceUI == null)
             {
                 resourceUI = GetComponent<ResourceUI>();
-                Debug.LogWarning("[UISetup] ResourceUI was not assigned, found component on GameObject");
+                CZLogger.LogWarning("ResourceUI was not assigned, found component on GameObject", LogCategory.UI);
             }
 
             // Load default assets if not assigned
             if (panelSettings == null)
             {
                 panelSettings = Resources.Load<PanelSettings>("UI/DefaultPanelSettings");
-                Debug.LogWarning("[UISetup] PanelSettings was not assigned, loaded from Resources");
+                CZLogger.LogWarning("PanelSettings was not assigned, loaded from Resources", LogCategory.UI);
             }
 
             if (resourceConfig == null)
             {
                 resourceConfig = Resources.Load<ResourceConfiguration>("Configuration/DefaultResourceConfiguration");
-                Debug.LogWarning("[UISetup] ResourceConfiguration was not assigned, loaded from Resources");
+                CZLogger.LogWarning("ResourceConfiguration was not assigned, loaded from Resources", LogCategory.UI);
             }
 
             if (resourceCounterTemplate == null)
             {
                 resourceCounterTemplate = Resources.Load<VisualTreeAsset>("UI/ResourceCounter");
-                Debug.LogWarning("[UISetup] ResourceCounterTemplate was not assigned, loaded from Resources");
+                CZLogger.LogWarning("ResourceCounterTemplate was not assigned, loaded from Resources", LogCategory.UI);
             }
 
             // Validate required components
-            if (uiDocument == null) throw new MissingComponentException("[UISetup] UIDocument component is required!");
-            if (resourceUI == null) throw new MissingComponentException("[UISetup] ResourceUI component is required!");
-            if (panelSettings == null) throw new MissingReferenceException("[UISetup] PanelSettings asset is required!");
-            if (resourceConfig == null) throw new MissingReferenceException("[UISetup] ResourceConfiguration asset is required!");
-            if (resourceCounterTemplate == null) throw new MissingReferenceException("[UISetup] ResourceCounterTemplate asset is required!");
+            if (uiDocument == null) throw new MissingComponentException("UIDocument component is required!");
+            if (resourceUI == null) throw new MissingComponentException("ResourceUI component is required!");
+            if (panelSettings == null) throw new MissingReferenceException("PanelSettings asset is required!");
+            if (resourceConfig == null) throw new MissingReferenceException("ResourceConfiguration asset is required!");
+            if (resourceCounterTemplate == null) throw new MissingReferenceException("ResourceCounterTemplate asset is required!");
         }
 
         private void SetupUIComponents()
@@ -117,11 +118,11 @@ namespace CZ.Core.UI
                 resourceUI.enabled = false;
                 resourceUI.enabled = true;
 
-                Debug.Log("[UISetup] UI Components configured successfully");
+                CZLogger.LogInfo("UI Components configured successfully", LogCategory.UI);
             }
             else
             {
-                Debug.LogWarning("[UISetup] ResourceUI component not found, skipping configuration");
+                CZLogger.LogWarning("ResourceUI component not found, skipping configuration", LogCategory.UI);
             }
         }
 

@@ -6,6 +6,7 @@ using Unity.Profiling;
 using System;
 using System.Collections;
 using UnityEditor;
+using CZ.Core.Logging;
 
 namespace CZ.Core.Resource
 {
@@ -264,23 +265,23 @@ namespace CZ.Core.Resource
         #endregion
 
         #region Resource Spawning
-        public BaseResource SpawnResource(ResourceType type, Vector3 position, int value = 1)
+        public BaseResource SpawnResource(ResourceType type, Vector3 position)
         {
             if (!isInitialized)
             {
-                Debug.LogError($"[ResourceManager] Cannot spawn resource of type {type} - Manager not initialized!");
+                CZLogger.LogError($"Cannot spawn resource of type {type} - Manager not initialized!", LogCategory.Resource);
                 return null;
             }
 
             if (isQuitting)
             {
-                Debug.LogWarning($"[ResourceManager] Cannot spawn resource of type {type} - Application is quitting");
+                CZLogger.LogWarning($"Cannot spawn resource of type {type} - Application is quitting", LogCategory.Resource);
                 return null;
             }
 
             if (!resourcePools.TryGetValue(type, out var pool))
             {
-                Debug.LogError($"[ResourceManager] No pool found for resource type: {type}. Available pools: {string.Join(", ", resourcePools.Keys)}");
+                CZLogger.LogError($"No pool found for resource type: {type}. Available pools: {string.Join(", ", resourcePools.Keys)}", LogCategory.Resource);
                 return null;
             }
 
@@ -291,16 +292,16 @@ namespace CZ.Core.Resource
                 {
                     resource.transform.position = position;
                     resource.gameObject.SetActive(true);
-                    Debug.Log($"[ResourceManager] Successfully spawned resource of type {type} at {position}. Pool count: {pool.CurrentCount}");
+                    CZLogger.LogDebug($"Successfully spawned resource of type {type} at {position}. Pool count: {pool.CurrentCount}", LogCategory.Resource);
                     return resource;
                 }
 
-                Debug.Log($"[ResourceManager] Failed to get resource from pool: {type}. Pool count: {pool.CurrentCount}");
+                CZLogger.LogWarning($"Failed to get resource from pool: {type}. Pool count: {pool.CurrentCount}", LogCategory.Resource);
                 return null;
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[ResourceManager] Error spawning resource: {e.Message}\nStack trace: {e.StackTrace}");
+                CZLogger.LogError($"Error spawning resource: {e.Message}\nStack trace: {e.StackTrace}", LogCategory.Resource);
                 return null;
             }
         }
@@ -309,7 +310,7 @@ namespace CZ.Core.Resource
         {
             if (!isInitialized || isQuitting)
             {
-                Debug.LogWarning("[ResourceManager] Cannot spawn resource burst - manager not ready or quitting");
+                CZLogger.LogWarning("Cannot spawn resource burst - manager not ready or quitting", LogCategory.Resource);
                 return;
             }
 
@@ -329,16 +330,16 @@ namespace CZ.Core.Resource
 
                 if (successfulSpawns < count)
                 {
-                    Debug.LogWarning($"[ResourceManager] Resource burst partially failed - spawned {successfulSpawns}/{count} resources");
+                    CZLogger.LogWarning($"Resource burst partially failed - spawned {successfulSpawns}/{count} resources", LogCategory.Resource);
                 }
                 else
                 {
-                    Debug.Log($"[ResourceManager] Successfully spawned resource burst - {count} resources of type {type}");
+                    CZLogger.LogDebug($"Successfully spawned resource burst - {count} resources of type {type}", LogCategory.Resource);
                 }
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[ResourceManager] Error during resource burst: {e.Message}");
+                CZLogger.LogError($"Error during resource burst: {e.Message}", LogCategory.Resource);
             }
         }
         #endregion
@@ -409,7 +410,7 @@ namespace CZ.Core.Resource
         {
             using var _ = s_cleanupMarker.Auto();
             
-            Debug.Log($"[ResourceManager] Scene unloaded: {scene.name}, performing cleanup");
+            CZLogger.LogInfo($"Scene unloaded: {scene.name}, performing cleanup", LogCategory.Resource);
             
             // Perform cleanup but maintain the manager
             if (resourcePools != null)
@@ -421,11 +422,11 @@ namespace CZ.Core.Resource
                         try
                         {
                             pool.Clear();
-                            Debug.Log($"[ResourceManager] Successfully cleared pool during scene cleanup");
+                            CZLogger.LogDebug("Successfully cleared pool during scene cleanup", LogCategory.Resource);
                         }
-                        catch (Exception e)
+                        catch (System.Exception e)
                         {
-                            Debug.LogError($"[ResourceManager] Error clearing pool during scene cleanup: {e.Message}");
+                            CZLogger.LogError($"Error clearing pool during scene cleanup: {e.Message}", LogCategory.Resource);
                         }
                     }
                 }

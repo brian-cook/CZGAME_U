@@ -4,6 +4,8 @@ using CZ.Core.Resource;
 using System.Collections.Generic;
 using NaughtyAttributes;
 using System.Collections;
+using System;
+using CZ.Core.Logging;
 
 namespace CZ.Core.UI
 {
@@ -62,14 +64,14 @@ namespace CZ.Core.UI
 
             if (ResourceManager.Instance == null)
             {
-                Debug.LogWarning("[ResourceUI] ResourceManager not found, will retry connection...");
+                CZLogger.LogWarning("[ResourceUI] ResourceManager not found, will retry connection...", LogCategory.UI);
                 StartCoroutine(WaitForResourceManager());
                 return;
             }
 
             if (uiDocument == null)
             {
-                Debug.LogError("[ResourceUI] UIDocument not assigned!");
+                CZLogger.LogError("[ResourceUI] UIDocument not assigned!", LogCategory.UI);
                 return;
             }
 
@@ -81,65 +83,89 @@ namespace CZ.Core.UI
             
             if (resourceContainer == null)
             {
-                Debug.LogError("[ResourceUI] Resource container not found in UI Document!");
+                CZLogger.LogError("[ResourceUI] Resource container not found in UI Document!", LogCategory.UI);
                 return;
             }
 
-            InitializeResourceCounters();
+            InitializeResourceCounters(root);
             isInitialized = true;
-            Debug.Log("[ResourceUI] UI initialized successfully");
+            CZLogger.LogInfo("[ResourceUI] UI initialized successfully", LogCategory.UI);
         }
 
-        private void InitializeResourceCounters()
+        private void ValidateConfiguration()
         {
-            if (isQuitting) return;
-
             if (resourceConfig == null)
             {
-                Debug.LogError("[ResourceUI] ResourceConfiguration is missing!");
+                CZLogger.LogError("[ResourceUI] ResourceConfiguration is missing!", LogCategory.UI);
                 return;
             }
 
             if (resourceCounterTemplate == null)
             {
-                Debug.LogError("[ResourceUI] ResourceCounterTemplate is missing!");
+                CZLogger.LogError("[ResourceUI] ResourceCounterTemplate is missing!", LogCategory.UI);
+                return;
+            }
+        }
+
+        private void InitializeResourceCounters(VisualElement root)
+        {
+            if (resourceCounterTemplate == null)
+            {
+                CZLogger.LogError("[ResourceUI] Resource counter template is missing!", LogCategory.UI);
                 return;
             }
 
-            // Create new dictionary if null
             resourceCounters = new Dictionary<ResourceType, ResourceCounter>();
 
-            // Create counters for each resource type
             foreach (ResourceType type in System.Enum.GetValues(typeof(ResourceType)))
             {
                 try
                 {
-                    var counter = new ResourceCounter(type, resourceConfig, resourceCounterTemplate);
+                    var instance = resourceCounterTemplate.Instantiate();
+                    var counter = new ResourceCounter(type, resourceConfig, instance);
                     
-                    if (counter.Root == null)
+                    if (!counter.IsValid)
                     {
-                        Debug.LogError($"[ResourceUI] Failed to create counter for {type} - Root is null");
+                        CZLogger.LogError($"[ResourceUI] Failed to create valid counter for {type}", LogCategory.UI);
                         continue;
                     }
 
-                    if (counter.IsValid)
-                    {
-                        resourceContainer.Add(counter.Root);
-                        resourceCounters.Add(type, counter);
-                        Debug.Log($"[ResourceUI] Created and added counter for {type} with initial value: {counter.CurrentValue}");
-                    }
-                    else
-                    {
-                        Debug.LogError($"[ResourceUI] Counter for {type} is invalid - skipping");
-                    }
+                    resourceCounters[type] = counter;
+                    resourceContainer.Add(counter.Root);
+                    CZLogger.LogInfo($"[ResourceUI] Successfully created counter for {type}", LogCategory.UI);
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
-                    Debug.LogError($"[ResourceUI] Error creating counter for {type}: {e.Message}");
+                    CZLogger.LogError($"[ResourceUI] Failed to create counter for {type}: {e.Message}", LogCategory.UI);
                 }
             }
+        }
 
-            Debug.Log($"[ResourceUI] Initialized {resourceCounters.Count} resource counters");
+        private ResourceCounter CreateResourceCounter(ResourceType type, VisualElement root)
+        {
+            if (resourceCounterTemplate == null)
+            {
+                CZLogger.LogError($"[ResourceCounter] Template is null for {type}", LogCategory.UI);
+                return null;
+            }
+
+            if (resourceConfig == null)
+            {
+                CZLogger.LogError($"[ResourceCounter] Config is null for {type}", LogCategory.UI);
+                return null;
+            }
+
+            var instance = resourceCounterTemplate.CloneTree();
+            var counter = new ResourceCounter(type, resourceConfig, instance);
+
+            if (!counter.Initialize())
+            {
+                CZLogger.LogError($"[ResourceCounter] Failed to find required UI elements for {type}", LogCategory.UI);
+                return null;
+            }
+
+            root.Add(instance);
+            return counter;
         }
 
         private IEnumerator WaitForResourceManager()
@@ -155,12 +181,12 @@ namespace CZ.Core.UI
 
             if (ResourceManager.Instance != null && !isQuitting)
             {
-                Debug.Log("[ResourceUI] ResourceManager found, initializing UI...");
+                CZLogger.LogInfo("[ResourceUI] ResourceManager found, initializing UI...", LogCategory.UI);
                 InitializeUI();
             }
             else if (!isQuitting)
             {
-                Debug.LogError("[ResourceUI] ResourceManager not found after timeout. UI will not be initialized.");
+                CZLogger.LogError("[ResourceUI] ResourceManager not found after timeout. UI will not be initialized.", LogCategory.UI);
             }
         }
         #endregion
@@ -175,11 +201,11 @@ namespace CZ.Core.UI
             {
                 resourceManager.OnResourceCollected += HandleResourceCollected;
                 SetResourceCountersInteractable(true);
-                Debug.Log("[ResourceUI] Successfully subscribed to ResourceManager events");
+                CZLogger.LogInfo("[ResourceUI] Successfully subscribed to ResourceManager events", LogCategory.UI);
             }
             else
             {
-                Debug.LogWarning("[ResourceUI] ResourceManager not available - resource collection events will not be processed");
+                CZLogger.LogWarning("[ResourceUI] ResourceManager not available - resource collection events will not be processed", LogCategory.UI);
                 SetResourceCountersInteractable(false);
             }
         }
@@ -191,11 +217,11 @@ namespace CZ.Core.UI
             try
             {
                 ResourceManager.Instance.OnResourceCollected -= HandleResourceCollected;
-                Debug.Log("[ResourceUI] Unsubscribed from ResourceManager events");
+                CZLogger.LogInfo("[ResourceUI] Unsubscribed from ResourceManager events", LogCategory.UI);
             }
             catch (System.Exception e)
             {
-                Debug.LogWarning($"[ResourceUI] Error during unsubscribe: {e.Message}");
+                CZLogger.LogWarning($"[ResourceUI] Error during unsubscribe: {e.Message}", LogCategory.UI);
             }
         }
 
@@ -234,18 +260,18 @@ namespace CZ.Core.UI
         {
             if (!isInitialized || isQuitting)
             {
-                Debug.LogWarning($"[ResourceUI] Ignoring resource collection - UI not initialized or quitting. Type: {type}, Value: {value}");
+                CZLogger.LogWarning($"[ResourceUI] Ignoring resource collection - UI not initialized or quitting. Type: {type}, Value: {value}", LogCategory.UI);
                 return;
             }
 
             if (resourceCounters != null && resourceCounters.TryGetValue(type, out var counter))
             {
                 counter.AddValue(value);
-                Debug.Log($"[ResourceUI] Updated counter for {type} with value {value}. New total: {counter.CurrentValue}");
+                CZLogger.LogInfo($"Updated counter for {type} with value {value}. New total: {counter.CurrentValue}", LogCategory.UI);
             }
             else
             {
-                Debug.LogError($"[ResourceUI] Failed to update counter - Counter not found for type: {type}");
+                CZLogger.LogError($"[ResourceUI] Failed to update counter - Counter not found for type: {type}", LogCategory.UI);
             }
         }
 
@@ -268,7 +294,7 @@ namespace CZ.Core.UI
             
             foreach (ResourceType type in System.Enum.GetValues(typeof(ResourceType)))
             {
-                HandleResourceCollected(type, Random.Range(1, 10));
+                HandleResourceCollected(type, UnityEngine.Random.Range(1, 10));
             }
         }
         #endregion
@@ -276,34 +302,31 @@ namespace CZ.Core.UI
 
     public class ResourceCounter
     {
-        public VisualElement Root { get; private set; }
+        private readonly ResourceConfiguration resourceConfig;
+        private readonly ResourceType resourceType;
         private Label valueLabel;
         private VisualElement icon;
         private int currentValue;
+        
+        public VisualElement Root { get; private set; }
         public int CurrentValue => currentValue;
-        private ResourceType resourceType;
         public bool IsValid => Root != null && valueLabel != null && icon != null;
 
-        public ResourceCounter(ResourceType type, ResourceConfiguration config, VisualTreeAsset template)
+        public ResourceCounter(ResourceType type, ResourceConfiguration config, VisualElement root)
         {
-            if (template == null)
-            {
-                Debug.LogError($"[ResourceCounter] Template is null for {type}");
-                return;
-            }
+            resourceType = type;
+            resourceConfig = config;
+            currentValue = 0;
+            Root = root;
 
             if (config == null)
             {
-                Debug.LogError($"[ResourceCounter] Config is null for {type}");
+                CZLogger.LogError($"[ResourceCounter] Config is null for {type}", LogCategory.UI);
                 return;
             }
 
-            resourceType = type;
-            currentValue = 0;
-
             try
             {
-                Root = template.Instantiate();
                 Root.name = $"{type}Counter";
 
                 // Setup UI elements
@@ -312,7 +335,7 @@ namespace CZ.Core.UI
 
                 if (!IsValid)
                 {
-                    Debug.LogError($"[ResourceCounter] Failed to find required UI elements for {type}");
+                    CZLogger.LogError($"[ResourceCounter] Failed to find required UI elements for {type}", LogCategory.UI);
                     return;
                 }
 
@@ -328,11 +351,11 @@ namespace CZ.Core.UI
 
                 icon.style.backgroundColor = color;
                 valueLabel.text = "0";
-                Debug.Log($"[ResourceCounter] Initialized counter for {type} with color: {color}");
+                CZLogger.LogInfo($"[ResourceCounter] Initialized counter for {type} with color: {color}", LogCategory.UI);
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[ResourceCounter] Error during initialization of {type}: {e.Message}");
+                CZLogger.LogError($"[ResourceCounter] Error during initialization of {type}: {e.Message}", LogCategory.UI);
                 Root = null;
                 valueLabel = null;
                 icon = null;
@@ -343,39 +366,39 @@ namespace CZ.Core.UI
         {
             if (!IsValid)
             {
-                Debug.LogError($"[ResourceCounter] Cannot add value - counter for {resourceType} is invalid");
+                CZLogger.LogError($"[ResourceCounter] Cannot add value - counter for {resourceType} is invalid", LogCategory.UI);
                 return;
             }
 
             if (value < 0)
             {
-                Debug.LogWarning($"[ResourceCounter] Attempted to add negative value: {value} to {resourceType}");
+                CZLogger.LogWarning($"[ResourceCounter] Attempted to add negative value: {value} to {resourceType}", LogCategory.UI);
                 return;
             }
 
             currentValue += value;
             UpdateDisplay();
             PlayCollectionAnimation();
-            Debug.Log($"[ResourceCounter] Added {value} to {resourceType}. New total: {currentValue}");
+            CZLogger.LogInfo($"[ResourceCounter] Added {value} to {resourceType}. New total: {currentValue}", LogCategory.UI);
         }
 
         public void Reset()
         {
             currentValue = 0;
             UpdateDisplay();
-            Debug.Log($"[ResourceCounter] Reset counter for {resourceType}");
+            CZLogger.LogInfo($"[ResourceCounter] Reset counter for {resourceType}", LogCategory.UI);
         }
 
         private void UpdateDisplay()
         {
             if (!IsValid)
             {
-                Debug.LogError($"[ResourceCounter] Cannot update display - counter for {resourceType} is invalid");
+                CZLogger.LogError($"[ResourceCounter] Cannot update display - counter for {resourceType} is invalid", LogCategory.UI);
                 return;
             }
 
             valueLabel.text = currentValue.ToString();
-            Debug.Log($"[ResourceCounter] Updated display for {resourceType} to: {currentValue}");
+            CZLogger.LogInfo($"[ResourceCounter] Updated display for {resourceType} to: {currentValue}", LogCategory.UI);
         }
 
         private void PlayCollectionAnimation()
@@ -409,6 +432,39 @@ namespace CZ.Core.UI
                 Root.style.opacity = 1f;
                 UpdateDisplay();
             }
+        }
+
+        public bool Initialize()
+        {
+            if (Root == null)
+            {
+                CZLogger.LogError($"[ResourceCounter] Root is null for {resourceType}", LogCategory.UI);
+                return false;
+            }
+
+            valueLabel = Root.Q<Label>("Value");
+            icon = Root.Q<VisualElement>("Icon");
+
+            if (valueLabel == null || icon == null)
+            {
+                CZLogger.LogError($"[ResourceCounter] Failed to find required UI elements for {resourceType}", LogCategory.UI);
+                return false;
+            }
+
+            // Configure appearance
+            Color color = resourceType switch
+            {
+                ResourceType.Health => resourceConfig.healthColor,
+                ResourceType.Experience => resourceConfig.experienceColor,
+                ResourceType.PowerUp => resourceConfig.powerUpColor,
+                ResourceType.Currency => resourceConfig.currencyColor,
+                _ => Color.white
+            };
+
+            icon.style.backgroundColor = color;
+            valueLabel.text = "0";
+            CZLogger.LogInfo($"[ResourceCounter] Initialized counter for {resourceType} with color: {color}", LogCategory.UI);
+            return true;
         }
     }
 } 

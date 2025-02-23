@@ -6,7 +6,8 @@
         "NaughtyAttributes.Core",
         "CZ.Core.Interfaces",
         "CZ.Core.Pooling",
-        "CZ.Core.Configuration"
+        "CZ.Core.Configuration",
+        "CZ.Core.Logging"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

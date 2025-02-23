@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Profiling;
 using System;
 using CZ.Core.Interfaces;
+using CZ.Core.Logging;
 
 namespace CZ.Core.Pooling
 {
@@ -76,12 +77,6 @@ namespace CZ.Core.Pooling
         
         private bool ShouldExpandPool()
         {
-            // Check total count first to avoid unnecessary memory checks
-            if (TotalCount >= maxSize)
-            {
-                return false;
-            }
-
             var currentMemory = totalMemoryRecorder.LastValue / (1024f * 1024f);
             var memoryDelta = currentMemory - startupBaseline;
             
@@ -89,11 +84,10 @@ namespace CZ.Core.Pooling
             var thresholdScale = Mathf.Clamp(startupBaseline / 512f, 0.5f, 2f);
             var adjustedThreshold = memoryThresholdMB * thresholdScale;
             
-            // Log detailed memory stats in development
             #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (currentMemory >= adjustedThreshold)
             {
-                Debug.LogWarning($"Pool '{poolName}' memory threshold reached: {currentMemory:F2}MB/{adjustedThreshold:F2}MB");
+                CZLogger.LogWarning($"Pool '{poolName}' memory threshold reached: {currentMemory:F2}MB/{adjustedThreshold:F2}MB", LogCategory.Pool);
             }
             #endif
             
@@ -108,7 +102,6 @@ namespace CZ.Core.Pooling
             T obj;
             isExpanding = false;
             
-            // First try to reuse an inactive object
             if (pool.Count > 0)
             {
                 obj = pool.Dequeue();
@@ -118,13 +111,11 @@ namespace CZ.Core.Pooling
                 return obj;
             }
             
-            // If no inactive objects and below max size, create new
             if (TotalCount < maxSize && ShouldExpandPool())
             {
                 isExpanding = true;
                 obj = createFunc();
                 
-                // Update peak count with thread safety
                 int newPeakCount = TotalCount + 1;
                 if (newPeakCount > peakCount)
                 {
@@ -132,7 +123,7 @@ namespace CZ.Core.Pooling
                 }
                 
                 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning($"Pool '{poolName}' expanded. Size: {TotalCount + 1}, Peak: {peakCount}, Memory: {totalMemoryRecorder.LastValue / (1024f * 1024f):F2}MB");
+                CZLogger.LogWarning($"Pool '{poolName}' expanded. Size: {TotalCount + 1}, Peak: {peakCount}, Memory: {totalMemoryRecorder.LastValue / (1024f * 1024f):F2}MB", LogCategory.Pool);
                 #endif
                 
                 System.Threading.Interlocked.Increment(ref activeCount);
@@ -141,9 +132,8 @@ namespace CZ.Core.Pooling
                 return obj;
             }
             
-            // At max size, log warning and return null
             var currentMemory = totalMemoryRecorder.LastValue / (1024f * 1024f);
-            Debug.LogWarning($"Pool '{poolName}' at capacity. Size: {TotalCount}, Max: {maxSize}, Memory: {currentMemory:F2}MB/{memoryThresholdMB}MB. Waiting for object return.");
+            CZLogger.LogWarning($"Pool '{poolName}' at capacity. Size: {TotalCount}, Max: {maxSize}, Memory: {currentMemory:F2}MB/{memoryThresholdMB}MB. Waiting for object return.", LogCategory.Pool);
             return default;
         }
         
@@ -154,28 +144,26 @@ namespace CZ.Core.Pooling
         {
             if (obj == null)
             {
-                Debug.LogError($"Pool '{poolName}' attempted to return null object");
+                CZLogger.LogError($"Pool '{poolName}' attempted to return null object", LogCategory.Pool);
                 return;
             }
 
-            // Validate object type matches pool
             if (!ValidateObjectType(obj))
             {
-                Debug.LogError($"Pool '{poolName}' received object of incorrect type");
+                CZLogger.LogError($"Pool '{poolName}' received object of incorrect type", LogCategory.Pool);
                 return;
             }
 
             obj.OnDespawn();
             obj.GameObject.SetActive(false);
             
-            // Ensure we don't exceed max size
             if (pool.Count < maxSize)
             {
                 pool.Enqueue(obj);
             }
             else
             {
-                Debug.LogWarning($"Pool '{poolName}' destroying excess object to maintain size limit");
+                CZLogger.LogWarning($"Pool '{poolName}' destroying excess object to maintain size limit", LogCategory.Pool);
                 UnityEngine.Object.Destroy(obj.GameObject);
             }
             
@@ -200,7 +188,7 @@ namespace CZ.Core.Pooling
                         var isValid = string.Equals(resourceType, poolTypeName, StringComparison.OrdinalIgnoreCase);
                         if (!isValid)
                         {
-                            Debug.LogError($"[ObjectPool] Type mismatch in pool '{poolName}'. Expected: {poolTypeName}, Got: {resourceType}");
+                            CZLogger.LogError($"Type mismatch in pool '{poolName}'. Expected: {poolTypeName}, Got: {resourceType}", LogCategory.Pool);
                         }
                         return isValid;
                     }

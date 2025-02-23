@@ -6,6 +6,7 @@ using System.Collections;
 using CZ.Core.Configuration;
 using System.Linq;
 using CZ.Core.Interfaces;
+using CZ.Core.Logging;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -29,46 +30,26 @@ namespace CZ.Core.Pooling
             {
                 if (instance == null)
                 {
-                    // Handle edit mode differently
-                    if (!Application.isPlaying)
+                    #if UNITY_EDITOR
+                    if (!UnityEditor.EditorApplication.isPlaying)
                     {
-                        // Look for existing editor instance first
-                        var editorInstances = FindObjectsByType<PoolManager>(FindObjectsSortMode.None)
-                            .Where(p => p.gameObject.name.Contains("PoolManager_EditorOnly"))
-                            .ToList();
-                        
-                        // Clean up duplicate editor instances if found
-                        if (editorInstances.Count > 1)
-                        {
-                            Debug.LogWarning("[PoolManager] Found multiple editor instances. Cleaning up duplicates...");
-                            for (int i = 1; i < editorInstances.Count; i++)
-                            {
-                                DestroyImmediate(editorInstances[i].gameObject);
-                            }
-                        }
-                        
-                        instance = editorInstances.FirstOrDefault();
-                        
+                        // In editor mode, find or create a temporary instance
+                        instance = FindAnyObjectByType<PoolManager>();
                         if (instance == null)
                         {
-                            // Create new editor instance only if none exists
                             var go = new GameObject("PoolManager_EditorOnly");
                             instance = go.AddComponent<PoolManager>();
                             instance.InitializeManager(true);
-                            
-                            #if UNITY_EDITOR
-                            Debug.Log("[PoolManager] Created editor-only instance");
-                            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-                            #endif
                         }
+                        return instance;
                     }
-                    else
-                    {
-                        var go = new GameObject("PoolManager");
-                        instance = go.AddComponent<PoolManager>();
-                        DontDestroyOnLoad(go);
-                        instance.InitializeManager(false);
-                    }
+                    #endif
+
+                    // In play mode, create a persistent instance
+                    var gameObject = new GameObject("PoolManager");
+                    instance = gameObject.AddComponent<PoolManager>();
+                    DontDestroyOnLoad(gameObject);
+                    instance.InitializeManager(false);
                 }
                 return instance;
             }
@@ -123,7 +104,7 @@ namespace CZ.Core.Pooling
                 poolCriticalThreshold = baseMemory * POOL_MEMORY_CRITICAL_RATIO;
                 poolEmergencyThreshold = baseMemory * POOL_MEMORY_EMERGENCY_RATIO;
                 
-                Debug.LogWarning($"[PoolManager] Using calculated thresholds - Warning: {poolWarningThreshold:F2}MB, Critical: {poolCriticalThreshold:F2}MB, Emergency: {poolEmergencyThreshold:F2}MB");
+                CZLogger.LogWarning($"Using calculated thresholds - Warning: {poolWarningThreshold:F2}MB, Critical: {poolCriticalThreshold:F2}MB, Emergency: {poolEmergencyThreshold:F2}MB", LogCategory.Pool);
             }
 
             // Initialize monitoring
@@ -155,7 +136,7 @@ namespace CZ.Core.Pooling
             var type = typeof(T);
             if (pools.ContainsKey(type))
             {
-                Debug.LogWarning($"[PoolManager] Pool for type {type.Name} already exists");
+                CZLogger.LogWarning($"Pool for type {type.Name} already exists", LogCategory.Pool);
                 return (ObjectPool<T>)pools[type];
             }
 
@@ -163,12 +144,12 @@ namespace CZ.Core.Pooling
             {
                 var pool = new ObjectPool<T>(createFunc, initialSize, maxSize, poolName);
                 pools.Add(type, pool);
-                Debug.Log($"[PoolManager] Created new pool for {type.Name} with size {initialSize}/{maxSize}");
+                CZLogger.LogInfo($"Created new pool for {type.Name} with size {initialSize}/{maxSize}", LogCategory.Pool);
                 return pool;
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
-                Debug.LogError($"[PoolManager] Failed to create pool for {type.Name}: {e.Message}");
+                CZLogger.LogError($"Failed to create pool for {type.Name}: {e.Message}", LogCategory.Pool);
                 return null;
             }
         }
@@ -181,7 +162,7 @@ namespace CZ.Core.Pooling
             var type = typeof(T);
             if (!pools.ContainsKey(type))
             {
-                Debug.LogError($"[PoolManager] No pool found for type {type.Name}");
+                CZLogger.LogError($"No pool found for type {type.Name}", LogCategory.Pool);
                 return null;
             }
 
@@ -210,17 +191,17 @@ namespace CZ.Core.Pooling
             // Log warnings based on dynamic thresholds
             if (totalMemoryMB > poolEmergencyThreshold)
             {
-                Debug.LogError($"[PoolManager] EMERGENCY: Pool memory usage critical: {totalMemoryMB:F2}MB/{poolEmergencyThreshold:F2}MB");
+                CZLogger.LogError($"EMERGENCY: Pool memory usage critical: {totalMemoryMB:F2}MB/{poolEmergencyThreshold:F2}MB", LogCategory.Pool);
                 TriggerEmergencyCleanup();
             }
             else if (totalMemoryMB > poolCriticalThreshold)
             {
-                Debug.LogWarning($"[PoolManager] CRITICAL: Pool memory usage high: {totalMemoryMB:F2}MB/{poolCriticalThreshold:F2}MB");
+                CZLogger.LogWarning($"CRITICAL: Pool memory usage high: {totalMemoryMB:F2}MB/{poolCriticalThreshold:F2}MB", LogCategory.Pool);
                 TriggerPoolCleanup(true);
             }
             else if (totalMemoryMB > poolWarningThreshold)
             {
-                Debug.LogWarning($"[PoolManager] WARNING: Pool memory usage elevated: {totalMemoryMB:F2}MB/{poolWarningThreshold:F2}MB");
+                CZLogger.LogWarning($"WARNING: Pool memory usage elevated: {totalMemoryMB:F2}MB/{poolWarningThreshold:F2}MB", LogCategory.Pool);
                 TriggerPoolCleanup(false);
             }
         }
@@ -347,7 +328,7 @@ namespace CZ.Core.Pooling
                 
                 if (editorInstances.Any())
                 {
-                    Debug.LogWarning("[PoolManager] Duplicate editor instance detected during validation. Please clean up using GameObject -> Clean PoolManager Editor Instances.");
+                    CZLogger.LogWarning("Duplicate editor instance detected during validation. Please clean up using GameObject -> Clean PoolManager Editor Instances.", LogCategory.Pool);
                 }
             }
             #endif

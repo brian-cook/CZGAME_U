@@ -1,10 +1,11 @@
 {
     "name": "CZ.Core.Pooling",
-    "rootNamespace": "CZ.Core.Pooling",
+    "rootNamespace": "CZ.Core",
     "references": [
         "GUID:75469ad4d38634e559750d17036d5f7c",
+        "CZ.Core.Interfaces",
         "CZ.Core.Configuration",
-        "CZ.Core.Interfaces"
+        "CZ.Core.Logging"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -4,6 +4,7 @@ using Unity.Profiling;
 using NaughtyAttributes;
 using CZ.Core.Interfaces;
 using CZ.Core.Resource;
+using CZ.Core.Logging;
 
 namespace CZ.Core.Enemy
 {
@@ -219,12 +220,12 @@ namespace CZ.Core.Enemy
                 circleCollider.isTrigger = useTriggerCollider;
                 
                 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log($"[BaseEnemy] Configured collider - Radius: {circleCollider.radius:F2}, IsTrigger: {useTriggerCollider}");
+                CZLogger.LogInfo($"Configured collider - Radius: {circleCollider.radius:F2}, IsTrigger: {useTriggerCollider}", LogCategory.Enemy);
                 #endif
             }
 
             isInitialized = true;
-            Debug.Log($"[BaseEnemy] Initialized enemy: {gameObject.name}");
+            CZLogger.LogInfo($"Initialized enemy: {gameObject.name}", LogCategory.Enemy);
         }
         #endregion
 
@@ -262,7 +263,7 @@ namespace CZ.Core.Enemy
                 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (rb.linearVelocity.magnitude > 0.1f)
                 {
-                    Debug.LogWarning($"[BaseEnemy] Using stale target data. Age: {targetAge:F2}s, Speed: {rb.linearVelocity.magnitude:F2}");
+                    CZLogger.LogWarning($"Using stale target data. Age: {targetAge:F2}s, Speed: {rb.linearVelocity.magnitude:F2}", LogCategory.Enemy);
                 }
                 #endif
             }
@@ -292,7 +293,7 @@ namespace CZ.Core.Enemy
         {
             if (!isInitialized)
             {
-                Debug.LogError("[BaseEnemy] Cannot set target - enemy not initialized!");
+                CZLogger.LogError("Cannot set target - enemy not initialized!", LogCategory.Enemy);
                 return;
             }
             
@@ -307,7 +308,7 @@ namespace CZ.Core.Enemy
                 hasValidTarget = true;
                 
                 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log($"[BaseEnemy] Target updated to: {position}, Distance: {((Vector2)position - rb.position).magnitude:F2}");
+                CZLogger.LogDebug($"Target updated to: {position}, Distance: {((Vector2)position - rb.position).magnitude:F2}", LogCategory.Enemy);
                 #endif
             }
         }
@@ -327,7 +328,7 @@ namespace CZ.Core.Enemy
             }
             
             #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Debug.Log($"[BaseEnemy] Took {damage} damage. Current health: {currentHealth}/{maxHealth}");
+            CZLogger.LogDebug($"Took {damage} damage. Current health: {currentHealth}/{maxHealth}", LogCategory.Enemy);
             #endif
         }
 
@@ -349,7 +350,7 @@ namespace CZ.Core.Enemy
             }
             
             #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Debug.Log($"[BaseEnemy] Starting death sequence for: {gameObject.name}");
+            CZLogger.LogInfo($"Starting death sequence for: {gameObject.name}", LogCategory.Enemy);
             #endif
         }
 
@@ -371,66 +372,67 @@ namespace CZ.Core.Enemy
                         {
                             int experienceDrop = Random.Range(minExperienceDrop, maxExperienceDrop + 1);
                             Vector3 expPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-                            var expResource = ResourceManager.Instance.SpawnResource(ResourceType.Experience, expPosition, experienceDrop);
+                            var expResource = ResourceManager.Instance.SpawnResource(ResourceType.Experience, expPosition);
                             if (expResource != null)
                             {
+                                expResource.SetResourceValue(experienceDrop);
                                 resourcesSpawned = true;
-                                Debug.Log($"[BaseEnemy] Spawned experience resource at {expPosition} with value {experienceDrop}");
+                                CZLogger.LogDebug($"Spawned experience resource at {expPosition} with value {experienceDrop}", LogCategory.Enemy);
                             }
                         }
 
                         // Random chance for health drop with validation and offset
                         float healthRoll = Random.value * 100f;
-                        Debug.Log($"[BaseEnemy] Health drop roll: {healthRoll} vs chance: {healthDropChance}");
                         if (healthRoll <= healthDropChance)
                         {
                             Vector3 healthPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-                            var healthResource = ResourceManager.Instance.SpawnResource(ResourceType.Health, healthPosition, healthDropValue);
+                            var healthResource = ResourceManager.Instance.SpawnResource(ResourceType.Health, healthPosition);
                             if (healthResource != null)
                             {
+                                healthResource.SetResourceValue(healthDropValue);
                                 resourcesSpawned = true;
-                                Debug.Log($"[BaseEnemy] Spawned health resource at {healthPosition} with value {healthDropValue}");
+                                CZLogger.LogDebug($"Spawned health resource at {healthPosition} with value {healthDropValue}", LogCategory.Enemy);
                             }
                         }
 
                         // Random chance for power-up with validation and offset
                         float powerUpRoll = Random.value * 100f;
-                        Debug.Log($"[BaseEnemy] PowerUp drop roll: {powerUpRoll} vs chance: {powerUpDropChance}");
                         if (powerUpRoll <= powerUpDropChance)
                         {
                             Vector3 powerUpPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-                            var powerUpResource = ResourceManager.Instance.SpawnResource(ResourceType.PowerUp, powerUpPosition, powerUpDropValue);
+                            var powerUpResource = ResourceManager.Instance.SpawnResource(ResourceType.PowerUp, powerUpPosition);
                             if (powerUpResource != null)
                             {
+                                powerUpResource.SetResourceValue(powerUpDropValue);
                                 resourcesSpawned = true;
-                                Debug.Log($"[BaseEnemy] Spawned power-up resource at {powerUpPosition} with value {powerUpDropValue}");
+                                CZLogger.LogDebug($"Spawned power-up resource at {powerUpPosition} with value {powerUpDropValue}", LogCategory.Enemy);
                             }
                         }
 
                         // Random chance for currency with validation and offset
                         float currencyRoll = Random.value * 100f;
-                        Debug.Log($"[BaseEnemy] Currency drop roll: {currencyRoll} vs chance: {currencyDropChance}");
                         if (currencyRoll <= currencyDropChance)
                         {
                             Vector3 currencyPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-                            var currencyResource = ResourceManager.Instance.SpawnResource(ResourceType.Currency, currencyPosition, currencyDropValue);
+                            var currencyResource = ResourceManager.Instance.SpawnResource(ResourceType.Currency, currencyPosition);
                             if (currencyResource != null)
                             {
+                                currencyResource.SetResourceValue(currencyDropValue);
                                 resourcesSpawned = true;
-                                Debug.Log($"[BaseEnemy] Spawned currency resource at {currencyPosition} with value {currencyDropValue}");
+                                CZLogger.LogDebug($"Spawned currency resource at {currencyPosition} with value {currencyDropValue}", LogCategory.Enemy);
                             }
                         }
 
-                        Debug.Log($"[BaseEnemy] Death sequence resource spawning complete. Resources spawned: {resourcesSpawned}");
+                        CZLogger.LogDebug($"Death sequence resource spawning complete. Resources spawned: {resourcesSpawned}", LogCategory.Enemy);
                     }
                     catch (System.Exception e)
                     {
-                        Debug.LogError($"[BaseEnemy] Error spawning resources: {e.Message}\nStack trace: {e.StackTrace}");
+                        CZLogger.LogError($"Error spawning resources: {e.Message}\nStack trace: {e.StackTrace}", LogCategory.Enemy);
                     }
                 }
                 else
                 {
-                    Debug.LogError("[BaseEnemy] ResourceManager not available for spawning resources");
+                    CZLogger.LogError("ResourceManager not available for spawning resources", LogCategory.Enemy);
                 }
             }
             finally
@@ -442,6 +444,7 @@ namespace CZ.Core.Enemy
 
         public void OnSpawn()
         {
+            CZLogger.LogDebug($"Enemy spawned: {gameObject.name}", LogCategory.Enemy);
             if (!isInitialized)
             {
                 InitializeComponents();
@@ -489,11 +492,12 @@ namespace CZ.Core.Enemy
             }
             
             gameObject.SetActive(true);
-            Debug.Log($"[BaseEnemy] Enemy spawned: {gameObject.name}");
+            CZLogger.LogInfo($"Enemy spawned: {gameObject.name}", LogCategory.Enemy);
         }
 
         public void OnDespawn()
         {
+            CZLogger.LogDebug($"Enemy despawning: {gameObject.name}", LogCategory.Enemy);
             // Clean up material instance if it exists
             if (materialInstance != null)
             {
@@ -531,7 +535,7 @@ namespace CZ.Core.Enemy
             }
             
             gameObject.SetActive(false);
-            Debug.Log($"[BaseEnemy] Enemy despawned: {gameObject.name}");
+            CZLogger.LogInfo($"Enemy despawned: {gameObject.name}", LogCategory.Enemy);
         }
         #endregion
 
@@ -562,23 +566,23 @@ namespace CZ.Core.Enemy
                     if (pool != null)
                     {
                         pool.Return(this);
-                        Debug.Log($"[BaseEnemy] Successfully returned to pool: {gameObject.name}");
+                        CZLogger.LogInfo($"Enemy despawned: {gameObject.name}", LogCategory.Enemy);
                     }
                     else
                     {
-                        Debug.LogError($"[BaseEnemy] Failed to return to pool - pool not found for: {gameObject.name}");
+                        CZLogger.LogError($"Failed to return to pool - pool not found for: {gameObject.name}", LogCategory.Enemy);
                         gameObject.SetActive(false);
                     }
                 }
                 else
                 {
-                    Debug.LogError("[BaseEnemy] PoolManager not available for returning to pool");
+                    CZLogger.LogError("PoolManager not available for returning to pool", LogCategory.Enemy);
                     gameObject.SetActive(false);
                 }
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[BaseEnemy] Error returning to pool: {e.Message}\nStack trace: {e.StackTrace}");
+                CZLogger.LogError($"Error returning to pool: {e.Message}\nStack trace: {e.StackTrace}", LogCategory.Enemy);
                 gameObject.SetActive(false);
             }
         }

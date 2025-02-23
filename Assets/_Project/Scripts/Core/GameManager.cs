@@ -7,6 +7,7 @@ using System.Collections;
 using CZ.Core.Pooling;
 using CZ.Core.Configuration;
 using CZ.Core.Interfaces;
+using CZ.Core.Logging;
 
 namespace CZ.Core
 {
@@ -149,7 +150,7 @@ namespace CZ.Core
             }
             else
             {
-                Debug.LogError("[GameManager] Failed to initialize performance monitoring. Memory management disabled.");
+                CZLogger.LogError("[GameManager] Failed to initialize performance monitoring. Memory management disabled.", LogCategory.System);
                 enabled = false;
             }
         }
@@ -171,14 +172,14 @@ namespace CZ.Core
                 
                 if (!drawCallsRecorder.Valid)
                 {
-                    Debug.LogError("[GameManager] Failed to initialize draw calls recorder");
+                    CZLogger.LogError("[GameManager] Failed to initialize draw calls recorder", LogCategory.Performance);
                     return false;
                 }
                 
                 // Initialize memory monitoring
                 if (!InitializeMemoryMonitoring())
                 {
-                    Debug.LogError("[GameManager] Failed to initialize memory monitoring");
+                    CZLogger.LogError("[GameManager] Failed to initialize memory monitoring", LogCategory.Performance);
                     CleanupRecorders();
                     return false;
                 }
@@ -186,7 +187,7 @@ namespace CZ.Core
                 // Initialize GC monitoring
                 if (!InitializeGCMonitoring())
                 {
-                    Debug.LogError("[GameManager] Failed to initialize GC monitoring");
+                    CZLogger.LogError("[GameManager] Failed to initialize GC monitoring", LogCategory.Performance);
                     CleanupRecorders();
                     return false;
                 }
@@ -195,31 +196,31 @@ namespace CZ.Core
                 if (memoryRecorder.Valid && memoryRecorder.CurrentValue > 0)
                 {
                     float initialMemory = ConvertToMB(memoryRecorder.CurrentValue);
-                    Debug.Log($"[GameManager] Initial memory reading: {initialMemory:F2}MB");
+                    CZLogger.LogInfo($"[GameManager] Initial memory reading: {initialMemory:F2}MB", LogCategory.Performance);
                     startupMemoryBaseline = initialMemory;
                     memoryBaseline = initialMemory;
-                    Debug.Log($"[GameManager] Setting initial memory baseline to: {memoryBaseline:F2}MB");
+                    CZLogger.LogInfo($"[GameManager] Setting initial memory baseline to: {memoryBaseline:F2}MB", LogCategory.Performance);
                     
                     // Perform initial cleanup if needed
                     if (initialMemory > memoryConfig.BaseThreshold)
                     {
-                        Debug.Log("[GameManager] Performing initial memory cleanup...");
+                        CZLogger.LogInfo("[GameManager] Performing initial memory cleanup...", LogCategory.Performance);
                         StartCoroutine(PerformInitialCleanup(memoryConfig.BaseThreshold));
                     }
                 }
                 else
                 {
-                    Debug.LogError("[GameManager] Failed to get initial memory reading");
+                    CZLogger.LogError("[GameManager] Failed to get initial memory reading", LogCategory.Performance);
                     CleanupRecorders();
                     return false;
                 }
 
-                Debug.Log("[GameManager] Performance monitoring initialized successfully");
+                CZLogger.LogInfo("[GameManager] Performance monitoring initialized successfully", LogCategory.Performance);
                 return true;
             }
             catch (Exception e)
             {
-                Debug.LogError($"[GameManager] Failed to initialize performance monitoring: {e.Message}");
+                CZLogger.LogError($"[GameManager] Failed to initialize performance monitoring: {e.Message}", LogCategory.Performance);
                 CleanupRecorders();
                 return false;
             }
@@ -255,7 +256,7 @@ namespace CZ.Core
                             memoryConfig.CriticalThreshold = baseValue * 1.75f;
                             memoryConfig.EmergencyThreshold = baseValue * 2.0f;
                             
-                            Debug.Log($"[GameManager] Dynamic thresholds calculated - Base: {memoryConfig.BaseThreshold:F2}MB, Warning: {memoryConfig.WarningThreshold:F2}MB, Critical: {memoryConfig.CriticalThreshold:F2}MB, Emergency: {memoryConfig.EmergencyThreshold:F2}MB");
+                            CZLogger.LogInfo($"[GameManager] Dynamic thresholds calculated - Base: {memoryConfig.BaseThreshold:F2}MB, Warning: {memoryConfig.WarningThreshold:F2}MB, Critical: {memoryConfig.CriticalThreshold:F2}MB, Emergency: {memoryConfig.EmergencyThreshold:F2}MB", LogCategory.Performance);
                         }
                         else
                         {
@@ -293,7 +294,7 @@ namespace CZ.Core
                                 float testValue = ConvertToMB(memoryRecorder.CurrentValue);
                                 if (testValue > 0)
                                 {
-                                    Debug.Log($"[GameManager] Successfully initialized memory recorder with counter: {counterName} (Current: {testValue:F2}MB)");
+                                    CZLogger.LogInfo($"[GameManager] Successfully initialized memory recorder with counter: {counterName} (Current: {testValue:F2}MB)", LogCategory.Performance);
                                     currentMemoryUsageMB = testValue;
                                     memoryRecorderInitialized = true;
                                     break;
@@ -303,7 +304,7 @@ namespace CZ.Core
                         }
                         catch (Exception e)
                         {
-                            Debug.LogWarning($"[GameManager] Failed to initialize counter '{counterName}': {e.Message}");
+                            CZLogger.LogWarning($"[GameManager] Failed to initialize counter '{counterName}': {e.Message}", LogCategory.Performance);
                             if (!memoryRecorder.Equals(default(ProfilerRecorder)))
                             {
                                 memoryRecorder.Dispose();
@@ -319,13 +320,13 @@ namespace CZ.Core
                     retryAttempts++;
                     if (retryAttempts < MAX_RETRY_ATTEMPTS)
                     {
-                        Debug.LogWarning($"[GameManager] Memory monitoring initialization attempt {retryAttempts} failed. Retrying...");
+                        CZLogger.LogWarning($"[GameManager] Memory monitoring initialization attempt {retryAttempts} failed. Retrying...", LogCategory.Performance);
                         System.Threading.Thread.Sleep(100); // Brief pause before retry
                     }
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"[GameManager] Error during memory monitoring initialization: {e.Message}");
+                    CZLogger.LogError($"[GameManager] Error during memory monitoring initialization: {e.Message}", LogCategory.Performance);
                     retryAttempts++;
                     if (retryAttempts < MAX_RETRY_ATTEMPTS)
                     {
@@ -334,13 +335,13 @@ namespace CZ.Core
                 }
             }
             
-            Debug.LogError("[GameManager] Failed to initialize memory monitoring after multiple attempts");
+            CZLogger.LogError("[GameManager] Failed to initialize memory monitoring after multiple attempts", LogCategory.Performance);
             return false;
         }
 
         private void UseDefaultThresholds()
         {
-            Debug.LogWarning("[GameManager] Using fallback memory thresholds");
+            CZLogger.LogWarning("[GameManager] Using fallback memory thresholds", LogCategory.Performance);
             
             // Ensure we have a valid configuration
             EnsureMemoryConfiguration();
@@ -362,7 +363,7 @@ namespace CZ.Core
             memoryConfig.PoolCriticalThreshold = baseValue * 0.35f;  // 35% of base
             memoryConfig.PoolEmergencyThreshold = baseValue * 0.45f; // 45% of base
             
-            Debug.Log($"[GameManager] System-aware thresholds set:\n" +
+            CZLogger.LogInfo($"[GameManager] System-aware thresholds set:\n" +
                      $"System Memory: {systemMemory:F2}MB\n" +
                      $"Base: {baseValue:F2}MB\n" +
                      $"Warning: {memoryConfig.WarningThreshold:F2}MB\n" +
@@ -370,7 +371,7 @@ namespace CZ.Core
                      $"Emergency: {memoryConfig.EmergencyThreshold:F2}MB\n" +
                      $"Pool Warning: {memoryConfig.PoolWarningThreshold:F2}MB\n" +
                      $"Pool Critical: {memoryConfig.PoolCriticalThreshold:F2}MB\n" +
-                     $"Pool Emergency: {memoryConfig.PoolEmergencyThreshold:F2}MB");
+                     $"Pool Emergency: {memoryConfig.PoolEmergencyThreshold:F2}MB", LogCategory.Performance);
         }
 
         private bool InitializeGCMonitoring()
@@ -393,7 +394,7 @@ namespace CZ.Core
                         float testValue = ConvertToMB(gcMemoryRecorder.CurrentValue);
                         if (testValue > 0)
                         {
-                            Debug.Log($"[GameManager] Successfully initialized GC recorder with counter: {counterName} (Current: {testValue:F2}MB)");
+                            CZLogger.LogInfo($"[GameManager] Successfully initialized GC recorder with counter: {counterName} (Current: {testValue:F2}MB)", LogCategory.Performance);
                             return true;
                         }
                         gcMemoryRecorder.Dispose();
@@ -401,7 +402,7 @@ namespace CZ.Core
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning($"[GameManager] Failed to initialize GC counter '{counterName}': {e.Message}");
+                    CZLogger.LogWarning($"[GameManager] Failed to initialize GC counter '{counterName}': {e.Message}", LogCategory.Performance);
                     if (!gcMemoryRecorder.Equals(default(ProfilerRecorder)))
                     {
                         gcMemoryRecorder.Dispose();
@@ -417,7 +418,7 @@ namespace CZ.Core
             if (isCleaningUp) yield break;
             
             isCleaningUp = true;
-            Debug.Log("[GameManager] Performing initial memory cleanup...");
+            CZLogger.LogInfo("[GameManager] Performing initial memory cleanup...", LogCategory.Performance);
             
             // Wait for initial load to settle
             yield return new WaitForSeconds(1f);
@@ -425,7 +426,7 @@ namespace CZ.Core
             // Verify recorder is still valid
             if (!memoryRecorder.Valid || !gcMemoryRecorder.Valid)
             {
-                Debug.LogError("[GameManager] Memory recorders not valid during initial cleanup");
+                CZLogger.LogError("[GameManager] Memory recorders not valid during initial cleanup", LogCategory.Performance);
                 enabled = false;
                 yield break;
             }
@@ -474,20 +475,20 @@ namespace CZ.Core
                 float newMemoryUsage = ConvertToMB(memoryRecorder.CurrentValue);
                 float delta = newMemoryUsage - startupMemoryBaseline;
                 
-                Debug.Log($"[GameManager] Initial cleanup completed. Memory: {newMemoryUsage:F2}MB (Delta: {delta:F2}MB)");
+                CZLogger.LogInfo($"[GameManager] Initial cleanup completed. Memory: {newMemoryUsage:F2}MB (Delta: {delta:F2}MB)", LogCategory.Performance);
                 
                 // Calculate relative thresholds based on adjusted baseline
                 float relativeWarning = (memoryConfig.WarningThreshold / memoryConfig.BaseThreshold) * adjustedBaseline;
                 float relativeCritical = (memoryConfig.CriticalThreshold / memoryConfig.BaseThreshold) * adjustedBaseline;
                 float relativeEmergency = (memoryConfig.EmergencyThreshold / memoryConfig.BaseThreshold) * adjustedBaseline;
                 
-                Debug.Log($"[GameManager] Adjusted thresholds - Warning: {relativeWarning:F2}MB, Critical: {relativeCritical:F2}MB, Emergency: {relativeEmergency:F2}MB");
+                CZLogger.LogInfo($"[GameManager] Adjusted thresholds - Warning: {relativeWarning:F2}MB, Critical: {relativeCritical:F2}MB, Emergency: {relativeEmergency:F2}MB", LogCategory.Performance);
                 
                 // Update baseline if we achieved reduction
                 if (newMemoryUsage < memoryBaseline)
                 {
                     memoryBaseline = newMemoryUsage;
-                    Debug.Log($"[GameManager] Memory baseline adjusted after cleanup: {memoryBaseline:F2}MB");
+                    CZLogger.LogInfo($"[GameManager] Memory baseline adjusted after cleanup: {memoryBaseline:F2}MB", LogCategory.Performance);
                 }
             }
             
@@ -508,19 +509,6 @@ namespace CZ.Core
         {
             if (CurrentGameState != GameState.Playing)
             {
-                Debug.Log("[GameManager] Initializing game start sequence...");
-
-                // Verify memory state before starting
-                if (isInEmergencyMode)
-                {
-                    Debug.LogError("[GameManager] Cannot start game while in emergency memory state");
-                    return;
-                }
-
-                // Reset performance counters for new game session
-                ResetPerformanceCounters();
-
-                // Handle editor vs play mode differently
                 #if UNITY_EDITOR
                 if (!UnityEditor.EditorApplication.isPlaying)
                 {
@@ -530,10 +518,22 @@ namespace CZ.Core
                 }
                 #endif
 
+                CZLogger.LogInfo("[GameManager] Initializing game start sequence...", LogCategory.System);
+
+                // Verify memory state before starting
+                if (isInEmergencyMode)
+                {
+                    CZLogger.LogError("[GameManager] Cannot start game while in emergency memory state", LogCategory.System);
+                    return;
+                }
+
+                // Reset performance counters for new game session
+                ResetPerformanceCounters();
+
                 // Validate all game systems
                 if (!ValidateGameSystems())
                 {
-                    Debug.LogError("[GameManager] Game system validation failed");
+                    CZLogger.LogError("[GameManager] Game system validation failed", LogCategory.System);
                     return;
                 }
 
@@ -546,7 +546,7 @@ namespace CZ.Core
         {
             try
             {
-                Debug.Log($"[GameManager] Transitioning game state from {CurrentGameState} to {newState}");
+                CZLogger.LogInfo($"[GameManager] Transitioning game state from {CurrentGameState} to {newState}", LogCategory.System);
                 
                 // Pre-transition setup
                 switch (newState)
@@ -580,12 +580,12 @@ namespace CZ.Core
                 // Post-transition setup
                 if (newState == GameState.Playing)
                 {
-                    Debug.Log("[GameManager] Game started successfully - All systems initialized and enabled");
+                    CZLogger.LogInfo("[GameManager] Game started successfully - All systems initialized and enabled", LogCategory.System);
                 }
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[GameManager] Error during state transition: {e.Message}");
+                CZLogger.LogError($"[GameManager] Error during state transition: {e.Message}", LogCategory.System);
                 CurrentGameState = GameState.MainMenu;
                 Time.timeScale = 1f;
             }
@@ -593,14 +593,14 @@ namespace CZ.Core
 
         private IEnumerator GameStateMonitor()
         {
-            Debug.Log("[GameManager] Starting game state monitoring");
+            CZLogger.LogInfo("[GameManager] Starting game state monitoring", LogCategory.System);
             
             while (isMonitoring && CurrentGameState == GameState.Playing)
             {
                 // Monitor game state
                 if (!ValidateGameSystems())
                 {
-                    Debug.LogError("[GameManager] Critical system failure detected during gameplay");
+                    CZLogger.LogError("[GameManager] Critical system failure detected during gameplay", LogCategory.System);
                     SetGameState(GameState.MainMenu);
                     yield break;
                 }
@@ -608,20 +608,20 @@ namespace CZ.Core
                 yield return new WaitForSeconds(1f);
             }
             
-            Debug.Log("[GameManager] Game state monitoring ended");
+            CZLogger.LogInfo("Game state monitoring ended", LogCategory.System);
         }
 
         private bool ValidateGameSystems()
         {
             try
             {
-                Debug.Log("[GameManager] Validating game systems...");
+                CZLogger.LogInfo("[GameManager] Validating game systems...", LogCategory.System);
 
                 // Validate input system first
                 UnityEngine.InputSystem.InputSystem.Update();
                 if (UnityEngine.InputSystem.InputSystem.devices.Count == 0)
                 {
-                    Debug.LogWarning("[GameManager] No input devices found. Attempting to initialize input system...");
+                    CZLogger.LogWarning("[GameManager] No input devices found. Attempting to initialize input system...", LogCategory.System);
                     
                     // Force multiple updates to ensure initialization
                     for (int i = 0; i < 3; i++)
@@ -632,7 +632,7 @@ namespace CZ.Core
                     
                     if (UnityEngine.InputSystem.InputSystem.devices.Count == 0)
                     {
-                        Debug.LogError("[GameManager] Input system failed to initialize after multiple attempts");
+                        CZLogger.LogError("[GameManager] Input system failed to initialize after multiple attempts", LogCategory.System);
                         return false;
                     }
                 }
@@ -640,16 +640,16 @@ namespace CZ.Core
                 // Validate essential systems
                 if (PoolManager.Instance == null)
                 {
-                    Debug.LogError("[GameManager] PoolManager not initialized");
+                    CZLogger.LogError("[GameManager] PoolManager not initialized", LogCategory.System);
                     return false;
                 }
 
-                Debug.Log("[GameManager] All game systems validated successfully");
+                CZLogger.LogInfo("[GameManager] All game systems validated successfully", LogCategory.System);
                 return true;
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[GameManager] Error during system validation: {e.Message}");
+                CZLogger.LogError($"[GameManager] Error during system validation: {e.Message}", LogCategory.System);
                 return false;
             }
         }
@@ -661,7 +661,7 @@ namespace CZ.Core
             {
                 CurrentGameState = GameState.Paused;
                 Time.timeScale = 0f;
-                Debug.Log("Game Paused");
+                CZLogger.LogInfo("Game Paused", LogCategory.System);
             }
         }
 
@@ -672,7 +672,7 @@ namespace CZ.Core
             {
                 CurrentGameState = GameState.Playing;
                 Time.timeScale = 1f;
-                Debug.Log("Game Resumed");
+                CZLogger.LogInfo("Game Resumed", LogCategory.System);
             }
         }
 
@@ -682,7 +682,7 @@ namespace CZ.Core
             if (CurrentGameState == GameState.Playing)
             {
                 CurrentGameState = GameState.GameOver;
-                Debug.Log("Game Ended");
+                CZLogger.LogInfo("Game Ended", LogCategory.System);
             }
         }
         #endregion
@@ -707,7 +707,7 @@ namespace CZ.Core
                 drawCallsRatio = currentDrawCalls / 100f;
                 if (currentDrawCalls > 100)
                 {
-                    Debug.LogWarning($"Draw calls exceeded limit: {currentDrawCalls}/100");
+                    CZLogger.LogWarning($"Draw calls exceeded limit: {currentDrawCalls}/100", LogCategory.Performance);
                 }
             }
 
@@ -724,7 +724,7 @@ namespace CZ.Core
                 {
                     if (Time.time - lastCleanupTime >= CLEANUP_COOLDOWN)
                     {
-                        Debug.Log($"Preemptive cleanup at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})");
+                        CZLogger.LogInfo($"Preemptive cleanup at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})", LogCategory.Performance);
                         StartCoroutine(PerformPreemptiveCleanup());
                     }
                 }
@@ -733,15 +733,15 @@ namespace CZ.Core
                 {
                     if (Time.time - lastCleanupTime >= CLEANUP_COOLDOWN/2)
                     {
-                        Debug.LogWarning($"Critical cleanup at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})");
+                        CZLogger.LogWarning($"Critical cleanup at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})", LogCategory.Performance);
                         StartCoroutine(PerformAggressiveCleanup());
                     }
                 }
                 // Emergency cleanup
                 else if (currentMemoryUsageMB > memoryConfig.EmergencyThreshold && !emergencyCleanupRequired)
                 {
+                    CZLogger.LogError($"Emergency cleanup required at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})", LogCategory.Performance);
                     emergencyCleanupRequired = true;
-                    Debug.LogError($"EMERGENCY: Memory usage critical at {currentMemoryUsageMB:F2}MB (Delta: {memoryDelta:F2}MB, Relative: {relativeDelta:P2})");
                     StartCoroutine(PerformEmergencyCleanup());
                 }
             }
@@ -762,13 +762,13 @@ namespace CZ.Core
             
             float newMemoryUsage = memoryRecorder.Valid ? memoryRecorder.LastValue / (1024f * 1024f) : 0f;
             float delta = newMemoryUsage - currentMemoryUsageMB;
-            Debug.Log($"Preemptive cleanup completed. Change: {delta:F2}MB");
+            CZLogger.LogInfo($"Preemptive cleanup completed. Change: {delta:F2}MB", LogCategory.Performance);
             
             // Update baseline if significantly lower
             if (newMemoryUsage < memoryBaseline * 0.9f)
             {
                 memoryBaseline = newMemoryUsage;
-                Debug.Log($"Memory baseline adjusted to: {memoryBaseline:F2}MB");
+                CZLogger.LogInfo($"Memory baseline adjusted to: {memoryBaseline:F2}MB", LogCategory.Performance);
             }
             
             isCleaningUp = false;
@@ -783,7 +783,7 @@ namespace CZ.Core
             consecutiveCleanupAttempts++;
             
             float initialMemory = currentMemoryUsageMB;
-            Debug.LogWarning($"Aggressive cleanup initiated. Memory: {initialMemory:F2}MB - Attempt {consecutiveCleanupAttempts}/{MAX_CLEANUP_ATTEMPTS}");
+            CZLogger.LogWarning($"Aggressive cleanup initiated. Memory: {initialMemory:F2}MB - Attempt {consecutiveCleanupAttempts}/{MAX_CLEANUP_ATTEMPTS}", LogCategory.Performance);
             
             // Stop all coroutines except essential ones
             StopAllCoroutines();
@@ -826,7 +826,7 @@ namespace CZ.Core
             }
             
             float newMemoryUsage = memoryRecorder.Valid ? memoryRecorder.LastValue / (1024f * 1024f) : 0f;
-            Debug.Log($"Aggressive cleanup completed. Memory reduced from {initialMemory:F2}MB to {newMemoryUsage:F2}MB");
+            CZLogger.LogInfo($"Aggressive cleanup completed. Memory reduced from {initialMemory:F2}MB to {newMemoryUsage:F2}MB", LogCategory.Performance);
             
             if (consecutiveCleanupAttempts >= MAX_CLEANUP_ATTEMPTS && newMemoryUsage > memoryConfig.CriticalThreshold)
             {
@@ -843,7 +843,7 @@ namespace CZ.Core
             
             isCleaningUp = true;
             isInEmergencyMode = true;
-            Debug.LogError($"EMERGENCY CLEANUP - Memory usage critical: {currentMemoryUsageMB:F2}MB");
+            CZLogger.LogError($"EMERGENCY CLEANUP - Memory usage critical: {currentMemoryUsageMB:F2}MB", LogCategory.Performance);
             
             // Immediate aggressive cleanup
             Resources.UnloadUnusedAssets();
@@ -866,12 +866,12 @@ namespace CZ.Core
             
             if (newMemoryUsage > memoryConfig.CriticalThreshold)
             {
-                Debug.LogError($"CRITICAL: Emergency cleanup failed to reduce memory usage. Restarting scene...");
+                CZLogger.LogError($"CRITICAL: Emergency cleanup failed to reduce memory usage. Restarting scene...", LogCategory.Performance);
                 RestartCurrentScene();
             }
             else
             {
-                Debug.Log($"Emergency cleanup successful. Memory reduced from {currentMemoryUsageMB:F2}MB to {newMemoryUsage:F2}MB");
+                CZLogger.LogInfo($"Emergency cleanup successful. Memory reduced from {currentMemoryUsageMB:F2}MB to {newMemoryUsage:F2}MB", LogCategory.Performance);
                 emergencyCleanupRequired = false;
                 isInEmergencyMode = false;
                 
@@ -906,7 +906,7 @@ namespace CZ.Core
             {
                 if (!InitializePerformanceMonitoring())
                 {
-                    Debug.LogError("[GameManager] Failed to initialize performance monitoring in OnEnable. Memory management will be disabled.");
+                    CZLogger.LogError("[GameManager] Failed to initialize performance monitoring in OnEnable. Memory management will be disabled.", LogCategory.System);
                     enabled = false; // Disable the component if initialization fails
                     return;
                 }
@@ -962,7 +962,7 @@ namespace CZ.Core
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error during recorder cleanup: {e.Message}");
+                CZLogger.LogError($"Error during recorder cleanup: {e.Message}", LogCategory.System);
             }
         }
         #endregion
@@ -972,8 +972,7 @@ namespace CZ.Core
         {
             SceneManager.LoadSceneAsync(sceneName).completed += (asyncOperation) =>
             {
-                // Scene load completed callback
-                Debug.Log($"Scene {sceneName} loaded successfully");
+                CZLogger.LogInfo($"Scene {sceneName} loaded successfully", LogCategory.System);
             };
         }
 
@@ -997,7 +996,7 @@ namespace CZ.Core
             InitializePerformanceMonitoring();
             consecutiveCleanupAttempts = 0;
             lastCleanupTime = -CLEANUP_COOLDOWN;
-            Debug.Log("Performance Counters Reset");
+            CZLogger.LogInfo("Performance Counters Reset", LogCategory.Performance);
         }
         #endregion
 
@@ -1010,7 +1009,7 @@ namespace CZ.Core
                 
                 if (memoryConfig == null)
                 {
-                    Debug.LogWarning("[GameManager] MemoryConfiguration not found in Resources. Creating runtime instance.");
+                    CZLogger.LogWarning("[GameManager] MemoryConfiguration not found in Resources. Creating runtime instance.", LogCategory.System);
                     memoryConfig = ScriptableObject.CreateInstance<MemoryConfiguration>();
                     
                     // Set values according to project requirements
@@ -1025,7 +1024,7 @@ namespace CZ.Core
                     memoryConfig.PoolCriticalThreshold = baseMemory * 0.35f;  // 35% of base
                     memoryConfig.PoolEmergencyThreshold = baseMemory * 0.45f; // 45% of base
                     
-                    Debug.Log($"[GameManager] Created runtime MemoryConfiguration with project-specified thresholds:\nBase: {baseMemory:F2}MB\nWarning: {memoryConfig.WarningThreshold:F2}MB\nCritical: {memoryConfig.CriticalThreshold:F2}MB\nEmergency: {memoryConfig.EmergencyThreshold:F2}MB");
+                    CZLogger.LogInfo($"[GameManager] Created runtime MemoryConfiguration with project-specified thresholds:\nBase: {baseMemory:F2}MB\nWarning: {memoryConfig.WarningThreshold:F2}MB\nCritical: {memoryConfig.CriticalThreshold:F2}MB\nEmergency: {memoryConfig.EmergencyThreshold:F2}MB", LogCategory.System);
                 }
             }
         }

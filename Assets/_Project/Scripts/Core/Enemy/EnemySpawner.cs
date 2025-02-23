@@ -7,6 +7,7 @@ using NaughtyAttributes;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using CZ.Core.Logging;
 
 namespace CZ.Core.Enemy
 {
@@ -49,13 +50,13 @@ namespace CZ.Core.Enemy
         
         private void OnEnable()
         {
-            Debug.Log("[EnemySpawner] OnEnable called");
+            CZLogger.LogInfo("OnEnable called", LogCategory.Enemy);
             SubscribeToGameManager();
         }
 
         private void OnDisable()
         {
-            Debug.Log("[EnemySpawner] OnDisable called");
+            CZLogger.LogInfo("OnDisable called", LogCategory.Enemy);
             UnsubscribeFromGameManager();
             StopSpawning();
         }
@@ -85,44 +86,44 @@ namespace CZ.Core.Enemy
 
         private void Awake()
         {
-            Debug.Log("[EnemySpawner] Awake called");
+            CZLogger.LogInfo("Awake called", LogCategory.Enemy);
             isInitializing = false;
             isInitialized = false;
         }
 
         private void Start()
         {
-            Debug.Log("[EnemySpawner] Start called");
+            CZLogger.LogInfo("Start called", LogCategory.Enemy);
             
             // Verify component state
-            Debug.Log($"[EnemySpawner] Component State - IsInitialized: {isInitialized}, IsInitializing: {isInitializing}, HasPrefab: {enemyPrefab != null}");
+            CZLogger.LogDebug($"Component State - IsInitialized: {isInitialized}, IsInitializing: {isInitializing}, HasPrefab: {enemyPrefab != null}", LogCategory.Enemy);
             
             var player = Object.FindFirstObjectByType<PlayerController>();
             targetPositionProvider = player as IPositionProvider;
             if (targetPositionProvider == null)
             {
-                Debug.LogWarning("[EnemySpawner] IPositionProvider not found in scene!");
+                CZLogger.LogWarning("IPositionProvider not found in scene!", LogCategory.Enemy);
             }
             else
             {
-                Debug.Log("[EnemySpawner] IPositionProvider found successfully");
+                CZLogger.LogDebug("IPositionProvider found successfully", LogCategory.Enemy);
             }
             
             if (enemyPrefab != null)
             {
-                Debug.Log($"[EnemySpawner] Initializing pool with prefab: {enemyPrefab.name}");
+                CZLogger.LogInfo($"Initializing pool with prefab: {enemyPrefab.name}", LogCategory.Enemy);
                 InitializePool();
             }
             else
             {
-                Debug.LogError("[EnemySpawner] No enemy prefab assigned in inspector!");
+                CZLogger.LogError("No enemy prefab assigned in inspector!", LogCategory.Enemy);
             }
             
             // Subscribe to GameManager after initialization
             SubscribeToGameManager();
             
             // Log final state
-            Debug.Log($"[EnemySpawner] Start completed - IsInitialized: {isInitialized}, IsGamePlaying: {isGamePlaying}, IsSpawning: {isSpawning}");
+            CZLogger.LogDebug($"Start completed - IsInitialized: {isInitialized}, IsGamePlaying: {isGamePlaying}, IsSpawning: {isSpawning}", LogCategory.Enemy);
         }
         
         private void HandleGameStateChanged(GameManager.GameState newState)
@@ -133,28 +134,28 @@ namespace CZ.Core.Enemy
             // Only process if state actually changed
             if (wasGamePlaying != isGamePlaying)
             {
-                Debug.Log($"[EnemySpawner] Game state changed to {newState} (Previous isGamePlaying: {wasGamePlaying})");
+                CZLogger.LogInfo($"Game state changed to {newState} (Previous isGamePlaying: {wasGamePlaying})", LogCategory.Enemy);
                 
                 if (!isGamePlaying)
                 {
-                    Debug.Log("[EnemySpawner] Game no longer playing, stopping spawn");
+                    CZLogger.LogInfo("Game no longer playing, stopping spawn", LogCategory.Enemy);
                     StopSpawning();
                     DespawnAllEnemies();
                 }
                 else if (isInitialized && !GameManager.Instance.IsInEmergencyMode)
                 {
-                    Debug.Log("[EnemySpawner] Starting spawning due to game state change to Playing");
+                    CZLogger.LogInfo("Starting spawning due to game state change to Playing", LogCategory.Enemy);
                     StartSpawning();
                 }
                 else
                 {
                     string reason = !isInitialized ? "not initialized" : "in emergency memory state";
-                    Debug.LogWarning($"[EnemySpawner] Cannot start spawning - {reason} when game state changed to Playing (Init: {isInitialized}, Initializing: {isInitializing})");
+                    CZLogger.LogWarning($"Cannot start spawning - {reason} when game state changed to Playing (Init: {isInitialized}, Initializing: {isInitializing})", LogCategory.Enemy);
                     
                     // Attempt late initialization if we have a prefab and not in emergency mode
                     if (enemyPrefab != null && !isInitializing && !GameManager.Instance.IsInEmergencyMode)
                     {
-                        Debug.Log("[EnemySpawner] Attempting late initialization");
+                        CZLogger.LogInfo("Attempting late initialization", LogCategory.Enemy);
                         InitializePool();
                         if (isInitialized)
                         {
@@ -175,7 +176,7 @@ namespace CZ.Core.Enemy
             
             if (enemyPrefab == null)
             {
-                Debug.LogError("[EnemySpawner] Enemy prefab is not set! Please assign a prefab in the inspector.", this);
+                CZLogger.LogError("Enemy prefab is not set! Please assign a prefab in the inspector.", LogCategory.Enemy);
                 isInitializing = false;
                 return;
             }
@@ -183,7 +184,7 @@ namespace CZ.Core.Enemy
             var baseEnemy = enemyPrefab.GetComponent<BaseEnemy>();
             if (baseEnemy == null)
             {
-                Debug.LogError("[EnemySpawner] Enemy prefab must have BaseEnemy component!", this);
+                CZLogger.LogError("Enemy prefab must have BaseEnemy component!", LogCategory.Enemy);
                 isInitializing = false;
                 return;
             }
@@ -210,11 +211,11 @@ namespace CZ.Core.Enemy
                 );
                 
                 isInitialized = true;
-                Debug.Log($"[EnemySpawner] Pool initialized with {initialPoolSize} initial enemies and {maxPoolSize} max size.");
+                CZLogger.LogInfo($"Pool initialized with {initialPoolSize} initial enemies and {maxPoolSize} max size.", LogCategory.Enemy);
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[EnemySpawner] Failed to initialize enemy pool: {e.Message}", this);
+                CZLogger.LogError($"Failed to initialize enemy pool: {e.Message}", LogCategory.Enemy);
                 isInitialized = false;
             }
             finally
@@ -227,13 +228,13 @@ namespace CZ.Core.Enemy
         {
             if (prefab == null)
             {
-                Debug.LogError("[EnemySpawner] Cannot set null enemy prefab!", this);
+                CZLogger.LogError("Cannot set null enemy prefab!", LogCategory.Enemy);
                 return;
             }
             
             if (prefab.GetComponent<BaseEnemy>() == null)
             {
-                Debug.LogError("[EnemySpawner] Prefab must have BaseEnemy component!", this);
+                CZLogger.LogError("Prefab must have BaseEnemy component!", LogCategory.Enemy);
                 return;
             }
             
@@ -263,7 +264,7 @@ namespace CZ.Core.Enemy
         {
             if (!isInitialized)
             {
-                Debug.LogError("[EnemySpawner] Cannot start spawning - pool not initialized!", this);
+                CZLogger.LogError("Cannot start spawning - pool not initialized!", LogCategory.Enemy);
                 return;
             }
             
@@ -282,7 +283,7 @@ namespace CZ.Core.Enemy
             
             if (!isInitialized)
             {
-                Debug.LogWarning("[EnemySpawner] Cannot despawn enemies - pool not initialized!", this);
+                CZLogger.LogWarning("Cannot despawn enemies - pool not initialized!", LogCategory.Enemy);
                 return;
             }
             
@@ -316,7 +317,7 @@ namespace CZ.Core.Enemy
                 nextTargetUpdateTime = Time.time + targetUpdateInterval;
                 
                 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log($"[EnemySpawner] Scheduled next target update in {targetUpdateInterval}s");
+                CZLogger.LogDebug($"Scheduled next target update in {targetUpdateInterval}s", LogCategory.Enemy);
                 #endif
             }
             
@@ -332,7 +333,7 @@ namespace CZ.Core.Enemy
         {
             if (targetPositionProvider == null)
             {
-                Debug.LogError("[EnemySpawner] Cannot update targets - IPositionProvider is null!");
+                CZLogger.LogError("Cannot update targets - IPositionProvider is null!", LogCategory.Enemy);
                 return;
             }
             
@@ -354,13 +355,13 @@ namespace CZ.Core.Enemy
                     catch (System.Exception e)
                     {
                         failedCount++;
-                        Debug.LogError($"[EnemySpawner] Failed to update enemy target: {e.Message}");
+                        CZLogger.LogError($"Failed to update enemy target: {e.Message}", LogCategory.Enemy);
                     }
                 }
             }
             
             #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Debug.Log($"[EnemySpawner] Target update complete - Updated: {updatedCount}, Failed: {failedCount}, Target: {targetPos}");
+            CZLogger.LogDebug($"Target update complete - Updated: {updatedCount}, Failed: {failedCount}, Target: {targetPos}", LogCategory.Enemy);
             #endif
         }
         
@@ -370,7 +371,7 @@ namespace CZ.Core.Enemy
             
             if (!isInitialized)
             {
-                Debug.LogError("[EnemySpawner] Cannot spawn enemy - pool not initialized!", this);
+                CZLogger.LogError("Cannot spawn enemy - pool not initialized!", LogCategory.Enemy);
                 return;
             }
             
@@ -390,11 +391,11 @@ namespace CZ.Core.Enemy
                 // Set initial target
                 enemy.SetTarget(currentPlayerPos);
                 
-                Debug.Log($"[EnemySpawner] Spawned enemy at {enemy.transform.position}. Active count: {activeEnemies.Count}");
+                CZLogger.LogInfo($"Spawned enemy at {enemy.transform.position}. Active count: {activeEnemies.Count}", LogCategory.Enemy);
             }
             else
             {
-                Debug.LogError("[EnemySpawner] Failed to get enemy from pool!");
+                CZLogger.LogError("Failed to get enemy from pool!", LogCategory.Enemy);
             }
         }
         
@@ -430,6 +431,7 @@ namespace CZ.Core.Enemy
         
         private void OnDestroy()
         {
+            CZLogger.LogInfo("OnDestroy called", LogCategory.Enemy);
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
