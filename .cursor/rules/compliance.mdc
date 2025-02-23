@@ -23,14 +23,14 @@ CRITICAL -
 
 !Critical Priority! Agent should never make assumptions. !!!
 
-!!! Follow Unity 6 (6000.0.38f1) - which is a full release - and packages documented best practices
+!!! Follow Unity 6 Full Release (6000.0.38f1) and packages documented best practices
 
 ## Process
 1. Pre-Operation Checks:
    - Review all rules in [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json)
    - Verify AGENT compliance with each rule category:
      * File Verification (Critical)
-     * Cursor First Operations (Critical)
+     * Cursor First Operations unless in conflice with Unity 6 best practices (Critical)
      * Cursor Integration (Critical)
      * Unity Compliance with current version (unity 6 - 6000.0.38f1) (Highest)
      * Technical Standards (Critical)
