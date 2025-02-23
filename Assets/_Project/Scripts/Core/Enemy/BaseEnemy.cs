@@ -64,12 +64,16 @@ namespace CZ.Core.Enemy
 
         [Header("Resource Drop Configuration")]
         [SerializeField, MinValue(1)]
-        [InfoBox("Minimum experience points dropped", EInfoBoxType.Normal)]
-        private int minExperienceDrop = 1;
+        [InfoBox("Minimum number of experience objects to drop", EInfoBoxType.Normal)]
+        private int minExperienceDropCount = 1;
         
         [SerializeField, MinValue(1)]
-        [InfoBox("Maximum experience points dropped", EInfoBoxType.Normal)]
-        private int maxExperienceDrop = 1;
+        [InfoBox("Maximum number of experience objects to drop", EInfoBoxType.Normal)]
+        private int maxExperienceDropCount = 1;
+        
+        [SerializeField, MinValue(1)]
+        [InfoBox("Value per experience object", EInfoBoxType.Normal)]
+        private int experienceDropValue = 1;
         
         [SerializeField, Range(0, 100)]
         [InfoBox("Chance to drop experience (0-100%)", EInfoBoxType.Normal)]
@@ -370,14 +374,17 @@ namespace CZ.Core.Enemy
                         float expRoll = Random.value * 100f;
                         if (expRoll <= experienceDropChance)
                         {
-                            int experienceDrop = Random.Range(minExperienceDrop, maxExperienceDrop + 1);
-                            Vector3 expPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
-                            var expResource = ResourceManager.Instance.SpawnResource(ResourceType.Experience, expPosition);
-                            if (expResource != null)
+                            int experienceDropCount = Random.Range(minExperienceDropCount, maxExperienceDropCount + 1);
+                            for (int i = 0; i < experienceDropCount; i++)
                             {
-                                expResource.SetResourceValue(experienceDrop);
-                                resourcesSpawned = true;
-                                CZLogger.LogDebug($"Spawned experience resource at {expPosition} with value {experienceDrop}", LogCategory.Enemy);
+                                Vector3 expPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+                                var expResource = ResourceManager.Instance.SpawnResource(ResourceType.Experience, expPosition);
+                                if (expResource != null)
+                                {
+                                    expResource.SetResourceValue(experienceDropValue);
+                                    resourcesSpawned = true;
+                                    CZLogger.LogDebug($"Spawned experience resource at {expPosition} with value {experienceDropValue}", LogCategory.Enemy);
+                                }
                             }
                         }
 

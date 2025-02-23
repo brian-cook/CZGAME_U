@@ -57,8 +57,9 @@ MonoBehaviour:
   deathFadeDuration: 0.5
   collisionRadius: 0.25
   useTriggerCollider: 0
-  minExperienceDrop: 1
-  maxExperienceDrop: 1
+  minExperienceDropCount: 1
+  maxExperienceDropCount: 3
+  experienceDropValue: 1
   experienceDropChance: 100
   healthDropValue: 1
   healthDropChance: 100

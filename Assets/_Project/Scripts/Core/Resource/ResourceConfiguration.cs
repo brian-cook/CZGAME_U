@@ -8,13 +8,19 @@ namespace CZ.Core.Resource
     {
         [Header("Experience Settings")]
         [SerializeField, MinValue(1)]
+        [Tooltip("Base value for each experience resource")]
         public int baseExperienceValue = 1;
         
         [SerializeField]
         public Color experienceColor = Color.yellow;
 
-        [SerializeField, MinValue(1)]
+        [SerializeField, MinValue(5)]
+        [Tooltip("Maximum number of experience resources that can stack")]
         public int experienceStackSize = 10;
+
+        [SerializeField, MinValue(0.1f)]
+        [Tooltip("Bonus multiplier for completing an experience stack")]
+        public float experienceStackBonus = 1.5f;
 
         [Header("Health Settings")]
         [SerializeField, MinValue(1)]
