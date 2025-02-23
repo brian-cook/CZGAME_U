@@ -30,4 +30,11 @@
     -unity-font-style: bold;
     min-width: 40px;
     -unity-text-align: middle-left;
+    -unity-font-definition: url('project://database/Assets/_Project/UI/Fonts/UIToolkit/DefaultFont.asset');
+    letter-spacing: 1px;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.5);
+    opacity: 1;
+    visibility: visible;
+    display: flex;
 } 

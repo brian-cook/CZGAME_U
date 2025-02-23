@@ -28,7 +28,7 @@ CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scrip
 CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:141)
 CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:37)
 
-[Performance] [GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1168.44MB)
+[Performance] [GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1051.67MB)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -38,7 +38,7 @@ CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scrip
 CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:141)
 CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:37)
 
-[Performance] [GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 633.88MB)
+[Performance] [GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 595.52MB)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -48,7 +48,7 @@ CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scrip
 CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:141)
 CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:37)
 
-[Performance] [GameManager] Initial memory reading: 1168.45MB
+[Performance] [GameManager] Initial memory reading: 1051.68MB
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -57,7 +57,7 @@ CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scrip
 CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:141)
 CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:37)
 
-[Performance] [GameManager] Setting initial memory baseline to: 1168.45MB
+[Performance] [GameManager] Setting initial memory baseline to: 1051.68MB
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -501,6 +501,9 @@ CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets
 CZ.Core.Enemy.EnemySpawner:InitializePool () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:214)
 CZ.Core.Enemy.EnemySpawner:Start () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:115)
 
+Invalid value for font MissingAssetReference
+UnityEngine.UIElements.UIElementsRuntimeUtilityNative:UpdatePanels ()
+
 [System] [GameManager] Initializing game start sequence...
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
@@ -544,7 +547,7 @@ CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs
 CZ.Core.GameManager/<AutoStartGame>d__46:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:502)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[Performance] [GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1202.32MB)
+[Performance] [GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1085.98MB)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -556,7 +559,7 @@ CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs
 CZ.Core.GameManager/<AutoStartGame>d__46:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:502)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[Performance] [GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 637.64MB)
+[Performance] [GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 599.07MB)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -568,7 +571,7 @@ CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs
 CZ.Core.GameManager/<AutoStartGame>d__46:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:502)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[Performance] [GameManager] Initial memory reading: 1202.33MB
+[Performance] [GameManager] Initial memory reading: 1085.99MB
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -579,7 +582,7 @@ CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs
 CZ.Core.GameManager/<AutoStartGame>d__46:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:502)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[Performance] [GameManager] Setting initial memory baseline to: 1202.33MB
+[Performance] [GameManager] Setting initial memory baseline to: 1085.99MB
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -762,7 +765,7 @@ CZ.Core.Pooling.ObjectPool`1<CZ.Core.Enemy.BaseEnemy>:Get () (at Assets/_Project
 CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:378)
 CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:327)
 
-[Enemy] Spawned enemy at (-3.67, 4.17, 0.00). Active count: 1
+[Enemy] Spawned enemy at (-7.61, 0.57, 0.00). Active count: 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -770,7 +773,7 @@ CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets
 CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:394)
 CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:327)
 
-[Enemy] Spawned enemy at (4.89, -3.38, 0.00). Active count: 2
+[Enemy] Spawned enemy at (-7.78, 1.90, 0.00). Active count: 2
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -778,7 +781,7 @@ CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets
 CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:394)
 CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:327)
 
-[Performance] [GameManager] Initial cleanup completed. Memory: 1194.03MB (Delta: -8.30MB)
+[Performance] [GameManager] Initial cleanup completed. Memory: 1086.58MB (Delta: 0.59MB)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -794,15 +797,7 @@ CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets
 CZ.Core.GameManager/<PerformInitialCleanup>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:485)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[Performance] [GameManager] Memory baseline adjusted after cleanup: 1194.03MB
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.GameManager/<PerformInitialCleanup>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:491)
-UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
-
-[Enemy] Spawned enemy at (4.15, 5.84, 0.00). Active count: 3
+[Enemy] Spawned enemy at (4.05, -8.07, 0.00). Active count: 3
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -931,7 +926,7 @@ CZ.Core.Enemy.BaseEnemy:ReturnToPool () (at Assets/_Project/Scripts/Core/Enemy/B
 CZ.Core.Enemy.BaseEnemy:CompleteDeathSequence () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:441)
 CZ.Core.Enemy.BaseEnemy:Update () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:164)
 
-[Enemy] Spawned enemy at (6.02, 5.22, 0.00). Active count: 4
+[Enemy] Spawned enemy at (8.55, -4.77, 0.00). Active count: 4
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -939,21 +934,13 @@ CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets
 CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:394)
 CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:327)
 
-[Enemy] Spawned enemy at (-0.84, -5.74, 0.00). Active count: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:394)
-CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:327)
-
-[ResourceManager] Collecting resource: Health with value 1
+[ResourceManager] Collecting resource: Currency with value 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:361)
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
-[UI] [ResourceCounter] Updated display for Health to: 1
+[UI] [ResourceCounter] Updated display for Currency to: 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -965,7 +952,7 @@ CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
-[UI] [ResourceCounter] Added 1 to Health. New total: 1
+[UI] [ResourceCounter] Added 1 to Currency. New total: 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -976,7 +963,7 @@ CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
-[UI] Updated counter for Health with value 1. New total: 1
+[UI] Updated counter for Currency with value 1. New total: 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -986,7 +973,7 @@ CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
-[BaseResource] Resource collected: Health with value 1
+[BaseResource] Resource collected: Currency with value 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:220)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
@@ -1079,13 +1066,13 @@ UnityEngine.Debug:Log (object)
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:220)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
-[ResourceManager] Collecting resource: Currency with value 1
+[ResourceManager] Collecting resource: Health with value 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:361)
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
-[UI] [ResourceCounter] Updated display for Currency to: 1
+[UI] [ResourceCounter] Updated display for Health to: 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -1097,7 +1084,7 @@ CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
-[UI] [ResourceCounter] Added 1 to Currency. New total: 1
+[UI] [ResourceCounter] Added 1 to Health. New total: 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -1108,7 +1095,7 @@ CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
-[UI] Updated counter for Currency with value 1. New total: 1
+[UI] Updated counter for Health with value 1. New total: 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -1118,9 +1105,50 @@ CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
-[BaseResource] Resource collected: Currency with value 1
+[BaseResource] Resource collected: Health with value 1
 UnityEngine.Debug:Log (object)
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:220)
+CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
+
+[Enemy] Spawned enemy at (-5.32, -4.69, 0.00). Active count: 5
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:394)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:327)
+
+[UI] [ResourceCounter] Updated display for Experience to: 2
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
+CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
+CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
+CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
+CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
+CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
+
+[UI] [ResourceCounter] Added 1 to Experience. New total: 2
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
+CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
+CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
+CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
+CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
+
+[UI] Updated counter for Experience with value 1. New total: 2
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
+CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
+CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
 [UI] [ResourceCounter] Updated display for Currency to: 2
@@ -1147,39 +1175,6 @@ CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Re
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
 [UI] Updated counter for Currency with value 1. New total: 2
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for PowerUp to: 2
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to PowerUp. New total: 2
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for PowerUp with value 1. New total: 2
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -1222,434 +1217,73 @@ CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,
 CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
 CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
 
-[UI] [ResourceCounter] Updated display for Experience to: 2
+[PlayerController] Game state changed to GameOver, input enabled: False
 UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
+CZ.Core.Player.PlayerController:HandleGameStateChanged (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:450)
+CZ.Core.GameManager:set_CurrentGameState (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/GameManager.cs:117)
+CZ.Core.GameManager:EndGame () (at Assets/_Project/Scripts/Core/GameManager.cs:684)
+System.Reflection.MethodBase:Invoke (object,object[])
+NaughtyAttributes.Editor.NaughtyEditorGUI:Button (UnityEngine.Object,System.Reflection.MethodInfo) (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/Utility/NaughtyEditorGUI.cs:167)
+NaughtyAttributes.Editor.NaughtyInspector:DrawButtons (bool) (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/NaughtyInspector.cs:188)
+NaughtyAttributes.Editor.NaughtyInspector:OnInspectorGUI () (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/NaughtyInspector.cs:52)
+UnityEngine.GUIUtility:ProcessEvent (int,intptr,bool&)
 
-[UI] [ResourceCounter] Added 1 to Experience. New total: 2
+[Enemy] Game state changed to GameOver (Previous isGamePlaying: True)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
 CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
+CZ.Core.Enemy.EnemySpawner:HandleGameStateChanged (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:137)
+CZ.Core.GameManager:set_CurrentGameState (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/GameManager.cs:117)
+CZ.Core.GameManager:EndGame () (at Assets/_Project/Scripts/Core/GameManager.cs:684)
+System.Reflection.MethodBase:Invoke (object,object[])
+NaughtyAttributes.Editor.NaughtyEditorGUI:Button (UnityEngine.Object,System.Reflection.MethodInfo) (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/Utility/NaughtyEditorGUI.cs:167)
+NaughtyAttributes.Editor.NaughtyInspector:DrawButtons (bool) (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/NaughtyInspector.cs:188)
+NaughtyAttributes.Editor.NaughtyInspector:OnInspectorGUI () (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/NaughtyInspector.cs:52)
+UnityEngine.GUIUtility:ProcessEvent (int,intptr,bool&)
 
-[UI] Updated counter for Experience with value 1. New total: 2
+[Enemy] Game no longer playing, stopping spawn
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
 CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
+CZ.Core.Enemy.EnemySpawner:HandleGameStateChanged (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:141)
+CZ.Core.GameManager:set_CurrentGameState (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/GameManager.cs:117)
+CZ.Core.GameManager:EndGame () (at Assets/_Project/Scripts/Core/GameManager.cs:684)
+System.Reflection.MethodBase:Invoke (object,object[])
+NaughtyAttributes.Editor.NaughtyEditorGUI:Button (UnityEngine.Object,System.Reflection.MethodInfo) (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/Utility/NaughtyEditorGUI.cs:167)
+NaughtyAttributes.Editor.NaughtyInspector:DrawButtons (bool) (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/NaughtyInspector.cs:188)
+NaughtyAttributes.Editor.NaughtyInspector:OnInspectorGUI () (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/NaughtyInspector.cs:52)
+UnityEngine.GUIUtility:ProcessEvent (int,intptr,bool&)
 
-[UI] [ResourceCounter] Updated display for Health to: 3
+[Enemy] Enemy despawned: Enemy(Clone)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
 CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
+CZ.Core.Enemy.BaseEnemy:OnDespawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:538)
+CZ.Core.Pooling.ObjectPool`1<CZ.Core.Enemy.BaseEnemy>:Return (CZ.Core.Enemy.BaseEnemy) (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:157)
+CZ.Core.Enemy.EnemySpawner:DespawnAllEnemies () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:296)
+CZ.Core.Enemy.EnemySpawner:HandleGameStateChanged (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:143)
+CZ.Core.GameManager:set_CurrentGameState (CZ.Core.GameManager/GameState) (at Assets/_Project/Scripts/Core/GameManager.cs:117)
+CZ.Core.GameManager:EndGame () (at Assets/_Project/Scripts/Core/GameManager.cs:684)
+System.Reflection.MethodBase:Invoke (object,object[])
+NaughtyAttributes.Editor.NaughtyEditorGUI:Button (UnityEngine.Object,System.Reflection.MethodInfo) (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/Utility/NaughtyEditorGUI.cs:167)
+NaughtyAttributes.Editor.NaughtyInspector:DrawButtons (bool) (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/NaughtyInspector.cs:188)
+NaughtyAttributes.Editor.NaughtyInspector:OnInspectorGUI () (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/NaughtyInspector.cs:52)
+UnityEngine.GUIUtility:ProcessEvent (int,intptr,bool&)
 
-[UI] [ResourceCounter] Added 1 to Health. New total: 3
+[System] Game Ended
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
 CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for Health with value 1. New total: 3
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for PowerUp to: 3
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to PowerUp. New total: 3
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for PowerUp with value 1. New total: 3
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for Currency to: 3
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to Currency. New total: 3
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for Currency with value 1. New total: 3
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for Experience to: 3
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to Experience. New total: 3
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for Experience with value 1. New total: 3
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for Health to: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to Health. New total: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for Health with value 1. New total: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for PowerUp to: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to PowerUp. New total: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for PowerUp with value 1. New total: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for Currency to: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to Currency. New total: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for Currency with value 1. New total: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for Experience to: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to Experience. New total: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for Experience with value 1. New total: 4
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for Health to: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to Health. New total: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for Health with value 1. New total: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for Currency to: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to Currency. New total: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for Currency with value 1. New total: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for Experience to: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to Experience. New total: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for Experience with value 1. New total: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Updated display for PowerUp to: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:UpdateDisplay () (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:401)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:380)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] [ResourceCounter] Added 1 to PowerUp. New total: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceCounter:AddValue (int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:382)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:269)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
-
-[UI] Updated counter for PowerUp with value 1. New total: 5
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
-CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
-CZ.Core.UI.ResourceUI:HandleResourceCollected (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/UI/ResourceUI.cs:270)
-CZ.Core.Resource.ResourceManager:CollectResource (CZ.Core.Resource.ResourceType,int) (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:362)
-CZ.Core.Resource.BaseResource:OnCollected () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:219)
-CZ.Core.Resource.BaseResource:Update () (at Assets/_Project/Scripts/Core/Resource/BaseResource.cs:165)
+CZ.Core.GameManager:EndGame () (at Assets/_Project/Scripts/Core/GameManager.cs:685)
+System.Reflection.MethodBase:Invoke (object,object[])
+NaughtyAttributes.Editor.NaughtyEditorGUI:Button (UnityEngine.Object,System.Reflection.MethodInfo) (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/Utility/NaughtyEditorGUI.cs:167)
+NaughtyAttributes.Editor.NaughtyInspector:DrawButtons (bool) (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/NaughtyInspector.cs:188)
+NaughtyAttributes.Editor.NaughtyInspector:OnInspectorGUI () (at ./Library/PackageCache/com.dbrizov.naughtyattributes@8d5490813e1b/Scripts/Editor/NaughtyInspector.cs:52)
+UnityEngine.GUIUtility:ProcessEvent (int,intptr,bool&)
 
 [ResourceManager] Starting application quit cleanup...
 UnityEngine.Debug:Log (object)
@@ -1663,10 +1297,6 @@ CZ.Core.Resource.ResourceManager:OnApplicationQuit () (at Assets/_Project/Script
 [ResourceManager] Cleanup completed successfully
 UnityEngine.Debug:Log (object)
 CZ.Core.Resource.ResourceManager:OnApplicationQuit () (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:246)
-
-[PlayerController] OnDisable - Input system disabled
-UnityEngine.Debug:Log (object)
-CZ.Core.Player.PlayerController:OnDisable () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:246)
 
 [LoggingManager] Instance requested during application quit, returning null
 UnityEngine.Debug:LogWarning (object)
@@ -1690,37 +1320,7 @@ UnityEngine.Debug:Log (object)
 CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:42)
 CZ.Core.Enemy.EnemySpawner:OnDestroy () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:434)
 
-[LoggingManager] Instance requested during application quit, returning null
-UnityEngine.Debug:LogWarning (object)
-CZ.Core.Logging.LoggingManager:get_Instance () (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:39)
-CZ.Core.Logging.CZLogger:LogDebug (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:48)
-CZ.Core.Enemy.BaseEnemy:OnDespawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:500)
-CZ.Core.Pooling.ObjectPool`1<CZ.Core.Enemy.BaseEnemy>:Return (CZ.Core.Enemy.BaseEnemy) (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:157)
-CZ.Core.Enemy.EnemySpawner:DespawnAllEnemies () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:296)
-CZ.Core.Enemy.EnemySpawner:OnDestroy () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:442)
-
-[Enemy] Enemy despawning: Enemy(Clone) (Fallback: LoggingManager not available)
+[PlayerController] OnDisable - Input system disabled
 UnityEngine.Debug:Log (object)
-CZ.Core.Logging.CZLogger:LogDebug (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:55)
-CZ.Core.Enemy.BaseEnemy:OnDespawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:500)
-CZ.Core.Pooling.ObjectPool`1<CZ.Core.Enemy.BaseEnemy>:Return (CZ.Core.Enemy.BaseEnemy) (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:157)
-CZ.Core.Enemy.EnemySpawner:DespawnAllEnemies () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:296)
-CZ.Core.Enemy.EnemySpawner:OnDestroy () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:442)
-
-[LoggingManager] Instance requested during application quit, returning null
-UnityEngine.Debug:LogWarning (object)
-CZ.Core.Logging.LoggingManager:get_Instance () (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:39)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:35)
-CZ.Core.Enemy.BaseEnemy:OnDespawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:538)
-CZ.Core.Pooling.ObjectPool`1<CZ.Core.Enemy.BaseEnemy>:Return (CZ.Core.Enemy.BaseEnemy) (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:157)
-CZ.Core.Enemy.EnemySpawner:DespawnAllEnemies () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:296)
-CZ.Core.Enemy.EnemySpawner:OnDestroy () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:442)
-
-[Enemy] Enemy despawned: Enemy(Clone) (Fallback: LoggingManager not available)
-UnityEngine.Debug:Log (object)
-CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:42)
-CZ.Core.Enemy.BaseEnemy:OnDespawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:538)
-CZ.Core.Pooling.ObjectPool`1<CZ.Core.Enemy.BaseEnemy>:Return (CZ.Core.Enemy.BaseEnemy) (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:157)
-CZ.Core.Enemy.EnemySpawner:DespawnAllEnemies () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:296)
-CZ.Core.Enemy.EnemySpawner:OnDestroy () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:442)
+CZ.Core.Player.PlayerController:OnDisable () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:246)
 
