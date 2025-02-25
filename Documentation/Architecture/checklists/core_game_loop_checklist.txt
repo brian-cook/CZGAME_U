@@ -49,70 +49,101 @@
                 [✓] Monitor memory impact
 
     [ ] Player Health System (CRITICAL PRIORITY)
-        [ ] Core Health Implementation
-            [ ] IDamageable Interface Integration
+        [ ] Phase 1: Core Health Implementation
+            [ ] IDamageable Interface
+                [ ] Create IDamageable interface with TakeDamage method
+                [ ] Define health properties (current, max, percentage)
+                [ ] Implement death state handling
+                [ ] Add damage type support
+            [ ] PlayerHealth Component
                 [ ] Implement IDamageable on PlayerController
-                [ ] Add health configuration variables
-                [ ] Implement TakeDamage method
-                [ ] Add health property accessors
-            [ ] Health State Management
-                [ ] Current health tracking
-                [ ] Maximum health system
-                [ ] Health percentage calculation
-                [ ] Death state handling
+                [ ] Add serialized health configuration variables
+                [ ] Create health property accessors
+                [ ] Implement health initialization
+            [ ] Damage Processing
+                [ ] Create damage calculation system
+                [ ] Implement hit detection with Physics2D
+                [ ] Add damage source tracking
+                [ ] Implement critical hit system
+            [ ] Death Handling
+                [ ] Create player death state
+                [ ] Implement death event system
+                [ ] Add respawn functionality
+                [ ] Create death animation trigger
+            [ ] Performance Considerations
+                [ ] Optimize collision detection
+                [ ] Implement efficient event system
+                [ ] Add Profiler markers for health system
+                [ ] Monitor memory impact (< 1MB)
+            [ ] Testing & Validation
+                [ ] Unit test health calculations
+                [ ] Validate damage processing
+                [ ] Test death and respawn cycle
+                [ ] Verify event system integration
         
-        [ ] Visual Feedback System
-            [ ] Damage Feedback
-                [ ] Flash effect on damage
-                [ ] Screen shake integration
-                [ ] Damage animation
-                [ ] Audio feedback
-            [ ] Health State Visualization
-                [ ] Low health warning effect
-                [ ] Critical health pulse
-                [ ] Death visualization
-                [ ] Recovery animation
-        
-        [ ] Invulnerability System
-            [ ] I-Frame Implementation
-                [ ] Configure duration
-                [ ] Visual indicator
-                [ ] Collision handling
-                [ ] State management
-            [ ] Recovery Mechanics
-                [ ] Health recovery system
-                [ ] Recovery cooldown
-                [ ] Visual feedback
-                [ ] Audio cues
-        
-        [ ] UI Integration
-            [ ] Health Bar Implementation
-                [ ] Dynamic health bar
-                [ ] Smooth value transitions
-                [ ] Color state indication
-                [ ] Critical state effects
-            [ ] Status Effects Display
-                [ ] Invulnerability indicator
-                [ ] Damage taken popup
-                [ ] Recovery visualization
-                [ ] Death screen fade
-        
-        [ ] Testing & Validation
-            [ ] Unit Tests
-                [ ] Health system tests
-                [ ] Damage handling tests
-                [ ] Recovery system tests
-                [ ] I-Frame validation
-            [ ] Integration Tests
-                [ ] Enemy collision tests
-                [ ] Resource interaction tests
-                [ ] UI update tests
-                [ ] Performance impact tests
+        [ ] Phase 2: Health UI Implementation
+            [ ] Health Bar Component
+                [ ] Create health bar prefab
+                [ ] Implement smooth value transitions
+                [ ] Add color state indicators
+                [ ] Optimize UI draw calls
+            [ ] Player Status UI
+                [ ] Create player status panel
+                [ ] Implement health text display
+                [ ] Add health percentage visualization
+                [ ] Create critical health indicator
+            [ ] Damage Indicators
+                [ ] Implement floating damage numbers
+                [ ] Create damage direction indicator
+                [ ] Add critical hit visualization
+                [ ] Optimize text mesh pooling
+            [ ] UI Manager Integration
+                [ ] Connect health events to UI updates
+                [ ] Implement UI animation system
+                [ ] Create UI state machine
+                [ ] Optimize UI refresh rate
             [ ] Performance Optimization
-                [ ] Effect pooling
-                [ ] Animation optimization
-                [ ] Memory management
-                [ ] State tracking efficiency
+                [ ] Implement UI element pooling
+                [ ] Optimize canvas batching
+                [ ] Add UI-specific profiler markers
+                [ ] Monitor UI memory usage (< 5MB)
+            [ ] Testing & Validation
+                [ ] Test UI responsiveness
+                [ ] Validate UI animations
+                [ ] Verify UI memory usage
+                [ ] Test UI under stress conditions
+        
+        [ ] Phase 3: Visual & Audio Feedback
+            [ ] Damage Feedback Effects
+                [ ] Create player flash effect shader
+                [ ] Implement screen shake integration
+                [ ] Add damage animation states
+                [ ] Create particle effect system
+            [ ] Audio Feedback System
+                [ ] Implement damage sound effects
+                [ ] Create audio mixer groups
+                [ ] Add spatial audio for impacts
+                [ ] Implement audio pooling
+            [ ] Health State Visualization
+                [ ] Create low health warning effect
+                [ ] Implement critical health pulse
+                [ ] Add recovery visualization
+                [ ] Create death effect sequence
+            [ ] Invulnerability System
+                [ ] Implement i-frame duration system
+                [ ] Create visual invulnerability indicator
+                [ ] Add collision filtering during i-frames
+                [ ] Implement state tracking
+            [ ] Performance Optimization
+                [ ] Implement effect pooling system
+                [ ] Optimize shader performance
+                [ ] Add audio memory management
+                [ ] Monitor effect memory usage (< 10MB)
+            [ ] Testing & Validation
+                [ ] Test effect synchronization
+                [ ] Validate audio mixing
+                [ ] Verify effect memory usage
+                [ ] Test system under high load
 
 [✓] Enemy Foundation 
     [✓] Basic Enemy Type
