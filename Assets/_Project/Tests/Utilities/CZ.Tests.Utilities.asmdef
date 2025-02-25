@@ -1,18 +1,11 @@
 {
-    "name": "CZ.Tests.PlayMode.Enemy",
-    "rootNamespace": "CZ.Tests.PlayMode.Enemy",
+    "name": "CZ.Tests.Utilities",
+    "rootNamespace": "CZ.Tests.Utilities",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "Unity.InputSystem",
-        "Unity.InputSystem.TestFramework",
-        "CZ.Core",
-        "CZ.Core.Pooling",
-        "CZ.Core.Enemy",
-        "CZ.Core.Player",
-        "CZ.Core.Interfaces",
-        "CZ.Tests.Utilities",
-        "Unity.PerformanceTesting"
+        "Unity.PerformanceTesting",
+        "CZ.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -21,7 +14,7 @@
     "precompiledReferences": [
         "nunit.framework.dll"
     ],
-    "autoReferenced": false,
+    "autoReferenced": true,
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"
     ],

@@ -8,7 +8,9 @@
         "CZ.Core",
         "CZ.Core.Pooling",
         "CZ.Core.Interfaces",
-        "Unity.Profiling.Core"
+        "Unity.Profiling.Core",
+        "CZ.Core.Player",
+        "CZ.Core.Enemy"
     ],
     "includePlatforms": [
         "Editor"

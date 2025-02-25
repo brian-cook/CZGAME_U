@@ -16,7 +16,8 @@
         "Unity.Profiling.Core",
         "Unity.Test-Framework.Performance",
         "CZ.Core.Player",
-        "CZ.Core.Input"
+        "CZ.Core.Input",
+        "CZ.Tests.Utilities"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

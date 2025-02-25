@@ -121,6 +121,10 @@ namespace CZ.Core.Enemy
         public GameObject GameObject => gameObject;
         public bool IsDead => currentHealth <= 0;
         public float HealthPercentage => maxHealth > 0 ? (float)currentHealth / maxHealth : 0f;
+        
+        // IDamageable interface properties
+        public int CurrentHealth => currentHealth;
+        public int MaxHealth => maxHealth;
         #endregion
 
         #region Unity Lifecycle
@@ -319,9 +323,17 @@ namespace CZ.Core.Enemy
 
         public void TakeDamage(int damage)
         {
+            TakeDamage(damage, DamageType.Normal);
+        }
+
+        public void TakeDamage(int damage, DamageType damageType)
+        {
             if (isDying || !isInitialized) return;
 
-            currentHealth = Mathf.Max(0, currentHealth - damage);
+            // Apply damage modifiers based on damage type
+            int actualDamage = CalculateDamage(damage, damageType);
+            
+            currentHealth = Mathf.Max(0, currentHealth - actualDamage);
             
             // Trigger damage flash
             damageFlashTimer = damageFlashDuration;
@@ -332,8 +344,27 @@ namespace CZ.Core.Enemy
             }
             
             #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            CZLogger.LogDebug($"Took {damage} damage. Current health: {currentHealth}/{maxHealth}", LogCategory.Enemy);
+            CZLogger.LogDebug($"Took {actualDamage} damage ({damageType}). Current health: {currentHealth}/{maxHealth}", LogCategory.Enemy);
             #endif
+        }
+
+        private int CalculateDamage(int baseDamage, DamageType damageType)
+        {
+            switch (damageType)
+            {
+                case DamageType.Critical:
+                    return Mathf.RoundToInt(baseDamage * 1.5f); // Critical hits do 50% more damage
+                
+                case DamageType.Environmental:
+                    return baseDamage; // Environmental damage is not modified
+                
+                case DamageType.DoT:
+                    return baseDamage; // DoT damage is not modified
+                
+                case DamageType.Normal:
+                default:
+                    return baseDamage;
+            }
         }
 
         private void StartDeathSequence()

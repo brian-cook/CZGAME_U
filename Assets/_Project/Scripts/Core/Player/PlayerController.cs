@@ -12,6 +12,7 @@ namespace CZ.Core.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(CircleCollider2D))]
+    [RequireComponent(typeof(PlayerHealth))]
     public class PlayerController : MonoBehaviour, IPositionProvider
     {
         #region Components
@@ -21,6 +22,7 @@ namespace CZ.Core.Player
         private static Material sharedTrailMaterial;
         private GameControls controls;
         private ObjectPool<Projectile> projectilePool;
+        private PlayerHealth playerHealth;
         #endregion
 
         #region Configuration
@@ -64,6 +66,7 @@ namespace CZ.Core.Player
         private Vector2 mousePosition;
         private Vector2 gamepadAimInput;
         private bool isUsingGamepad;
+        private bool isDead;
         #endregion
 
         #region Test Support
@@ -117,6 +120,14 @@ namespace CZ.Core.Player
 
             // Initialize projectile pool
             InitializeProjectilePool();
+            
+            // Subscribe to health events
+            if (playerHealth != null)
+            {
+                playerHealth.OnDeath += HandlePlayerDeath;
+                playerHealth.OnRespawn += HandlePlayerRespawn;
+                Debug.Log("[PlayerController] Subscribed to PlayerHealth events");
+            }
         }
 
         private void SetupComponents()
@@ -140,6 +151,14 @@ namespace CZ.Core.Player
             {
                 circleCollider.radius = 0.5f;
                 circleCollider.isTrigger = false;
+            }
+            
+            // Get PlayerHealth component
+            playerHealth = GetComponent<PlayerHealth>();
+            if (playerHealth == null)
+            {
+                Debug.LogError("[PlayerController] PlayerHealth component not found!");
+                playerHealth = gameObject.AddComponent<PlayerHealth>();
             }
 
             // Setup minimal trail with shared material
@@ -277,6 +296,13 @@ namespace CZ.Core.Player
                 controls.Dispose();
                 controls = null;
             }
+            
+            // Unsubscribe from health events
+            if (playerHealth != null)
+            {
+                playerHealth.OnDeath -= HandlePlayerDeath;
+                playerHealth.OnRespawn -= HandlePlayerRespawn;
+            }
 
             // Cleanup shared material if this is the last instance
             if (sharedTrailMaterial != null)
@@ -294,7 +320,7 @@ namespace CZ.Core.Player
         #region Movement
         private void HandleMovement()
         {
-            if (!isMoving)
+            if (!isMoving || isDead)
             {
                 // Apply stronger deceleration when stopping
                 float stopThreshold = 0.01f;
@@ -322,9 +348,9 @@ namespace CZ.Core.Player
         #region Input Handling
         private void OnMove(InputAction.CallbackContext context)
         {
-            if (!isInputEnabled)
+            if (!isInputEnabled || isDead)
             {
-                Debug.Log("[PlayerController] Input received but not enabled");
+                Debug.Log("[PlayerController] Input received but not enabled or player is dead");
                 return;
             }
             
@@ -349,7 +375,7 @@ namespace CZ.Core.Player
 
         private void OnAttack(InputAction.CallbackContext context)
         {
-            if (!isInputEnabled || !context.performed) return;
+            if (!isInputEnabled || !context.performed || isDead) return;
 
             float currentTime = Time.time;
             if (currentTime - lastAttackTime >= attackCooldown)
@@ -380,9 +406,9 @@ namespace CZ.Core.Player
 
         private void FireProjectile()
         {
-            if (projectilePool == null)
+            if (projectilePool == null || isDead)
             {
-                Debug.LogError("[PlayerController] Projectile pool not initialized!");
+                Debug.LogError("[PlayerController] Projectile pool not initialized or player is dead!");
                 return;
             }
 
@@ -421,10 +447,51 @@ namespace CZ.Core.Player
         }
         #endregion
 
+        #region Health Management
+        private void HandlePlayerDeath()
+        {
+            isDead = true;
+            isInputEnabled = false;
+            
+            // Stop movement
+            moveInput = Vector2.zero;
+            isMoving = false;
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+            }
+            
+            // Disable trail
+            if (movementTrail != null)
+            {
+                movementTrail.emitting = false;
+            }
+            
+            // Disable controls during death
+            controls?.Disable();
+            
+            Debug.Log("[PlayerController] Player died, input disabled");
+        }
+        
+        private void HandlePlayerRespawn()
+        {
+            isDead = false;
+            
+            // Only re-enable input if game is in playing state
+            if (GameManager.Instance?.CurrentGameState == GameManager.GameState.Playing)
+            {
+                isInputEnabled = true;
+                controls?.Enable();
+                Debug.Log("[PlayerController] Player respawned, input re-enabled");
+            }
+        }
+        #endregion
+
         #region Game State
         private void HandleGameStateChanged(GameManager.GameState newState)
         {
-            isInputEnabled = newState == GameManager.GameState.Playing;
+            // Don't enable input if player is dead
+            isInputEnabled = newState == GameManager.GameState.Playing && !isDead;
             
             if (isInputEnabled)
             {

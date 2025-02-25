@@ -1,7 +1,6 @@
 using UnityEngine;
 using CZ.Core.Pooling;
 using CZ.Core.Interfaces;
-using CZ.Core.Player;
 using Unity.Profiling;
 using NaughtyAttributes;
 using System.Collections;
@@ -98,8 +97,9 @@ namespace CZ.Core.Enemy
             // Verify component state
             CZLogger.LogDebug($"Component State - IsInitialized: {isInitialized}, IsInitializing: {isInitializing}, HasPrefab: {enemyPrefab != null}", LogCategory.Enemy);
             
-            var player = Object.FindFirstObjectByType<PlayerController>();
-            targetPositionProvider = player as IPositionProvider;
+            // Find target position provider
+            targetPositionProvider = PositionProviderHelper.FindPositionProvider();
+            
             if (targetPositionProvider == null)
             {
                 CZLogger.LogWarning("IPositionProvider not found in scene!", LogCategory.Enemy);

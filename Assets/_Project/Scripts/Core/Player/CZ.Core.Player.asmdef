@@ -7,7 +7,9 @@
         "CZ.Core.Input",
         "CZ.Core.Pooling",
         "CZ.Core.Interfaces",
-        "NaughtyAttributes.Core"
+        "NaughtyAttributes.Core",
+        "CZ.Core.Logging",
+        "Unity.Profiling.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

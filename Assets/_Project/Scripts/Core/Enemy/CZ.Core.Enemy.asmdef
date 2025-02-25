@@ -6,7 +6,6 @@
         "CZ.Core",
         "CZ.Core.Pooling",
         "CZ.Core.Interfaces",
-        "CZ.Core.Player",
         "CZ.Core.Resource",
         "NaughtyAttributes.Core",
         "CZ.Core.Logging"

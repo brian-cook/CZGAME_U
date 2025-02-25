@@ -8,7 +8,10 @@
         "Unity.InputSystem.TestFramework",
         "CZ.Core",
         "CZ.Core.Player",
-        "CZ.Core.Input"
+        "CZ.Core.Input",
+        "CZ.Core.Enemy",
+        "CZ.Core.Interfaces",
+        "CZ.Tests.Utilities"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
