@@ -13,8 +13,9 @@ namespace CZ.Core.Interfaces
         /// <returns>The first IPositionProvider found, or null if none exists</returns>
         public static IPositionProvider FindPositionProvider()
         {
-            // Find all MonoBehaviours in the scene
-            MonoBehaviour[] allMonoBehaviours = Object.FindObjectsOfType<MonoBehaviour>();
+            // Find all MonoBehaviours in the scene using the non-deprecated method
+            // Using FindObjectsSortMode.None for better performance since we don't need sorted results
+            MonoBehaviour[] allMonoBehaviours = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
             
             // Check each one to see if it implements IPositionProvider
             foreach (MonoBehaviour mb in allMonoBehaviours)
