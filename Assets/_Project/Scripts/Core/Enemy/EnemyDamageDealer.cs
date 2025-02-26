@@ -1,6 +1,7 @@
 using UnityEngine;
 using CZ.Core.Interfaces;
 using NaughtyAttributes;
+using CZ.Core.Logging;
 
 namespace CZ.Core.Enemy
 {
@@ -32,7 +33,7 @@ namespace CZ.Core.Enemy
         
         [BoxGroup("Debug Settings")]
         [SerializeField]
-        private bool enableDebugLogs = false;
+        private bool enableDebugLogs = true;
         
         private float lastDamageTime;
         
@@ -50,12 +51,18 @@ namespace CZ.Core.Enemy
             collider.isTrigger = useTrigger;
             
             lastDamageTime = -damageCooldown; // Allow immediate first damage
+            
+            if (enableDebugLogs)
+            {
+                CZLogger.LogInfo($"[EnemyDamageDealer] Initialized on {gameObject.name} with damage: {damageAmount}, type: {damageType}, useTrigger: {useTrigger}", LogCategory.Enemy);
+            }
         }
         
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (useTrigger) return; // Skip if using triggers
             
+            CZLogger.LogDebug($"[EnemyDamageDealer] OnCollisionEnter2D with {collision.gameObject.name}", LogCategory.Enemy);
             TryDealDamage(collision.gameObject);
         }
         
@@ -70,6 +77,7 @@ namespace CZ.Core.Enemy
         {
             if (!useTrigger) return; // Skip if using collisions
             
+            CZLogger.LogDebug($"[EnemyDamageDealer] OnTriggerEnter2D with {collider.gameObject.name}", LogCategory.Enemy);
             TryDealDamage(collider.gameObject);
         }
         
@@ -92,6 +100,10 @@ namespace CZ.Core.Enemy
             IDamageable damageable = target.GetComponent<IDamageable>();
             if (damageable == null)
             {
+                if (enableDebugLogs && target.CompareTag("Player"))
+                {
+                    CZLogger.LogWarning($"[EnemyDamageDealer] Target {target.name} has Player tag but no IDamageable component!", LogCategory.Enemy);
+                }
                 return;
             }
             
@@ -99,10 +111,7 @@ namespace CZ.Core.Enemy
             damageable.TakeDamage(damageAmount, damageType);
             lastDamageTime = Time.time;
             
-            if (enableDebugLogs)
-            {
-                Debug.Log($"[EnemyDamageDealer] Dealt {damageAmount} damage to {target.name}");
-            }
+            CZLogger.LogInfo($"[EnemyDamageDealer] Dealt {damageAmount} damage to {target.name}", LogCategory.Enemy);
         }
     }
 } 

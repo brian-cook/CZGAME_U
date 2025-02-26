@@ -232,6 +232,14 @@ namespace CZ.Core.Enemy
                 #endif
             }
 
+            // Ensure we have an EnemyDamageDealer component
+            EnemyDamageDealer damageDealer = GetComponent<EnemyDamageDealer>();
+            if (damageDealer == null)
+            {
+                damageDealer = gameObject.AddComponent<EnemyDamageDealer>();
+                CZLogger.LogInfo("Added EnemyDamageDealer component to enemy", LogCategory.Enemy);
+            }
+
             isInitialized = true;
             CZLogger.LogInfo($"Initialized enemy: {gameObject.name}", LogCategory.Enemy);
         }

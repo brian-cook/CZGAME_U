@@ -37,6 +37,7 @@ namespace CZ.Core.Player
         private float currentLifetime;
         private bool isInitialized;
         private bool isActive;
+        private GameObject owner; // Reference to the object that fired this projectile
         #endregion
 
         #region Unity Lifecycle
@@ -104,10 +105,18 @@ namespace CZ.Core.Player
         {
             if (!isActive) return;
 
+            // Skip collision with owner
+            if (owner != null && (other.gameObject == owner || other.transform.IsChildOf(owner.transform)))
+            {
+                Debug.Log($"[Projectile] Ignoring collision with owner: {owner.name}");
+                return;
+            }
+
             // Check for IDamageable interface first
             var damageable = other.GetComponent<IDamageable>();
             if (damageable != null)
             {
+                Debug.Log($"[Projectile] Hit damageable object: {other.gameObject.name}");
                 damageable.TakeDamage(damage);
                 ReturnToPool();
                 return;
@@ -116,6 +125,7 @@ namespace CZ.Core.Player
             // Fallback to tag check if needed
             if (other.CompareTag("Enemy"))
             {
+                Debug.Log($"[Projectile] Hit enemy with tag: {other.gameObject.name}");
                 ReturnToPool();
             }
         }
@@ -128,6 +138,7 @@ namespace CZ.Core.Player
         {
             isActive = true;
             currentLifetime = 0f;
+            owner = null; // Reset owner reference
             if (projectileTrail != null)
             {
                 projectileTrail.emitting = true;
@@ -137,6 +148,7 @@ namespace CZ.Core.Player
         public void OnDespawn()
         {
             isActive = false;
+            owner = null; // Clear owner reference
             if (rb != null)
             {
                 rb.linearVelocity = Vector2.zero;
@@ -149,14 +161,18 @@ namespace CZ.Core.Player
         #endregion
 
         #region Public Methods
-        public void Initialize(Vector2 direction)
+        public void Initialize(Vector2 direction, GameObject projectileOwner = null)
         {
+            owner = projectileOwner;
+            
             if (rb != null)
             {
                 rb.linearVelocity = direction.normalized * projectileSpeed;
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                 transform.rotation = Quaternion.Euler(0, 0, angle);
             }
+            
+            Debug.Log($"[Projectile] Initialized with direction: {direction}, owner: {(owner != null ? owner.name : "none")}");
         }
 
         private void ReturnToPool()

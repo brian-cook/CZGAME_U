@@ -192,24 +192,47 @@ namespace CZ.Core.Player
         {
             if (projectilePrefab == null)
             {
-                Debug.LogError("[PlayerController] Projectile prefab not assigned!");
+                Debug.LogError("[PlayerController] Projectile prefab not assigned! Please assign a projectile prefab in the inspector.");
                 return;
             }
 
-            projectilePool = PoolManager.Instance.CreatePool(
-                createFunc: () => {
-                    var proj = Instantiate(projectilePrefab);
-                    proj.gameObject.SetActive(false);
-                    return proj;
-                },
-                initialSize: 100,
-                maxSize: 200,
-                poolName: "ProjectilePool"
-            );
-
-            if (enableDebugLogs)
+            try
             {
-                Debug.Log("[PlayerController] Projectile pool initialized");
+                if (PoolManager.Instance == null)
+                {
+                    Debug.LogError("[PlayerController] PoolManager instance is null! Cannot initialize projectile pool.");
+                    return;
+                }
+
+                // Ensure the prefab is inactive before creating the pool
+                bool wasActive = projectilePrefab.gameObject.activeSelf;
+                if (wasActive)
+                {
+                    projectilePrefab.gameObject.SetActive(false);
+                }
+
+                projectilePool = PoolManager.Instance.CreatePool(
+                    createFunc: () => {
+                        var proj = Instantiate(projectilePrefab);
+                        proj.gameObject.SetActive(false);
+                        return proj;
+                    },
+                    initialSize: 20,  // Reduced from 100 to improve initialization performance
+                    maxSize: 100,     // Reduced from 200 to prevent memory issues
+                    poolName: "ProjectilePool"
+                );
+
+                // Restore prefab active state if needed
+                if (wasActive)
+                {
+                    projectilePrefab.gameObject.SetActive(true);
+                }
+
+                Debug.Log("[PlayerController] Projectile pool initialized successfully with initial size: 20, max size: 100");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[PlayerController] Failed to initialize projectile pool: {e.Message}\n{e.StackTrace}");
             }
         }
 
@@ -221,17 +244,96 @@ namespace CZ.Core.Player
             }
 
             // Only enable controls if game is in Playing state
-            if (GameManager.Instance?.CurrentGameState == GameManager.GameState.Playing)
+            if (GameManager.Instance?.CurrentGameState == GameManager.GameState.Playing && !isDead)
             {
-                controls?.Enable();
-                isInputEnabled = true;
+                EnablePlayerInput();
             }
             else
             {
                 isInputEnabled = false;
             }
             
-            Debug.Log($"[PlayerController] OnEnable - Input Enabled: {isInputEnabled}, Controls Active: {controls?.Player.enabled}");
+            Debug.Log($"[PlayerController] OnEnable - Input Enabled: {isInputEnabled}, Controls Active: {controls != null && controls.Player.enabled}");
+        }
+
+        private void EnablePlayerInput()
+        {
+            if (controls == null)
+            {
+                Debug.LogError("[PlayerController] Cannot enable input - controls is null!");
+                return;
+            }
+            
+            try
+            {
+                controls.Enable();
+                isInputEnabled = true;
+                Debug.Log("[PlayerController] Input system enabled");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[PlayerController] Error enabling input: {e.Message}");
+                isInputEnabled = false;
+            }
+        }
+
+        private void DisablePlayerInput()
+        {
+            if (controls == null) return;
+            
+            try
+            {
+                controls.Disable();
+                isInputEnabled = false;
+                Debug.Log("[PlayerController] Input system disabled");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[PlayerController] Error disabling input: {e.Message}");
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            if (isInputEnabled)
+            {
+                HandleMovement();
+            }
+        }
+
+        private void Update()
+        {
+            // Debug input system every few seconds
+            if (Time.frameCount % 60 == 0) // Check roughly every second at 60 FPS
+            {
+                DebugInputSystem();
+            }
+        }
+
+        private void DebugInputSystem()
+        {
+            if (controls == null)
+            {
+                Debug.LogError("[PlayerController] Controls object is null!");
+                return;
+            }
+
+            try
+            {
+                bool playerActionsEnabled = controls.Player.enabled;
+                bool attackActionEnabled = controls.Player.Attack.enabled;
+                
+                Debug.Log($"[PlayerController] Input System Status - " +
+                         $"Controls: {controls != null}, " +
+                         $"Player Actions Enabled: {playerActionsEnabled}, " +
+                         $"Attack Action Enabled: {attackActionEnabled}, " +
+                         $"Input Enabled Flag: {isInputEnabled}, " +
+                         $"Is Dead: {isDead}");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[PlayerController] Error checking input system: {e.Message}");
+            }
         }
 
         private void OnDisable()
@@ -263,14 +365,6 @@ namespace CZ.Core.Player
             }
             
             Debug.Log("[PlayerController] OnDisable - Input system disabled");
-        }
-
-        private void FixedUpdate()
-        {
-            if (isInputEnabled)
-            {
-                HandleMovement();
-            }
         }
 
         private void OnDestroy()
@@ -375,13 +469,35 @@ namespace CZ.Core.Player
 
         private void OnAttack(InputAction.CallbackContext context)
         {
-            if (!isInputEnabled || !context.performed || isDead) return;
+            // Add more detailed debug logging to diagnose the issue
+            Debug.Log($"[PlayerController] OnAttack called - InputEnabled: {isInputEnabled}, IsDead: {isDead}, IsPerformed: {context.performed}, Controls: {controls != null}");
+            
+            if (!isInputEnabled || !context.performed || isDead) 
+            {
+                if (enableDebugLogs)
+                {
+                    Debug.Log($"[PlayerController] Attack input ignored - InputEnabled: {isInputEnabled}, IsDead: {isDead}");
+                }
+                return;
+            }
 
             float currentTime = Time.time;
             if (currentTime - lastAttackTime >= attackCooldown)
             {
-                FireProjectile();
-                lastAttackTime = currentTime;
+                try
+                {
+                    Debug.Log("[PlayerController] Attempting to fire projectile");
+                    FireProjectile();
+                    lastAttackTime = currentTime;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"[PlayerController] Error firing projectile: {e.Message}\n{e.StackTrace}");
+                }
+            }
+            else if (enableDebugLogs)
+            {
+                Debug.Log($"[PlayerController] Attack on cooldown. Time since last attack: {currentTime - lastAttackTime}s");
             }
         }
 
@@ -406,43 +522,75 @@ namespace CZ.Core.Player
 
         private void FireProjectile()
         {
-            if (projectilePool == null || isDead)
+            if (isDead)
             {
-                Debug.LogError("[PlayerController] Projectile pool not initialized or player is dead!");
+                Debug.LogWarning("[PlayerController] Cannot fire projectile - player is dead!");
                 return;
             }
 
-            var projectile = projectilePool.Get();
-            if (projectile != null)
+            if (projectilePool == null)
             {
-                projectile.transform.position = transform.position;
+                Debug.LogError("[PlayerController] Projectile pool not initialized! Attempting to reinitialize...");
+                InitializeProjectilePool();
                 
-                Vector2 fireDirection;
-                if (isUsingGamepad && gamepadAimInput.sqrMagnitude > 0.01f)
+                if (projectilePool == null)
                 {
-                    // Use gamepad aim direction
-                    fireDirection = gamepadAimInput.normalized;
-                    if (enableDebugLogs)
+                    Debug.LogError("[PlayerController] Failed to reinitialize projectile pool!");
+                    return;
+                }
+            }
+
+            try
+            {
+                Debug.Log("[PlayerController] Getting projectile from pool");
+                var projectile = projectilePool.Get();
+                if (projectile != null)
+                {
+                    projectile.transform.position = transform.position;
+                    
+                    Vector2 fireDirection;
+                    if (isUsingGamepad && gamepadAimInput.sqrMagnitude > 0.01f)
                     {
-                        Debug.Log($"[PlayerController] Fired projectile using gamepad aim: {fireDirection}");
+                        // Use gamepad aim direction
+                        fireDirection = gamepadAimInput.normalized;
+                        Debug.Log($"[PlayerController] Using gamepad aim direction: {fireDirection}");
                     }
+                    else
+                    {
+                        // Use mouse aim or last move direction as fallback
+                        if (Camera.main != null)
+                        {
+                            Vector2 worldMousePos = Camera.main.ScreenToWorldPoint(mousePosition);
+                            fireDirection = (worldMousePos - (Vector2)transform.position).normalized;
+                            Debug.Log($"[PlayerController] Using mouse aim direction: {fireDirection}, Mouse position: {mousePosition}, World position: {worldMousePos}");
+                        }
+                        else
+                        {
+                            // Fallback to last move direction if camera is null
+                            fireDirection = lastMoveDirection;
+                            Debug.LogWarning("[PlayerController] Main camera not found, using last move direction for projectile!");
+                        }
+                    }
+                    
+                    // Ensure direction is normalized
+                    if (fireDirection.sqrMagnitude < 0.01f)
+                    {
+                        fireDirection = lastMoveDirection.sqrMagnitude > 0.01f ? lastMoveDirection : Vector2.right;
+                        Debug.Log($"[PlayerController] Using fallback direction: {fireDirection}");
+                    }
+                    
+                    Debug.Log($"[PlayerController] Initializing projectile with direction: {fireDirection}");
+                    projectile.Initialize(fireDirection, this.gameObject);
+                    Debug.Log($"[PlayerController] Projectile fired successfully: {projectile.name}");
                 }
                 else
                 {
-                    // Use mouse aim direction
-                    Vector2 worldMousePos = Camera.main.ScreenToWorldPoint(mousePosition);
-                    fireDirection = (worldMousePos - (Vector2)transform.position).normalized;
-                    if (enableDebugLogs)
-                    {
-                        Debug.Log($"[PlayerController] Fired projectile using mouse aim at {worldMousePos}, direction: {fireDirection}");
-                    }
+                    Debug.LogError("[PlayerController] Failed to get projectile from pool!");
                 }
-                
-                projectile.Initialize(fireDirection);
             }
-            else
+            catch (System.Exception e)
             {
-                Debug.LogError("[PlayerController] Failed to get projectile from pool!");
+                Debug.LogError($"[PlayerController] Error in FireProjectile: {e.Message}\n{e.StackTrace}");
             }
         }
         #endregion
@@ -468,7 +616,7 @@ namespace CZ.Core.Player
             }
             
             // Disable controls during death
-            controls?.Disable();
+            DisablePlayerInput();
             
             Debug.Log("[PlayerController] Player died, input disabled");
         }
@@ -480,8 +628,7 @@ namespace CZ.Core.Player
             // Only re-enable input if game is in playing state
             if (GameManager.Instance?.CurrentGameState == GameManager.GameState.Playing)
             {
-                isInputEnabled = true;
-                controls?.Enable();
+                EnablePlayerInput();
                 Debug.Log("[PlayerController] Player respawned, input re-enabled");
             }
         }
@@ -495,12 +642,12 @@ namespace CZ.Core.Player
             
             if (isInputEnabled)
             {
-                controls?.Enable();
+                EnablePlayerInput();
                 Debug.Log("[PlayerController] Input enabled due to game state change to Playing");
             }
             else
             {
-                controls?.Disable();
+                DisablePlayerInput();
                 // Reset movement state when input is disabled
                 moveInput = Vector2.zero;
                 isMoving = false;

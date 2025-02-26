@@ -167,24 +167,53 @@ namespace CZ.Core.Player
                 return;
             }
             
+            // More robust sprite renderer detection
             spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer == null)
             {
+                // Try to find in children
                 spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+                
+                // If still not found, try to find in parent
+                if (spriteRenderer == null && transform.parent != null)
+                {
+                    spriteRenderer = transform.parent.GetComponent<SpriteRenderer>();
+                }
+                
+                // Log warning if still not found
                 if (spriteRenderer == null)
                 {
-                    Debug.LogError("[PlayerHealth] SpriteRenderer component not found!");
-                    return;
+                    Debug.LogError("[PlayerHealth] SpriteRenderer component not found in self, children, or parent! Damage flash effects will not work.");
+                    // Create a debug visual to show damage
+                    GameObject visualIndicator = new GameObject("DamageVisualIndicator");
+                    visualIndicator.transform.SetParent(transform);
+                    visualIndicator.transform.localPosition = Vector3.zero;
+                    spriteRenderer = visualIndicator.AddComponent<SpriteRenderer>();
+                    spriteRenderer.sprite = Resources.Load<Sprite>("DefaultSprite");
+                    if (spriteRenderer.sprite == null)
+                    {
+                        // Create a small circle sprite if no default sprite is found
+                        spriteRenderer.drawMode = SpriteDrawMode.Sliced;
+                        spriteRenderer.size = new Vector2(0.5f, 0.5f);
+                        spriteRenderer.color = Color.white;
+                    }
+                    Debug.Log("[PlayerHealth] Created a fallback sprite renderer for damage visualization");
                 }
             }
             
-            originalColor = spriteRenderer.color;
+            if (spriteRenderer != null)
+            {
+                originalColor = spriteRenderer.color;
+                Debug.Log($"[PlayerHealth] Found SpriteRenderer with original color: {originalColor}");
+            }
+            else
+            {
+                originalColor = Color.white;
+            }
+            
             isInitialized = true;
             
-            if (enableDebugLogs)
-            {
-                Debug.Log("[PlayerHealth] Components initialized successfully");
-            }
+            Debug.Log("[PlayerHealth] Components initialized successfully");
         }
 
         private void InitializeHealth()
@@ -227,6 +256,7 @@ namespace CZ.Core.Player
                 // Check if we can take damage
                 if (isDying || isInvulnerable || !isInitialized || damage <= 0)
                 {
+                    Debug.LogWarning($"[PlayerHealth] Cannot take damage - isDying: {isDying}, isInvulnerable: {isInvulnerable}, isInitialized: {isInitialized}, damage: {damage}");
                     return;
                 }
 
@@ -248,10 +278,7 @@ namespace CZ.Core.Player
                 OnDamaged?.Invoke(actualDamage, currentHealth);
                 OnHealthChanged?.Invoke(currentHealth, maxHealth);
                 
-                if (enableDebugLogs)
-                {
-                    Debug.Log($"[PlayerHealth] Took {actualDamage} damage ({damageType}). Health: {currentHealth}/{maxHealth}");
-                }
+                Debug.Log($"[PlayerHealth] Took {actualDamage} damage ({damageType}) from {(UnityEngine.StackTraceUtility.ExtractStackTrace().Split('\n')[2])}. Health: {currentHealth}/{maxHealth}");
                 
                 // Check for death
                 if (currentHealth <= 0 && !isDying)
@@ -373,6 +400,26 @@ namespace CZ.Core.Player
                 {
                     float t = damageFlashTimer / damageFlashDuration;
                     spriteRenderer.color = Color.Lerp(originalColor, damageFlashColor, t);
+                    
+                    // Debug log to confirm flash is happening
+                    if (enableDebugLogs && Time.frameCount % 10 == 0) // Log every 10 frames to avoid spam
+                    {
+                        Debug.Log($"[PlayerHealth] Damage flash active: {t:F2}, Color: {spriteRenderer.color}");
+                    }
+                }
+                else
+                {
+                    // If no sprite renderer, try to find it again
+                    if (Time.frameCount % 30 == 0) // Only check occasionally
+                    {
+                        Debug.LogWarning("[PlayerHealth] No SpriteRenderer for damage flash, attempting to find one...");
+                        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+                        if (spriteRenderer != null)
+                        {
+                            originalColor = spriteRenderer.color;
+                            Debug.Log("[PlayerHealth] Found SpriteRenderer during runtime");
+                        }
+                    }
                 }
                 
                 if (damageFlashTimer <= 0f)
@@ -381,6 +428,7 @@ namespace CZ.Core.Player
                     if (!isInvulnerable && spriteRenderer != null)
                     {
                         spriteRenderer.color = originalColor;
+                        Debug.Log("[PlayerHealth] Damage flash ended, reset color");
                     }
                 }
             }
