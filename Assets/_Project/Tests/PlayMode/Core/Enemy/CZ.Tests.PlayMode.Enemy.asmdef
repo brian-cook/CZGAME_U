@@ -9,10 +9,10 @@
         "CZ.Core",
         "CZ.Core.Pooling",
         "CZ.Core.Enemy",
-        "CZ.Core.Player",
         "CZ.Core.Interfaces",
         "CZ.Tests.Utilities",
-        "Unity.PerformanceTesting"
+        "Unity.PerformanceTesting",
+        "CZ.Core.Player"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

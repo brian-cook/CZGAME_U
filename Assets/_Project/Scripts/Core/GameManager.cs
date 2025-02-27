@@ -24,6 +24,9 @@ namespace CZ.Core
         
         private void Awake()
         {
+            // Initialize physics setup first
+            InitializePhysics2D();
+            
             if (instance != null && instance != this)
             {
                 Destroy(gameObject);
@@ -1026,6 +1029,16 @@ namespace CZ.Core
                     
                     CZLogger.LogInfo($"[GameManager] Created runtime MemoryConfiguration with project-specified thresholds:\nBase: {baseMemory:F2}MB\nWarning: {memoryConfig.WarningThreshold:F2}MB\nCritical: {memoryConfig.CriticalThreshold:F2}MB\nEmergency: {memoryConfig.EmergencyThreshold:F2}MB", LogCategory.System);
                 }
+            }
+        }
+
+        private void InitializePhysics2D()
+        {
+            // Add the Physics2DSetup component if it doesn't exist
+            if (GetComponent<Physics2DSetup>() == null)
+            {
+                gameObject.AddComponent<Physics2DSetup>();
+                Debug.Log("[GameManager] Added Physics2DSetup component for collision configuration");
             }
         }
     }

@@ -58,10 +58,6 @@ namespace CZ.Core.Enemy
         [Tooltip("Radius of the collision circle relative to sprite size")]
         private float collisionRadius = 0.25f;
 
-        [SerializeField]
-        [Tooltip("Whether the collider should be a trigger")]
-        private bool useTriggerCollider = false;
-
         [Header("Resource Drop Configuration")]
         [SerializeField, MinValue(1)]
         [InfoBox("Minimum number of experience objects to drop", EInfoBoxType.Normal)]
@@ -179,69 +175,106 @@ namespace CZ.Core.Enemy
         private void InitializeComponents()
         {
             if (isInitialized) return;
-
-            // Get required components
-            spriteRenderer = GetComponent<SpriteRenderer>();
-            circleCollider = GetComponent<CircleCollider2D>();
-            rb = GetComponent<Rigidbody2D>();
-
-            // Store original color and create material instance
-            if (spriteRenderer != null)
+            
+            try
             {
+                // Get required components
+                spriteRenderer = GetComponent<SpriteRenderer>();
+                if (spriteRenderer == null)
+                {
+                    CZLogger.LogError("Enemy is missing SpriteRenderer component", LogCategory.Enemy);
+                    return;
+                }
+                
+                // Set up collider based on sprite size
+                circleCollider = GetComponent<CircleCollider2D>();
+                if (circleCollider == null)
+                {
+                    circleCollider = gameObject.AddComponent<CircleCollider2D>();
+                    CZLogger.LogInfo("Added CircleCollider2D component to enemy", LogCategory.Enemy);
+                }
+                
+                // Set the Enemy layer for proper collision filtering
+                gameObject.layer = LayerMask.NameToLayer("Enemy");
+                
+                // Set up physics
+                rb = GetComponent<Rigidbody2D>();
+                if (rb == null)
+                {
+                    rb = gameObject.AddComponent<Rigidbody2D>();
+                    CZLogger.LogInfo("Added Rigidbody2D component to enemy", LogCategory.Enemy);
+                }
+                
+                // Configure Rigidbody2D for proper physics behavior and collision detection
+                rb.gravityScale = 0f;
+                rb.linearDamping = 0.5f;
+                rb.angularDamping = 0.5f;
+                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+                rb.sleepMode = RigidbodySleepMode2D.NeverSleep; // Prevent sleeping to maintain collision response
+                rb.interpolation = RigidbodyInterpolation2D.Interpolate; // Smoother movement
+                rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // Prevent tunneling through colliders
+                
+                // IMPORTANT: Use Dynamic bodyType instead of isKinematic=false for proper collisions
+                rb.bodyType = RigidbodyType2D.Dynamic;
+                
+                // For enemies to collide with each other, this must be enabled
+                rb.simulated = true;
+                
+                // Add a small mass to improve collision stability
+                rb.mass = 1.5f;
+                
+                // Configure collider based on our intended collision behavior
+                float spriteSize = Mathf.Max(spriteRenderer.bounds.size.x, spriteRenderer.bounds.size.y);
+                circleCollider.radius = spriteSize * collisionRadius;
+                
+                // Important: We must NOT use trigger colliders for physical collisions
+                circleCollider.isTrigger = false;
+                
+                // Create or assign a physics material to improve collisions
+                if (circleCollider.sharedMaterial == null)
+                {
+                    // Create a physics material to prevent enemies from sticking to each other
+                    PhysicsMaterial2D physicsMaterial = new PhysicsMaterial2D("EnemyPhysicsMaterial");
+                    physicsMaterial.friction = 0.1f;       // Slight friction to prevent excessive sliding
+                    physicsMaterial.bounciness = 0.3f;    // Moderate bounce for better collision response
+                    
+                    // Apply the material to the collider
+                    circleCollider.sharedMaterial = physicsMaterial;
+                    
+                    CZLogger.LogInfo($"Created and applied physics material to enemy collider", LogCategory.Enemy);
+                }
+                
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                CZLogger.LogInfo($"Configured collider - Radius: {circleCollider.radius:F2}, IsTrigger: {false}, Mass: {rb.mass:F2}", LogCategory.Enemy);
+                #endif
+                
+                // Store original color and create material instance
                 originalColor = Color.white; // Default color
                 if (sharedMaterial == null)
                 {
-                    sharedMaterial = new Material(Shader.Find("Sprites/Default"))
-                    {
-                        hideFlags = HideFlags.DontSave
-                    };
+                    sharedMaterial = new Material(Shader.Find("Sprites/Default"));
+                    CZLogger.LogInfo("Created new material for enemy", LogCategory.Enemy);
                 }
+                
                 materialInstance = new Material(sharedMaterial);
-                materialInstance.hideFlags = HideFlags.DontSave;
                 spriteRenderer.material = materialInstance;
                 spriteRenderer.color = originalColor;
-            }
-
-            // Configure Rigidbody2D
-            if (rb != null)
-            {
-                rb.gravityScale = 0f;
-                rb.linearDamping = 0.5f;
-                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-                rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-            }
-
-            // Configure CircleCollider2D
-            if (circleCollider != null)
-            {
-                // Set collision radius based on sprite size and configuration
-                if (spriteRenderer != null)
+                
+                // Ensure we have an EnemyDamageDealer component
+                EnemyDamageDealer damageDealer = GetComponent<EnemyDamageDealer>();
+                if (damageDealer == null)
                 {
-                    float spriteSize = Mathf.Max(spriteRenderer.sprite.bounds.size.x, spriteRenderer.sprite.bounds.size.y);
-                    circleCollider.radius = spriteSize * collisionRadius;
-                }
-                else
-                {
-                    circleCollider.radius = collisionRadius;
+                    damageDealer = gameObject.AddComponent<EnemyDamageDealer>();
+                    CZLogger.LogInfo("Added EnemyDamageDealer component to enemy", LogCategory.Enemy);
                 }
                 
-                circleCollider.isTrigger = useTriggerCollider;
-                
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                CZLogger.LogInfo($"Configured collider - Radius: {circleCollider.radius:F2}, IsTrigger: {useTriggerCollider}", LogCategory.Enemy);
-                #endif
+                isInitialized = true;
+                CZLogger.LogInfo($"Initialized enemy: {gameObject.name}", LogCategory.Enemy);
             }
-
-            // Ensure we have an EnemyDamageDealer component
-            EnemyDamageDealer damageDealer = GetComponent<EnemyDamageDealer>();
-            if (damageDealer == null)
+            catch (System.Exception e)
             {
-                damageDealer = gameObject.AddComponent<EnemyDamageDealer>();
-                CZLogger.LogInfo("Added EnemyDamageDealer component to enemy", LogCategory.Enemy);
+                CZLogger.LogError($"Error initializing enemy: {e.Message}\nStack trace: {e.StackTrace}", LogCategory.Enemy);
             }
-
-            isInitialized = true;
-            CZLogger.LogInfo($"Initialized enemy: {gameObject.name}", LogCategory.Enemy);
         }
         #endregion
 

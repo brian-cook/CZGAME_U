@@ -5,7 +5,9 @@
         "GUID:75469ad4d38634e559750d17036d5f7c",
         "CZ.Core.Resource",
         "CZ.Core.Configuration",
-        "NaughtyAttributes.Core"
+        "NaughtyAttributes.Core",
+        "CZ.Core.Interfaces",
+        "CZ.Core.Logging"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

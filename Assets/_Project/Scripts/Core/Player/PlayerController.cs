@@ -10,10 +10,13 @@ using System.Linq;
 
 namespace CZ.Core.Player
 {
+    /// <summary>
+    /// Handles player movement, input, and game interactions
+    /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(CircleCollider2D))]
     [RequireComponent(typeof(PlayerHealth))]
-    public class PlayerController : MonoBehaviour, IPositionProvider
+    public class PlayerController : MonoBehaviour, IPositionProvider, IPlayerReference
     {
         #region Components
         private Rigidbody2D rb;
@@ -143,6 +146,12 @@ namespace CZ.Core.Player
                 rb.constraints = RigidbodyConstraints2D.FreezeRotation;
                 rb.interpolation = RigidbodyInterpolation2D.Interpolate;
                 rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+                
+                // Use bodyType instead of the obsolete isKinematic property
+                rb.bodyType = RigidbodyType2D.Dynamic;
+                
+                // Make sure simulation is enabled
+                rb.simulated = true;
             }
             
             // Get and configure CircleCollider2D
@@ -150,8 +159,11 @@ namespace CZ.Core.Player
             if (circleCollider != null)
             {
                 circleCollider.radius = 0.5f;
-                circleCollider.isTrigger = false;
+                circleCollider.isTrigger = false;  // Must be false for physical collisions
             }
+            
+            // Ensure the player is on the Player layer for proper collision matrix handling
+            gameObject.layer = LayerMask.NameToLayer("Player");
             
             // Get PlayerHealth component
             playerHealth = GetComponent<PlayerHealth>();
@@ -665,11 +677,39 @@ namespace CZ.Core.Player
         }
         #endregion
 
+        #region Public Methods
+        /// <summary>
+        /// Gets the current velocity of the player
+        /// </summary>
+        /// <returns>Current velocity as Vector2</returns>
+        public Vector2 GetVelocity()
+        {
+            return rb != null ? rb.linearVelocity : Vector2.zero;
+        }
+        #endregion
+
         #region IPositionProvider Implementation
         public Vector3 GetPosition()
         {
             return transform.position;
         }
+        #endregion
+
+        #region IPlayerReference Implementation
+        /// <summary>
+        /// The player's transform component
+        /// </summary>
+        public Transform PlayerTransform => transform;
+        
+        /// <summary>
+        /// The current position of the player
+        /// </summary>
+        public Vector3 PlayerPosition => transform.position;
+        
+        /// <summary>
+        /// Whether the player is currently alive
+        /// </summary>
+        public bool IsPlayerAlive => playerHealth == null ? true : !playerHealth.IsDead;
         #endregion
     }
 }

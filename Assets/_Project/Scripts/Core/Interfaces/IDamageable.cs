@@ -40,6 +40,27 @@ namespace CZ.Core.Interfaces
     }
     
     /// <summary>
+    /// Interface for entities that expose health-related events
+    /// </summary>
+    public interface IHasHealthEvents
+    {
+        /// <summary>
+        /// Event triggered when entity takes damage
+        /// </summary>
+        event System.Action<int, int> OnDamaged; // damage amount, current health
+        
+        /// <summary>
+        /// Event triggered when entity health changes
+        /// </summary>
+        event System.Action<int, int> OnHealthChanged; // current health, max health
+        
+        /// <summary>
+        /// Event triggered when entity dies
+        /// </summary>
+        event System.Action OnDeath;
+    }
+    
+    /// <summary>
     /// Types of damage that can be applied
     /// </summary>
     public enum DamageType

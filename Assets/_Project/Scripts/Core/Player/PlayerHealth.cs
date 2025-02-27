@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using NaughtyAttributes;
 using Unity.Profiling;
 using CZ.Core.Interfaces;
 using CZ.Core.Logging;
+// No direct VFX namespace import to avoid circular dependency
 
 namespace CZ.Core.Player
 {
@@ -12,7 +14,7 @@ namespace CZ.Core.Player
     /// Handles player health, damage processing, and death state
     /// </summary>
     [RequireComponent(typeof(PlayerController))]
-    public class PlayerHealth : MonoBehaviour, IDamageable
+    public class PlayerHealth : MonoBehaviour, IDamageable, IHasHealthEvents
     {
         #region Configuration
         [BoxGroup("Health Settings")]
@@ -60,27 +62,29 @@ namespace CZ.Core.Player
         private SpriteRenderer spriteRenderer;
         private Color originalColor;
         private PlayerController playerController;
+        private IHitEffects hitEffects; // Use interface instead of concrete implementation
+        private Vector2 lastDamageSourcePosition;
         private static readonly ProfilerMarker s_HealthSystemMarker = new ProfilerMarker("PlayerHealth.System");
         #endregion
 
         #region Events
         /// <summary>
-        /// Event triggered when player takes damage
+        /// Event fired when player takes damage
         /// </summary>
         public event Action<int, int> OnDamaged; // damage amount, current health
 
         /// <summary>
-        /// Event triggered when player health changes
+        /// Event fired when player health changes
         /// </summary>
         public event Action<int, int> OnHealthChanged; // current health, max health
 
         /// <summary>
-        /// Event triggered when player dies
+        /// Event fired when player dies
         /// </summary>
         public event Action OnDeath;
 
         /// <summary>
-        /// Event triggered when player respawns
+        /// Event fired when player respawns
         /// </summary>
         public event Action OnRespawn;
         #endregion
@@ -107,7 +111,7 @@ namespace CZ.Core.Player
         public bool IsDead => currentHealth <= 0;
 
         /// <summary>
-        /// Whether the player is currently invulnerable
+        /// Whether the player is currently invulnerable to damage
         /// </summary>
         public bool IsInvulnerable => isInvulnerable;
         #endregion
@@ -116,11 +120,12 @@ namespace CZ.Core.Player
         private void Awake()
         {
             InitializeComponents();
+            InitializeHealth();
         }
 
         private void Start()
         {
-            InitializeHealth();
+            // Nothing needed in Start as initialization is done in Awake
         }
 
         private void Update()
@@ -134,20 +139,22 @@ namespace CZ.Core.Player
 
         private void OnEnable()
         {
-            if (!isInitialized)
+            // No need to re-initialize components as we only reset health values
+            if (currentHealth <= 0 && isInitialized)
             {
-                InitializeComponents();
+                InitializeHealth();
             }
         }
 
         private void OnDisable()
         {
-            // Reset state when disabled
+            // Reset state
             isInvulnerable = false;
             invulnerabilityTimer = 0f;
             damageFlashTimer = 0f;
-            
-            // Reset sprite color
+            isDying = false;
+
+            // Reset sprite if it exists
             if (spriteRenderer != null)
             {
                 spriteRenderer.color = originalColor;
@@ -159,361 +166,375 @@ namespace CZ.Core.Player
         private void InitializeComponents()
         {
             if (isInitialized) return;
-            
+
+            // Get player controller
             playerController = GetComponent<PlayerController>();
             if (playerController == null)
             {
                 Debug.LogError("[PlayerHealth] PlayerController component not found!");
-                return;
+                playerController = gameObject.AddComponent<PlayerController>();
             }
-            
-            // More robust sprite renderer detection
+
+            // Get sprite renderer
             spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer == null)
             {
-                // Try to find in children
+                // Try finding sprite renderer in children
                 spriteRenderer = GetComponentInChildren<SpriteRenderer>();
                 
-                // If still not found, try to find in parent
-                if (spriteRenderer == null && transform.parent != null)
-                {
-                    spriteRenderer = transform.parent.GetComponent<SpriteRenderer>();
-                }
-                
-                // Log warning if still not found
                 if (spriteRenderer == null)
                 {
-                    Debug.LogError("[PlayerHealth] SpriteRenderer component not found in self, children, or parent! Damage flash effects will not work.");
-                    // Create a debug visual to show damage
-                    GameObject visualIndicator = new GameObject("DamageVisualIndicator");
-                    visualIndicator.transform.SetParent(transform);
-                    visualIndicator.transform.localPosition = Vector3.zero;
-                    spriteRenderer = visualIndicator.AddComponent<SpriteRenderer>();
-                    spriteRenderer.sprite = Resources.Load<Sprite>("DefaultSprite");
-                    if (spriteRenderer.sprite == null)
+                    Debug.LogWarning("[PlayerHealth] SpriteRenderer not found on this GameObject or its children. Damage flash effect will not work.");
+                }
+                else
+                {
+                    if (enableDebugLogs)
                     {
-                        // Create a small circle sprite if no default sprite is found
-                        spriteRenderer.drawMode = SpriteDrawMode.Sliced;
-                        spriteRenderer.size = new Vector2(0.5f, 0.5f);
-                        spriteRenderer.color = Color.white;
+                        Debug.Log("[PlayerHealth] Found SpriteRenderer on child GameObject.");
                     }
-                    Debug.Log("[PlayerHealth] Created a fallback sprite renderer for damage visualization");
                 }
             }
-            
+
             if (spriteRenderer != null)
             {
                 originalColor = spriteRenderer.color;
-                Debug.Log($"[PlayerHealth] Found SpriteRenderer with original color: {originalColor}");
             }
-            else
+
+            // Get hit effects component using interface
+            hitEffects = GetComponent<IHitEffects>();
+            if (hitEffects == null)
             {
-                originalColor = Color.white;
+                // Try finding in children
+                var childHitEffects = GetComponentInChildren<IHitEffects>();
+                if (childHitEffects != null)
+                {
+                    hitEffects = childHitEffects;
+                    if (enableDebugLogs)
+                    {
+                        Debug.Log("[PlayerHealth] Found IHitEffects component on child GameObject.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[PlayerHealth] No IHitEffects component found. Hit effects will be disabled.");
+                }
             }
-            
+
             isInitialized = true;
-            
-            Debug.Log("[PlayerHealth] Components initialized successfully");
+            if (enableDebugLogs)
+            {
+                Debug.Log("[PlayerHealth] Components initialized successfully");
+            }
         }
 
         private void InitializeHealth()
         {
-            currentHealth = Mathf.Clamp(initialHealth, 0, maxHealth);
+            currentHealth = initialHealth;
             isInvulnerable = false;
             invulnerabilityTimer = 0f;
             damageFlashTimer = 0f;
             isDying = false;
-            
-            // Trigger health changed event
+
+            // Reset sprite color
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = originalColor;
+            }
+
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
-            
             if (enableDebugLogs)
             {
-                Debug.Log($"[PlayerHealth] Health initialized: {currentHealth}/{maxHealth}");
+                Debug.Log($"[PlayerHealth] Health initialized to {currentHealth}/{maxHealth}");
             }
         }
         #endregion
 
-        #region Health Management
-        /// <summary>
-        /// Apply damage to the player
-        /// </summary>
-        /// <param name="damage">Amount of damage to apply</param>
+        #region Damage Handling
         public void TakeDamage(int damage)
         {
             TakeDamage(damage, DamageType.Normal);
         }
 
-        /// <summary>
-        /// Apply damage to the player with damage type
-        /// </summary>
-        /// <param name="damage">Amount of damage to apply</param>
-        /// <param name="damageType">Type of damage being applied</param>
         public void TakeDamage(int damage, DamageType damageType)
         {
-            using (s_HealthSystemMarker.Auto())
-            {
-                // Check if we can take damage
-                if (isDying || isInvulnerable || !isInitialized || damage <= 0)
-                {
-                    Debug.LogWarning($"[PlayerHealth] Cannot take damage - isDying: {isDying}, isInvulnerable: {isInvulnerable}, isInitialized: {isInitialized}, damage: {damage}");
-                    return;
-                }
+            if (isDying || isInvulnerable || damage <= 0) return;
 
-                // Apply damage modifiers based on damage type
-                int actualDamage = CalculateDamage(damage, damageType);
-                
-                // Apply damage
-                int previousHealth = currentHealth;
-                currentHealth = Mathf.Max(0, currentHealth - actualDamage);
-                
-                // Trigger damage flash
-                damageFlashTimer = damageFlashDuration;
-                
-                // Start invulnerability
-                isInvulnerable = true;
-                invulnerabilityTimer = invulnerabilityDuration;
-                
-                // Trigger events
-                OnDamaged?.Invoke(actualDamage, currentHealth);
-                OnHealthChanged?.Invoke(currentHealth, maxHealth);
-                
-                Debug.Log($"[PlayerHealth] Took {actualDamage} damage ({damageType}) from {(UnityEngine.StackTraceUtility.ExtractStackTrace().Split('\n')[2])}. Health: {currentHealth}/{maxHealth}");
-                
-                // Check for death
-                if (currentHealth <= 0 && !isDying)
-                {
-                    StartCoroutine(HandleDeath());
-                }
+            // Apply any damage modifiers
+            int actualDamage = CalculateDamage(damage, damageType);
+            
+            // Apply damage
+            currentHealth = Mathf.Max(0, currentHealth - actualDamage);
+            
+            // Set damage source position for hit effects
+            Vector2 damageSourcePos = GetDamageSourcePosition();
+            lastDamageSourcePosition = damageSourcePos;
+            
+            // Apply hit effects if available
+            if (hitEffects != null)
+            {
+                hitEffects.SetDamageSourcePosition(damageSourcePos);
+            }
+            
+            // Start invulnerability period
+            isInvulnerable = true;
+            invulnerabilityTimer = invulnerabilityDuration;
+            
+            // Start damage flash effect
+            damageFlashTimer = damageFlashDuration;
+            
+            // Invoke events
+            OnDamaged?.Invoke(actualDamage, currentHealth);
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[PlayerHealth] Took {actualDamage} damage ({damageType}). Current health: {currentHealth}/{maxHealth}");
+            }
+            
+            // Check for death
+            if (currentHealth <= 0 && !isDying)
+            {
+                StartCoroutine(HandleDeath());
             }
         }
 
-        /// <summary>
-        /// Calculate actual damage based on damage type
-        /// </summary>
+        private Vector2 GetDamageSourcePosition()
+        {
+            // Use last damage source position if available
+            if (lastDamageSourcePosition != Vector2.zero)
+            {
+                return lastDamageSourcePosition;
+            }
+            
+            // Find closest enemy if possible
+            var enemies = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)
+                .OfType<IDamageable>()
+                .Where(e => e != (object)this && e is MonoBehaviour mb && mb.gameObject.activeInHierarchy)
+                .Select(e => (e as MonoBehaviour).transform.position)
+                .ToArray();
+            
+            if (enemies.Length > 0)
+            {
+                // Find closest enemy
+                Vector2 playerPos = transform.position;
+                Vector2 closestPos = enemies
+                    .OrderBy(pos => Vector2.Distance(playerPos, pos))
+                    .FirstOrDefault();
+                
+                return closestPos;
+            }
+            
+            // Fallback to random direction
+            Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
+            return (Vector2)transform.position + randomDir * 2f;
+        }
+
         private int CalculateDamage(int baseDamage, DamageType damageType)
         {
+            // Apply any damage modifiers based on damage type
             switch (damageType)
             {
                 case DamageType.Critical:
-                    return Mathf.RoundToInt(baseDamage * 1.5f); // Critical hits do 50% more damage
-                
+                    // Critical damage is multiplied by 2
+                    return baseDamage * 2;
+                    
                 case DamageType.Environmental:
-                    return baseDamage; // Environmental damage is not modified
-                
+                    // Environmental damage bypasses armor (if implemented)
+                    return baseDamage;
+                    
                 case DamageType.DoT:
-                    return baseDamage; // DoT damage is not modified
-                
+                    // DoT might be reduced slightly
+                    return Mathf.Max(1, Mathf.FloorToInt(baseDamage * 0.8f));
+                    
                 case DamageType.Normal:
                 default:
                     return baseDamage;
             }
         }
+        #endregion
 
-        /// <summary>
-        /// Heal the player by the specified amount
-        /// </summary>
-        /// <param name="amount">Amount to heal</param>
+        #region Healing
         public void Heal(int amount)
         {
-            if (amount <= 0 || isDying || !isInitialized)
-            {
-                return;
-            }
+            if (isDying || amount <= 0) return;
             
+            // Apply healing
             int previousHealth = currentHealth;
-            currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
+            currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
             
-            // Only trigger event if health actually changed
+            // Only invoke events if health actually changed
             if (currentHealth != previousHealth)
             {
                 OnHealthChanged?.Invoke(currentHealth, maxHealth);
                 
                 if (enableDebugLogs)
                 {
-                    Debug.Log($"[PlayerHealth] Healed for {amount}. Health: {currentHealth}/{maxHealth}");
+                    Debug.Log($"[PlayerHealth] Healed {amount} health. Current health: {currentHealth}/{maxHealth}");
                 }
+            }
+            else if (enableDebugLogs)
+            {
+                Debug.Log($"[PlayerHealth] Healing had no effect. Already at max health: {currentHealth}/{maxHealth}");
             }
         }
 
-        /// <summary>
-        /// Fully restore player health
-        /// </summary>
         public void RestoreFullHealth()
         {
-            if (isDying || !isInitialized)
-            {
-                return;
-            }
+            if (isDying) return;
             
+            // Store previous health to check if it changed
             int previousHealth = currentHealth;
+            
+            // Set health to max
             currentHealth = maxHealth;
             
-            // Only trigger event if health actually changed
+            // Only invoke events if health actually changed
             if (currentHealth != previousHealth)
             {
                 OnHealthChanged?.Invoke(currentHealth, maxHealth);
                 
                 if (enableDebugLogs)
                 {
-                    Debug.Log($"[PlayerHealth] Fully restored health: {currentHealth}/{maxHealth}");
+                    Debug.Log($"[PlayerHealth] Restored to full health: {currentHealth}/{maxHealth}");
                 }
             }
         }
         #endregion
 
-        #region State Management
+        #region Status Effects
         private void UpdateInvulnerabilityState()
         {
-            if (isInvulnerable)
+            if (!isInvulnerable) return;
+            
+            // Decrease timer
+            invulnerabilityTimer -= Time.deltaTime;
+            
+            // Check if invulnerability has expired
+            if (invulnerabilityTimer <= 0f)
             {
-                invulnerabilityTimer -= Time.deltaTime;
+                isInvulnerable = false;
+                invulnerabilityTimer = 0f;
                 
-                // Flash the sprite while invulnerable
-                if (spriteRenderer != null)
+                if (enableDebugLogs)
                 {
-                    float alpha = Mathf.PingPong(Time.time * 10f, 1f);
-                    spriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
-                }
-                
-                if (invulnerabilityTimer <= 0f)
-                {
-                    isInvulnerable = false;
-                    
-                    // Reset sprite color
-                    if (spriteRenderer != null)
-                    {
-                        spriteRenderer.color = originalColor;
-                    }
+                    Debug.Log("[PlayerHealth] Invulnerability period ended");
                 }
             }
         }
 
         private void UpdateDamageFlash()
         {
-            if (damageFlashTimer > 0f)
+            if (spriteRenderer == null || damageFlashTimer <= 0f) return;
+            
+            // Decrease timer
+            damageFlashTimer -= Time.deltaTime;
+            
+            // Calculate flash intensity using sine wave for smoother effect
+            float flashIntensity = Mathf.Clamp01(damageFlashTimer / damageFlashDuration);
+            flashIntensity *= Mathf.Sin(flashIntensity * Mathf.PI); // Sine curve for smoother falloff
+            
+            // Apply flash color with intensity
+            spriteRenderer.color = Color.Lerp(originalColor, damageFlashColor, flashIntensity);
+            
+            // Reset color when effect ends
+            if (damageFlashTimer <= 0f)
             {
-                damageFlashTimer -= Time.deltaTime;
+                spriteRenderer.color = originalColor;
                 
-                // Apply damage flash color
-                if (spriteRenderer != null)
+                if (enableDebugLogs)
                 {
-                    float t = damageFlashTimer / damageFlashDuration;
-                    spriteRenderer.color = Color.Lerp(originalColor, damageFlashColor, t);
-                    
-                    // Debug log to confirm flash is happening
-                    if (enableDebugLogs && Time.frameCount % 10 == 0) // Log every 10 frames to avoid spam
-                    {
-                        Debug.Log($"[PlayerHealth] Damage flash active: {t:F2}, Color: {spriteRenderer.color}");
-                    }
-                }
-                else
-                {
-                    // If no sprite renderer, try to find it again
-                    if (Time.frameCount % 30 == 0) // Only check occasionally
-                    {
-                        Debug.LogWarning("[PlayerHealth] No SpriteRenderer for damage flash, attempting to find one...");
-                        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-                        if (spriteRenderer != null)
-                        {
-                            originalColor = spriteRenderer.color;
-                            Debug.Log("[PlayerHealth] Found SpriteRenderer during runtime");
-                        }
-                    }
-                }
-                
-                if (damageFlashTimer <= 0f)
-                {
-                    // Reset sprite color if not invulnerable
-                    if (!isInvulnerable && spriteRenderer != null)
-                    {
-                        spriteRenderer.color = originalColor;
-                        Debug.Log("[PlayerHealth] Damage flash ended, reset color");
-                    }
+                    Debug.Log("[PlayerHealth] Damage flash effect ended");
                 }
             }
         }
+        #endregion
 
+        #region Death and Respawn
         private IEnumerator HandleDeath()
         {
-            isDying = true;
+            if (isDying) yield break;
             
-            // Trigger death event
+            isDying = true;
+            currentHealth = 0;
+            
+            // Invoke death event first so listeners can prepare
             OnDeath?.Invoke();
             
             if (enableDebugLogs)
             {
-                Debug.Log("[PlayerHealth] Player died");
+                Debug.Log("[PlayerHealth] Player has died, starting death sequence");
             }
             
-            // Disable player input
-            if (playerController != null)
-            {
-                // TODO: Disable player input
-            }
-            
-            // Death animation/effect
+            // Play death effects/animation here
             if (spriteRenderer != null)
             {
-                // Fade out
-                float timer = 0f;
-                while (timer < deathDuration)
+                // Fade out sprite
+                float elapsedTime = 0f;
+                Color startColor = spriteRenderer.color;
+                Color targetColor = new Color(startColor.r, startColor.g, startColor.b, 0f);
+                
+                while (elapsedTime < deathDuration)
                 {
-                    timer += Time.deltaTime;
-                    float t = timer / deathDuration;
-                    spriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f - t);
+                    float t = elapsedTime / deathDuration;
+                    spriteRenderer.color = Color.Lerp(startColor, targetColor, t);
+                    
+                    elapsedTime += Time.deltaTime;
                     yield return null;
                 }
                 
-                // Ensure fully transparent
-                spriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0f);
+                // Ensure we end at fully transparent
+                spriteRenderer.color = targetColor;
             }
             else
             {
-                // Wait for death duration if no sprite renderer
+                // If no sprite renderer, just wait for death duration
                 yield return new WaitForSeconds(deathDuration);
             }
             
-            // Notify GameManager of player death
-            if (GameManager.Instance != null)
+            // Disable GameObject temporarily (until respawn)
+            gameObject.SetActive(false);
+            
+            if (enableDebugLogs)
             {
-                GameManager.Instance.EndGame();
+                Debug.Log("[PlayerHealth] Death sequence completed");
             }
         }
 
-        /// <summary>
-        /// Respawn the player with full health
-        /// </summary>
         public void Respawn()
         {
-            if (!isDying || !isInitialized)
+            if (!IsDead)
             {
+                Debug.LogWarning("[PlayerHealth] Cannot respawn player that is not dead");
                 return;
             }
             
-            isDying = false;
-            currentHealth = initialHealth;
-            isInvulnerable = true;
-            invulnerabilityTimer = invulnerabilityDuration;
+            // Re-enable GameObject if it was disabled
+            if (!gameObject.activeSelf)
+            {
+                gameObject.SetActive(true);
+            }
             
-            // Reset sprite color and visibility
+            // Reset health and state
+            isDying = false;
+            InitializeHealth();
+            
+            // Reset sprite if it exists
             if (spriteRenderer != null)
             {
                 spriteRenderer.color = originalColor;
             }
             
-            // Trigger events
+            // Invoke respawn event
             OnRespawn?.Invoke();
-            OnHealthChanged?.Invoke(currentHealth, maxHealth);
             
             if (enableDebugLogs)
             {
-                Debug.Log($"[PlayerHealth] Player respawned with health: {currentHealth}/{maxHealth}");
+                Debug.Log("[PlayerHealth] Player respawned successfully");
             }
         }
         #endregion
 
-        #region Debug
+        #region Debug Methods
         [Button("Take 10 Damage")]
         private void DebugTakeDamage()
         {
@@ -535,7 +556,7 @@ namespace CZ.Core.Player
         [Button("Kill Player")]
         private void DebugKillPlayer()
         {
-            TakeDamage(currentHealth);
+            TakeDamage(99999);
         }
 
         [Button("Restore Full Health")]
