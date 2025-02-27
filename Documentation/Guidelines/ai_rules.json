@@ -14,6 +14,7 @@
         },
         "reference_files": [
             "Documentation/Index.md",
+            "Documentation/ProjectFileIndex.md",
             "Documentation/Resources/project_dependencies.md",
             "Documentation/Resources/version_troubleshooting.md",
             "Documentation/Technical/Architecture/Infrastructure.md",
@@ -146,6 +147,7 @@
         "verify_completion": true,
         "reference_files": [
             "Documentation/Technical/Architecture/CoreGameLoop.md",
+            "Documentation/ProjectFileIndex.md",
             "Documentation/Resources/version_troubleshooting.md#version-update-checklist",
             "Documentation/Technical/Performance/PerformanceGuidelines.md"
         ]
@@ -173,6 +175,7 @@
         },
         "reference_files": [
             "Documentation/Index.md",
+            "Documentation/ProjectFileIndex.md",
             "Documentation/README.md",
             "Documentation/Resources/project_dependencies.md",
             "Documentation/Resources/version_troubleshooting.md",

@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using UnityEditor;
 using CZ.Core.Logging;
+using System.Reflection;
 
 namespace CZ.Core.Resource
 {
@@ -74,6 +75,46 @@ namespace CZ.Core.Resource
         private static readonly ProfilerMarker s_initMarker = new(ProfilerCategory.Scripts, "ResourceManager.Initialize");
         #endregion
 
+        #region PlayerHealth Reflection Cache
+        private MonoBehaviour cachedPlayerHealth;
+        private MethodInfo cachedHealMethod;
+        private bool playerHealthSearched = false;
+
+        private void FindPlayerHealthComponent()
+        {
+            if (playerHealthSearched) return; // Only search once
+            
+            playerHealthSearched = true;
+            using var _ = new ProfilerMarker("ResourceManager.FindPlayerHealthComponent").Auto();
+            
+            try
+            {
+                // Find any GameObject with a component that has the name "PlayerHealth"
+                var playerObjects = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+                foreach (var component in playerObjects)
+                {
+                    if (component.GetType().Name == "PlayerHealth")
+                    {
+                        // When we find it, cache the component and method
+                        cachedPlayerHealth = component;
+                        cachedHealMethod = component.GetType().GetMethod("Heal");
+                        
+                        if (cachedHealMethod != null)
+                        {
+                            CZLogger.LogInfo("[ResourceManager] Found and cached PlayerHealth component", LogCategory.Resource);
+                            return;
+                        }
+                    }
+                }
+                CZLogger.LogWarning("[ResourceManager] PlayerHealth component not found during initialization", LogCategory.Resource);
+            }
+            catch (Exception ex)
+            {
+                CZLogger.LogError($"[ResourceManager] Error finding PlayerHealth: {ex.Message}", LogCategory.Resource);
+            }
+        }
+        #endregion
+
         #region Unity Lifecycle
         private void Awake()
         {
@@ -101,6 +142,9 @@ namespace CZ.Core.Resource
 
             resourcePools = new Dictionary<ResourceType, ObjectPool<BaseResource>>();
             StartCoroutine(InitializeWhenReady());
+            
+            // Find PlayerHealth component early
+            FindPlayerHealthComponent();
         }
 
         private IEnumerator InitializeWhenReady()
@@ -132,6 +176,12 @@ namespace CZ.Core.Resource
             {
                 Debug.Log("[ResourceManager] Starting destroy cleanup...");
                 ClearAllPools();
+                
+                // Clear cached references
+                cachedPlayerHealth = null;
+                cachedHealMethod = null;
+                playerHealthSearched = false;
+                
                 isInitialized = false;
                 instance = null;
                 Debug.Log("[ResourceManager] Destroy cleanup completed");
@@ -359,11 +409,56 @@ namespace CZ.Core.Resource
                 }
 
                 Debug.Log($"[ResourceManager] Collecting resource: {type} with value {value}");
+                
+                // Special handling for health resources - they directly heal the player
+                if (type == ResourceType.Health)
+                {
+                    ApplyHealth(null, value);
+                }
+                
+                // Notify all listeners about the resource collection
                 OnResourceCollected?.Invoke(type, value);
             }
             catch (System.Exception e)
             {
                 Debug.LogError($"[ResourceManager] Error during resource collection: {e.Message}");
+            }
+        }
+        
+        public void ApplyHealth(GameObject target, int healthValue)
+        {
+            if (target == null)
+            {
+                CZLogger.LogWarning("[ResourceManager] Cannot apply health to null target", LogCategory.Resource);
+                return;
+            }
+            
+            // First make sure we've tried to find the PlayerHealth component
+            if (!playerHealthSearched)
+            {
+                FindPlayerHealthComponent();
+            }
+            
+            // If we have a cached component and method, use them
+            if (cachedPlayerHealth != null && cachedHealMethod != null && cachedPlayerHealth)
+            {
+                try
+                {
+                    cachedHealMethod.Invoke(cachedPlayerHealth, new object[] { healthValue });
+                    CZLogger.LogInfo($"[ResourceManager] Applied {healthValue} health to player", LogCategory.Resource);
+                }
+                catch (Exception ex)
+                {
+                    CZLogger.LogError($"[ResourceManager] Error applying health: {ex.Message}", LogCategory.Resource);
+                    // Reset cache so we can try to find it again next time
+                    cachedPlayerHealth = null;
+                    cachedHealMethod = null;
+                    playerHealthSearched = false;
+                }
+            }
+            else
+            {
+                CZLogger.LogWarning("[ResourceManager] PlayerHealth component not available, cannot apply healing", LogCategory.Resource);
             }
         }
         #endregion

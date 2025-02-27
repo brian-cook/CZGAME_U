@@ -34,6 +34,8 @@ Assets/
     └── Settings/
 ```
 
+For a comprehensive file index that includes all files and components, see the [Project File Index](Documentation/ProjectFileIndex.md).
+
 ## Getting Started
 1. Clone repository
 2. Open in Unity 2022.3 LTS
@@ -52,4 +54,6 @@ Assets/
 See the Documentation folder for:
 - Setup guides
 - Architecture documentation
-- Development guidelines 
+- Development guidelines
+- [Documentation Index](Documentation/Index.md): Full list of all documentation
+- [Project File Index](Documentation/ProjectFileIndex.md): Comprehensive index of all project files and components 

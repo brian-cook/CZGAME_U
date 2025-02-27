@@ -8,6 +8,7 @@ This index provides a comprehensive list of all documentation files in the proje
 |----------|-------------|--------------|
 | [Project Overview](Project/Overview.md) | High-level description of the CZGAME project | 2025-02-27 |
 | [Project Structure](Project/Structure.md) | Detailed project organization and directory structure | 2025-02-27 |
+| [Project File Index](ProjectFileIndex.md) | Comprehensive index of all project files and components | 2025-02-28 |
 | [Project Plan](Project/ProjectPlan.md) | Project roadmap and milestones | 2025-02-27 |
 | [Market Research](Project/MarketResearch.md) | Market analysis and competitive research | 2025-02-27 |
 | [Documentation Report](Project/Documentation_Report.md) | Summary of documentation improvements and recommendations | 2025-02-27 |

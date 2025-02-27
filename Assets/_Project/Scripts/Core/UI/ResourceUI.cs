@@ -119,6 +119,13 @@ namespace CZ.Core.UI
 
             foreach (ResourceType type in System.Enum.GetValues(typeof(ResourceType)))
             {
+                // Skip Health resources in the UI as they immediately heal the player
+                if (type == ResourceType.Health)
+                {
+                    CZLogger.LogInfo($"[ResourceUI] Skipping UI counter for {type} as they immediately heal the player", LogCategory.UI);
+                    continue;
+                }
+
                 try
                 {
                     var instance = resourceCounterTemplate.Instantiate();
@@ -261,6 +268,13 @@ namespace CZ.Core.UI
             if (!isInitialized || isQuitting)
             {
                 CZLogger.LogWarning($"[ResourceUI] Ignoring resource collection - UI not initialized or quitting. Type: {type}, Value: {value}", LogCategory.UI);
+                return;
+            }
+
+            // Skip updating UI for Health resources as they don't have counters
+            if (type == ResourceType.Health)
+            {
+                CZLogger.LogInfo($"[ResourceUI] Health resource collected but not displayed in UI. Value: {value}", LogCategory.UI);
                 return;
             }
 
