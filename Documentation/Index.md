@@ -28,6 +28,7 @@ This index provides a comprehensive list of all documentation files in the proje
 |----------|-------------|--------------|
 | [Physics System](Technical/Systems/Physics.md) | Documentation for the Physics2DSetup system | 2025-02-27 |
 | [Object Pooling](Technical/Systems/ObjectPooling.md) | Documentation for the object pooling system | 2025-02-27 |
+| [Player Health System](Technical/Systems/PlayerHealth.md) | Documentation for the player health system | 2025-02-27 |
 
 ### Performance
 
@@ -60,7 +61,6 @@ This index provides a comprehensive list of all documentation files in the proje
 | Document | Description | Last Updated |
 |----------|-------------|--------------|
 | [Testing Guidelines](Guidelines/testing_guidelines.md) | Standards for test creation and execution | 2025-02-18 |
-| [Player Health System](Guidelines/player_health_system.md) | Guidelines for the player health system | 2025-02-27 |
 | [AI Rules](Guidelines/ai_rules.json) | Configuration for AI assistance tools | 2025-02-22 |
 
 ## Resources

@@ -155,4 +155,8 @@ playerHealth.TakeDamage(10, DamageType.Critical);
 
 ## Conclusion
 
-The Player Health System provides a robust foundation for player survivability mechanics. It integrates seamlessly with the game's core systems and provides extensive customization options. The system is designed to be performant, maintainable, and extensible for future enhancements. 
+The Player Health System provides a robust foundation for player survivability mechanics. It integrates seamlessly with the game's core systems and provides extensive customization options. The system is designed to be performant, maintainable, and extensible for future enhancements.
+
+## Last Updated
+- Date: February 27, 2025
+- Unity Version: 6000.0.38f1 

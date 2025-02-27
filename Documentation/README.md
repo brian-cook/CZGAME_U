@@ -38,6 +38,7 @@ Technical documentation covering architecture, systems, and performance consider
 
 - [Physics System](Technical/Systems/Physics.md) - Documentation for the Physics2DSetup system
 - [Object Pooling](Technical/Systems/ObjectPooling.md) - Documentation for the object pooling system
+- [Player Health System](Technical/Systems/PlayerHealth.md) - Documentation for the player health system
 
 ### Performance
 
@@ -68,7 +69,6 @@ Reference documentation for Unity, packages, and tools.
 Development guidelines and standards.
 
 - [Testing Guidelines](Guidelines/testing_guidelines.md) - Standards for test creation and execution
-- [Player Health System](Guidelines/player_health_system.md) - Guidelines for the player health system
 - [AI Rules](Guidelines/ai_rules.json) - Configuration for AI assistance tools
 
 ## Resources
