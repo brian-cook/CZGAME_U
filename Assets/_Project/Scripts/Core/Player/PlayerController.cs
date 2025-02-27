@@ -43,6 +43,11 @@ namespace CZ.Core.Player
         [SerializeField, MinValue(0f)]
         [InfoBox("Linear drag applied to slow down movement", Normal)]
         private float linearDrag = 3f;
+        
+        [BoxGroup("Physics Settings")]
+        [SerializeField, Range(0.1f, 0.5f)]
+        [InfoBox("Size of the player's collision radius (smaller values make hitbox closer to sprite)", Normal)]
+        private float colliderRadius = 0.32f;
 
         [BoxGroup("Attack Settings")]
         [SerializeField]
@@ -158,8 +163,33 @@ namespace CZ.Core.Player
             circleCollider = GetComponent<CircleCollider2D>();
             if (circleCollider != null)
             {
-                circleCollider.radius = 0.5f;
+                // Set collider size to match sprite size more precisely
+                circleCollider.radius = colliderRadius;
                 circleCollider.isTrigger = false;  // Must be false for physical collisions
+                
+                // Get the sprite renderer to adjust collider size to match sprite if possible
+                SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null && spriteRenderer.sprite != null)
+                {
+                    // Optionally adjust collider to match sprite bounds more precisely
+                    float spriteWidth = spriteRenderer.sprite.bounds.size.x;
+                    float spriteHeight = spriteRenderer.sprite.bounds.size.y;
+                    
+                    // Use the smaller dimension to avoid overlap
+                    float minDimension = Mathf.Min(spriteWidth, spriteHeight);
+                    
+                    // Set radius to a percentage of the sprite size or use the configured value
+                    float idealRadius = minDimension * 0.4f; // 40% of sprite size
+                    
+                    // Use the smaller of the two (configured or calculated)
+                    circleCollider.radius = Mathf.Min(colliderRadius, idealRadius);
+                    
+                    if (enableDebugLogs)
+                    {
+                        Debug.Log($"[PlayerController] Adjusted collider radius to {circleCollider.radius}f " +
+                                  $"(Sprite size: {spriteWidth}x{spriteHeight})");
+                    }
+                }
             }
             
             // Ensure the player is on the Player layer for proper collision matrix handling
@@ -711,5 +741,55 @@ namespace CZ.Core.Player
         /// </summary>
         public bool IsPlayerAlive => playerHealth == null ? true : !playerHealth.IsDead;
         #endregion
+
+        #if UNITY_EDITOR
+        /// <summary>
+        /// Draws gizmos in the editor to visualize the player's collision area
+        /// </summary>
+        private void OnDrawGizmos()
+        {
+            // Draw collider visualization
+            if (circleCollider != null)
+            {
+                // Set gizmo color
+                Gizmos.color = new Color(0, 1, 0, 0.3f); // Semi-transparent green
+                
+                // Draw a sphere representing the collision area
+                Gizmos.DrawSphere(transform.position, circleCollider.radius);
+                
+                // Draw outline
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(transform.position, circleCollider.radius);
+            }
+            else
+            {
+                // If collider isn't found yet, use the default or configured radius
+                CircleCollider2D collider = GetComponent<CircleCollider2D>();
+                if (collider != null)
+                {
+                    // Get radius from collider
+                    float radius = collider.radius;
+                    
+                    // Draw visualization
+                    Gizmos.color = new Color(1, 0.5f, 0, 0.3f); // Semi-transparent orange
+                    Gizmos.DrawSphere(transform.position, radius);
+                    
+                    Gizmos.color = new Color(1, 0.5f, 0, 1f); // Solid orange
+                    Gizmos.DrawWireSphere(transform.position, radius);
+                }
+                else
+                {
+                    // Draw with default or configured radius if collider component not found
+                    float radius = colliderRadius;
+                    
+                    Gizmos.color = new Color(1, 0, 0, 0.3f); // Semi-transparent red
+                    Gizmos.DrawSphere(transform.position, radius);
+                    
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawWireSphere(transform.position, radius);
+                }
+            }
+        }
+        #endif
     }
 }
