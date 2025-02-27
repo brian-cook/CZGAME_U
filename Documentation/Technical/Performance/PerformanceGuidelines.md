@@ -1,15 +1,22 @@
-# Unity 6 Performance Guidelines for CZ Game
+# Unity 6 Performance Guidelines for CZGAME
+
+## Overview
+
+This document outlines the performance guidelines and optimization strategies for the CZGAME project built with Unity 6. These guidelines help maintain consistent performance across all target platforms.
 
 ## Performance Targets
-- Target FPS: 60 (as per Unity 6 guidelines)
-- Max Draw Calls: 100 (verified with ProfilerRecorder)
-- Max Memory Usage: 1024MB (monitored via Memory Profiler)
-- Target Platform: Windows (Primary)
-- Resolution: 1920x1080
+
+- **Target FPS**: 60 (as per Unity 6 guidelines)
+- **Max Draw Calls**: 100 (verified with ProfilerRecorder)
+- **Max Memory Usage**: 1024MB (monitored via Memory Profiler)
+- **Target Platform**: Windows (Primary)
+- **Resolution**: 1920x1080
 
 ## Unity 6 Optimizations
+
 ### Graphics Performance
-1. URP 17.0.3 Best Practices
+
+1. **URP 17.0.3 Best Practices**
    - Use Sprite Atlas for 2D textures
    - Enable GPU Instancing where possible
    - Implement proper batching strategies
@@ -17,7 +24,7 @@
    - Utilize URP Asset configuration
    - Implement proper LOD strategies
 
-2. Memory Management
+2. **Memory Management**
    - Object Pooling for frequently spawned objects
    - Addressable Assets for resource loading
    - Proper Asset Bundle strategy
@@ -25,7 +32,7 @@
    - Use ProfilerRecorder for memory tracking
    - Implement proper disposal patterns
 
-3. Physics Optimization
+3. **Physics Optimization**
    - Use 2D physics layers effectively
    - Implement proper collision detection
    - Optimize physics update intervals
@@ -34,48 +41,56 @@
    - Implement proper collision matrix
 
 ## Performance Monitoring
-1. Unity 6 Profiler
-   - Regular profiling sessions using ProfilerRecorder API
-   - Memory profiling with Unity Memory Profiler
-   - CPU usage monitoring with Profiler Window
-   - GPU performance analysis
-   - Custom performance markers
-   - Timeline profiling for sequences
 
-2. Frame Debugger
-   - Draw call analysis
-   - Batching verification
-   - Shader variant tracking
-   - URP render pipeline analysis
-   - Material property optimization
-   - Texture streaming monitoring
+### Unity 6 Profiler
+
+- Regular profiling sessions using ProfilerRecorder API
+- Memory profiling with Unity Memory Profiler
+- CPU usage monitoring with Profiler Window
+- GPU performance analysis
+- Custom performance markers
+- Timeline profiling for sequences
+
+### Frame Debugger
+
+- Draw call analysis
+- Batching verification
+- Shader variant tracking
+- URP render pipeline analysis
+- Material property optimization
+- Texture streaming monitoring
 
 ## Best Practices
-1. Asset Management
-   - Texture compression settings
-   - Audio compression profiles
-   - Mesh optimization techniques
-   - Asset loading strategies
-   - Addressables content management
-   - Asset bundle compression
 
-2. Code Optimization
-   - Use object pooling (PoolManager implementation)
-   - Implement proper garbage collection
-   - Optimize Update() calls
-   - Use coroutines effectively
-   - Implement proper IDisposable patterns
-   - Utilize Unity's new Job System
+### Asset Management
 
-3. Unity 6 Features
-   - Utilize Burst Compiler for performance
-   - Implement DOTS where beneficial
-   - Use Unity's new memory profiler
-   - Leverage Sentis for AI optimization
-   - Implement URP custom render features
-   - Use Input System for efficient input handling
+- Texture compression settings
+- Audio compression profiles
+- Mesh optimization techniques
+- Asset loading strategies
+- Addressables content management
+- Asset bundle compression
 
-4. Monitoring Implementation
+### Code Optimization
+
+- Use object pooling (PoolManager implementation)
+- Implement proper garbage collection
+- Optimize Update() calls
+- Use coroutines effectively
+- Implement proper IDisposable patterns
+- Utilize Unity's new Job System
+
+### Unity 6 Features
+
+- Utilize Burst Compiler for performance
+- Implement DOTS where beneficial
+- Use Unity's new memory profiler
+- Leverage Sentis for AI optimization
+- Implement URP custom render features
+- Use Input System for efficient input handling
+
+### Monitoring Implementation
+
 ```csharp
 public class PerformanceMonitor : MonoBehaviour
 {
@@ -109,8 +124,10 @@ public class PerformanceMonitor : MonoBehaviour
 ```
 
 ## Memory Management Strategy
+
 ### Core Principles
-1. Dynamic Memory Management (HIGH PRIORITY)
+
+1. **Dynamic Memory Management** (HIGH PRIORITY)
    - System-aware thresholds based on available memory:
      * Base: 1024MB (1GB base memory)
      * Warning: 1536MB (1.5GB - 150% of base)
@@ -129,7 +146,7 @@ public class PerformanceMonitor : MonoBehaviour
      * Aggressive: Full cleanup at critical threshold (1792MB)
      * Emergency: Scene restart if cleanup fails (2048MB)
 
-2. Pooling Strategy (HIGH PRIORITY)
+2. **Pooling Strategy** (HIGH PRIORITY)
    - Pool Configurations:
      * Projectiles: 100 initial, 200 max
      * Enemies: 50 initial, 100 max
@@ -146,7 +163,7 @@ public class PerformanceMonitor : MonoBehaviour
      * Monitor memory impact
      * Implement emergency cleanup
 
-3. Asset Loading (HIGH PRIORITY)
+3. **Asset Loading** (HIGH PRIORITY)
    - Use Addressables for:
      * Character variants
      * Weapon prefabs
@@ -158,7 +175,7 @@ public class PerformanceMonitor : MonoBehaviour
      * Track reference counts
      * Monitor memory footprint
 
-4. Scene Management
+4. **Scene Management**
    - Single scene approach:
      * Main gameplay scene
      * Additive UI scene
@@ -169,7 +186,8 @@ public class PerformanceMonitor : MonoBehaviour
      * Clear reference cache on restart
 
 ### Memory Budgets
-1. Runtime Memory (2048MB Emergency Total)
+
+1. **Runtime Memory** (2048MB Emergency Total)
    - Managed Memory: 1024MB (Base)
      * Game Logic: 256MB
      * Unity Systems: 512MB
@@ -184,7 +202,7 @@ public class PerformanceMonitor : MonoBehaviour
      * Graphics: 204.80MB
      * Audio: 102.40MB
 
-2. Asset Memory
+2. **Asset Memory**
    - Textures: 256MB max
    - Audio: 128MB max
    - Meshes: 64MB max
@@ -192,6 +210,7 @@ public class PerformanceMonitor : MonoBehaviour
    - Prefabs: 64MB max
 
 ### Monitoring Implementation
+
 ```csharp
 public class MemoryMonitor : MonoBehaviour
 {
@@ -252,21 +271,22 @@ public class MemoryMonitor : MonoBehaviour
 ```
 
 ### Memory Optimization Checklist
-1. Asset Configuration
+
+1. **Asset Configuration**
    - [ ] Texture compression appropriate for 2D
    - [ ] Audio compression (Vorbis, quality setting 70%)
    - [ ] Sprite atlas implementation
    - [ ] Material sharing strategy
    - [ ] Shader variant stripping
 
-2. Runtime Optimization
+2. **Runtime Optimization**
    - [ ] Object pooling for all spawned objects
    - [ ] Addressables loading patterns
    - [ ] Garbage collection optimization
    - [ ] Reference cleanup on scene changes
    - [ ] Async loading implementation
 
-3. Development Practices
+3. **Development Practices**
    - [ ] Regular memory profiling
    - [ ] Pool utilization monitoring
    - [ ] GC allocation tracking
@@ -274,43 +294,46 @@ public class MemoryMonitor : MonoBehaviour
    - [ ] Memory leak detection
 
 ### Critical Memory Considerations for Core Loop
-1. Enemy System
+
+1. **Enemy System**
    - Pool Size: 100 enemies max
    - Memory per Enemy: ~100KB
    - Total Budget: 10MB
    - Monitoring: Pool expansion events
 
-2. Projectile System
+2. **Projectile System**
    - Pool Size: 200 projectiles max
    - Memory per Projectile: ~50KB
    - Total Budget: 10MB
    - Cleanup: Automatic return to pool
 
-3. VFX System
+3. **VFX System**
    - Pool Size: 50 effects max
    - Memory per Effect: ~200KB
    - Total Budget: 10MB
    - Optimization: Particle system batching
 
-4. Comfort Zone System
+4. **Comfort Zone System**
    - Active Zones: 5 max
    - Memory per Zone: ~500KB
    - Total Budget: 2.5MB
    - Optimization: Shared materials
 
 ### Memory Profiling Schedule
-1. Development Phase
+
+1. **Development Phase**
    - Daily: Basic memory snapshot
    - Weekly: Deep memory analysis
    - Per Feature: Memory impact assessment
 
-2. Testing Phase
+2. **Testing Phase**
    - Every Build: Memory baseline check
    - Load Testing: Peak memory validation
    - Stress Testing: Memory leak detection
 
 ### Unity Memory Profiler Usage
-1. Key Metrics to Monitor
+
+1. **Key Metrics to Monitor**
    - Total Memory Used
    - Managed Heap Size
    - GC Reserved Memory
@@ -318,26 +341,45 @@ public class MemoryMonitor : MonoBehaviour
    - Mesh Memory
    - Asset Memory
 
-2. Warning Thresholds
+2. **Warning Thresholds**
    - Total Memory: 1024MB
    - Managed Memory: 512MB
    - GC Reserved: 256MB
    - Texture Memory: 128MB
    - Mesh Memory: 32MB
 
-3. Critical Thresholds
+3. **Critical Thresholds**
    - Total Memory: 1200MB
    - Managed Memory: 600MB
    - GC Reserved: 300MB
    - Texture Memory: 150MB
    - Mesh Memory: 40MB
 
-## References
-- Unity Memory Management: https://docs.unity3d.com/Manual/performance-managed-memory.html
-- Performance Guidelines: https://docs.unity3d.com/Manual/UnderstandingPerformance.html
-- Memory Profiler: https://docs.unity3d.com/Packages/com.unity.memoryprofiler@1.0/manual/index.html
+## Integration with Other Systems
 
-## Reference Documentation
+### Object Pooling System
+
+These performance guidelines are closely integrated with the [Object Pooling](../Systems/ObjectPooling.md) system, which implements the pooling strategy outlined in this document.
+
+### Physics System
+
+The [Physics System](../Systems/Physics.md) follows these performance guidelines, particularly regarding collision detection optimization and physics layer management.
+
+## References
+
+- [Unity Memory Management](https://docs.unity3d.com/Manual/performance-managed-memory.html)
+- [Performance Guidelines](https://docs.unity3d.com/Manual/UnderstandingPerformance.html)
+- [Memory Profiler](https://docs.unity3d.com/Packages/com.unity.memoryprofiler@1.0/manual/index.html)
 - [Unity 6 Performance Optimization](https://docs.unity3d.com/6000.0/Documentation/Manual/BestPracticeUnderstandingPerformanceInUnity.html)
 - [ProfilerRecorder API](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Unity.Profiling.ProfilerRecorder.html)
 - [URP Performance Guidelines](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@17.0/manual/performance-guidelines.html)
+
+## Revision History
+
+| Date | Version | Changes |
+|------|---------|---------|
+| 2025-02-27 | 1.0 | Initial document creation |
+| 2025-02-27 | 1.1 | Added memory monitoring implementation |
+
+Last Updated: 2025-02-27
+Unity Version: 6000.0.38f1 

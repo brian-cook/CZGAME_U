@@ -1,6 +1,7 @@
 # Project Plan: CZ Game - Survival Action with Comfort Zones
 
 ## 1. Core Game Mechanics
+
 ### Player Systems
 - Basic movement (WASD/Arrow keys)
 - Auto-attacking system
@@ -33,6 +34,7 @@
 - Strategic zone placement mechanics
 
 ## 2. Progression Systems
+
 ### Character Development
 - Experience points
 - Level-up system
@@ -61,6 +63,7 @@
 - Daily runs
 
 ## 3. Enemy Systems
+
 ### Enemy Types
 - Basic enemies (fast/weak)
 - Tank enemies (slow/strong)
@@ -81,6 +84,7 @@
 - Group behavior optimization using Unity's Jobs System
 
 ## 4. Technical Architecture
+
 ### Core Systems
 - GameManager (MonoBehaviour singleton)
 - EventManager for decoupled communication
@@ -181,4 +185,28 @@
    - Simple AI with pooling
    - Spawn system
    - Zone awareness behavior
-   - Update frequency management using coroutines 
+   - Update frequency management using coroutines
+
+## 7. Key Technical Considerations
+
+### Performance Targets
+- Target FPS: 60
+- Max Draw Calls: 100
+- Max Active Entities: 200
+- Memory Budget: 1024MB
+
+### Critical Systems Documentation
+- [Assembly Structure](../Technical/Architecture/AssemblyStructure.md)
+- [Infrastructure Plan](../Technical/Architecture/Infrastructure.md)
+- [Performance Guidelines](../Technical/Performance/PerformanceGuidelines.md)
+- [Object Pooling System](../Technical/Systems/ObjectPooling.md)
+- [Physics System](../Technical/Systems/Physics.md)
+
+## Revision History
+
+| Date | Version | Changes |
+|------|---------|---------|
+| 2025-02-27 | 1.0 | Initial document creation |
+
+Last Updated: 2025-02-27
+Unity Version: 6000.0.38f1 

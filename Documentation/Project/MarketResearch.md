@@ -1,6 +1,7 @@
 # Market Research: Popular Features in Survival Action Games
 
 ## 1. Vampire Survivors Features
+
 ### Highly Rated
 - Simple, intuitive controls
 - Meaningful character progression
@@ -10,12 +11,13 @@
 - Achievement system
 
 ### Player Comments
-"The simplicity of the controls lets you focus on build strategy"
-"Each run feels different due to item combinations"
-"Satisfying to become overpowered by late game"
-"Visual clarity even with hundreds of effects"
+- "The simplicity of the controls lets you focus on build strategy"
+- "Each run feels different due to item combinations"
+- "Satisfying to become overpowered by late game"
+- "Visual clarity even with hundreds of effects"
 
 ## 2. 20 Minutes Till Dawn Features
+
 ### Highly Rated
 - Tight controls
 - Bullet patterns and dodging
@@ -24,11 +26,12 @@
 - Visual clarity in combat
 
 ### Player Comments
-"More active gameplay than VS while keeping the core appeal"
-"Each character feels unique"
-"Good balance between difficulty and progression"
+- "More active gameplay than VS while keeping the core appeal"
+- "Each character feels unique"
+- "Good balance between difficulty and progression"
 
 ## 3. Brotato Features
+
 ### Highly Rated
 - Unique character traits
 - Multiple viable strategies
@@ -37,11 +40,12 @@
 - Challenge modes
 
 ### Player Comments
-"Each character completely changes how you play"
-"Stats and items feel impactful"
-"Good balance between risk and reward"
+- "Each character completely changes how you play"
+- "Stats and items feel impactful"
+- "Good balance between risk and reward"
 
 ## 4. Common Positive Features
+
 ### Gameplay Mechanics
 - Auto-attack systems
 - Clear progression paths
@@ -64,6 +68,7 @@
 - Power visualization
 
 ## 5. Common Criticisms
+
 ### To Avoid
 - Too much visual clutter
 - Unclear upgrade effects
@@ -80,6 +85,7 @@
 - Optimize for large numbers of entities
 
 ## 6. Unique Features for Our Game
+
 ### Comfort Zone System
 - Strategic safe zones
 - Risk/reward resource gathering
@@ -95,6 +101,7 @@
 - Zone synergies
 
 ## 7. Player Engagement Features
+
 ### Progression Systems
 - Character unlocks
 - Permanent upgrades
@@ -110,6 +117,7 @@
 - Community challenges
 
 ## 8. Quality of Life Features
+
 ### Highly Requested
 - Quick restart option
 - Build previews
@@ -126,6 +134,7 @@
 - Mini-map system
 
 ## 9. Content Variety
+
 ### Character Types
 - Different playstyles
 - Unique starting conditions
@@ -148,6 +157,7 @@
 - Visual themes
 
 ## 10. Technical Expectations
+
 ### Performance
 - Smooth framerate
 - Quick loading times
@@ -160,4 +170,33 @@
 - Key rebinding
 - Resolution options
 - Performance settings
-- Save system 
+- Save system
+
+## 11. Implementation in CZGAME
+
+### Features Already Implemented
+- Auto-attacking system
+- Character progression
+- Basic comfort zone mechanics
+- Resource gathering
+- Enemy variety
+
+### Priority Features Based on Research
+1. Multiple viable build paths
+2. Clear visual feedback
+3. Zone placement strategy
+4. Quick restart option
+5. Performance optimization for many entities
+
+## Related Documentation
+- [Project Plan](ProjectPlan.md)
+- [Performance Guidelines](../Technical/Performance/PerformanceGuidelines.md)
+
+## Revision History
+
+| Date | Version | Changes |
+|------|---------|---------|
+| 2025-02-27 | 1.0 | Initial document creation |
+
+Last Updated: 2025-02-27
+Unity Version: 6000.0.38f1 
