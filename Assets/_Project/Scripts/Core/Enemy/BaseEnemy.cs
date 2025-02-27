@@ -5,6 +5,7 @@ using NaughtyAttributes;
 using CZ.Core.Interfaces;
 using CZ.Core.Resource;
 using CZ.Core.Logging;
+using CZ.Core.Configuration;
 
 namespace CZ.Core.Enemy
 {
@@ -523,55 +524,51 @@ namespace CZ.Core.Enemy
 
         public void OnSpawn()
         {
-            CZLogger.LogDebug($"Enemy spawned: {gameObject.name}", LogCategory.Enemy);
-            if (!isInitialized)
-            {
-                InitializeComponents();
-            }
-            
-            // Reset state
+            // Reset health
             currentHealth = maxHealth;
             isDying = false;
             deathTimer = 0f;
-            damageFlashTimer = 0f;
-            hasValidTarget = false;
-            lastTargetUpdateTime = 0f;
             
-            // Reset physics
-            if (rb != null)
+            // Reset damage flash
+            damageFlashTimer = 0f;
+            if (spriteRenderer != null)
             {
-                rb.simulated = true;
-                rb.linearVelocity = Vector2.zero;
+                // Save the original color if not already saved
+                if (originalColor == default(Color))
+                {
+                    originalColor = spriteRenderer.color;
+                }
+                else
+                {
+                    // Otherwise, restore it
+                    spriteRenderer.color = originalColor;
+                }
             }
             
-            // Reset collider
+            // Reset collider and rigidbody
             if (circleCollider != null)
             {
                 circleCollider.enabled = true;
             }
             
-            // Reset visuals
-            if (spriteRenderer != null)
+            if (rb != null)
             {
-                // Ensure material is properly set
-                if (materialInstance == null)
-                {
-                    if (sharedMaterial == null)
-                    {
-                        sharedMaterial = new Material(Shader.Find("Sprites/Default"))
-                        {
-                            hideFlags = HideFlags.DontSave
-                        };
-                    }
-                    materialInstance = new Material(sharedMaterial);
-                    materialInstance.hideFlags = HideFlags.DontSave;
-                }
-                spriteRenderer.material = materialInstance;
-                spriteRenderer.color = originalColor;
+                rb.simulated = true;
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
             }
             
+            // Remove any ColliderAdjustmentMarker components from previous pool usage
+            var marker = GetComponent<Physics2DSetup.ColliderAdjustmentMarker>();
+            if (marker != null)
+            {
+                Destroy(marker);
+            }
+            
+            isInitialized = true;
             gameObject.SetActive(true);
-            CZLogger.LogInfo($"Enemy spawned: {gameObject.name}", LogCategory.Enemy);
+            
+            CZLogger.LogInfo($"Enemy spawned: {gameObject.name} at {transform.position}", LogCategory.Enemy);
         }
 
         public void OnDespawn()

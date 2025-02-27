@@ -144,8 +144,11 @@ namespace CZ.Core.Configuration
         }
         
         /// <summary>
-        /// Updates physics properties on all enemy objects to ensure proper collision detection
+        /// Marks a collider as already processed to prevent repeated adjustments
         /// </summary>
+        [DisallowMultipleComponent]
+        public class ColliderAdjustmentMarker : MonoBehaviour { }
+
         private void UpdateEnemyPhysicsProperties()
         {
             Rigidbody2D[] allRigidbodies = FindObjectsByType<Rigidbody2D>(FindObjectsSortMode.None);
@@ -155,6 +158,12 @@ namespace CZ.Core.Configuration
             {
                 if (rb.gameObject.layer == enemyLayer)
                 {
+                    // Skip objects that have already been processed
+                    if (rb.gameObject.TryGetComponent<ColliderAdjustmentMarker>(out _))
+                    {
+                        continue;
+                    }
+                    
                     // Ensure the rigidbody is properly configured for collisions
                     if (rb.bodyType != RigidbodyType2D.Dynamic)
                     {
@@ -212,18 +221,20 @@ namespace CZ.Core.Configuration
                             Debug.Log($"[Physics2DSetup] Fixed collider on {rb.gameObject.name} that was incorrectly set as trigger");
                         }
                         
-                        // If this is a circle collider, slightly increase its radius to improve collision detection
+                        // If this is a circle collider, apply the scale factor only once
                         if (collider is CircleCollider2D circleCollider)
                         {
                             float originalRadius = circleCollider.radius;
-                            float newRadius = originalRadius * enemyColliderScaleFactor;
+                            float baseRadius = originalRadius / enemyColliderScaleFactor; // Calculate what the base radius would be
+                            float targetRadius = baseRadius * enemyColliderScaleFactor;   // Then apply the scale factor correctly
                             
-                            if (Mathf.Abs(circleCollider.radius - newRadius) > 0.001f)
+                            // Only adjust if not already at target value (with some tolerance)
+                            if (Mathf.Abs(circleCollider.radius - targetRadius) > 0.001f)
                             {
-                                circleCollider.radius = newRadius;
+                                circleCollider.radius = targetRadius;
                                 updatedCount++;
                                 Debug.Log($"[Physics2DSetup] Adjusted collider radius on {rb.gameObject.name} " +
-                                          $"from {originalRadius:F3} to {newRadius:F3}");
+                                          $"from {originalRadius:F3} to {targetRadius:F3} (one-time adjustment)");
                             }
                             
                             hasPhysicsCollider = true;
@@ -246,6 +257,9 @@ namespace CZ.Core.Configuration
                         updatedCount++;
                         Debug.Log($"[Physics2DSetup] Added new physics collider to {rb.gameObject.name} with radius {newCollider.radius:F3}");
                     }
+                    
+                    // Mark this object as processed so we don't adjust it again
+                    rb.gameObject.AddComponent<ColliderAdjustmentMarker>();
                 }
             }
             
@@ -267,8 +281,8 @@ namespace CZ.Core.Configuration
                     Debug.Log("[Physics2DSetup] Re-enabled Enemy-Enemy collisions during gameplay");
                 }
                 
-                // Periodically update physics properties if needed
-                if (Time.frameCount % 60 == 0) // Check every 60 frames
+                // We still need to check periodically, but only for new objects
+                if (Time.frameCount % 120 == 0) // Every 120 frames (reduced from 60)
                 {
                     UpdateEnemyPhysicsProperties();
                 }

@@ -8,7 +8,8 @@
         "CZ.Core.Interfaces",
         "CZ.Core.Resource",
         "NaughtyAttributes.Core",
-        "CZ.Core.Logging"
+        "CZ.Core.Logging",
+        "CZ.Core.Configuration"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
