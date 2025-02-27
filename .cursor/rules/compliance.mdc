@@ -1,5 +1,10 @@
 ---
 description: 
+globs: 
+alwaysApply: false
+---
+---
+description: 
 globs: *.*
 ---
 ---
@@ -14,23 +19,23 @@ globs: *.*
 # AGENT RULES COMPLIANCE
 
 ## Overview
-This rule defines the mandatory compliance process for all AGENT operations in the codebase.
+This rule defines the mandatory compliance process for all AGENT operations in the codebase. It ensures that all development activity follows project standards, maintains documentation consistency, and adheres to Unity 6 best practices.
 
 ## Priority
 CRITICAL - 
 
-!Critical Priority! ensure that agent reviews all project files. !!!
-
-!Critical Priority! Agent should never make assumptions. !!!
-
-!!! Follow Unity 6 Full Release (6000.0.38f1) and packages documented best practices
+1. ensure that agent reviews all project files. 
+2. Agent should not make assumptions. 
+3. Follow Unity 6 Full Release (6000.0.38f1) and packages using documented best practices
+4. Follow documentation standards as outlined in Documentation/README.md 
 
 ## Process
 1. Pre-Operation Checks:
    - Review all rules in [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json)
+   - Consult [Documentation Index](mdc:Documentation/Index.md) for relevant documentation
    - Verify AGENT compliance with each rule category:
      * File Verification (Critical)
-     * Cursor First Operations unless in conflice with Unity 6 best practices (Critical)
+     * Cursor First Operations unless in conflict with Unity 6 best practices (Critical)
      * Cursor Integration (Critical)
      * Unity Compliance with current version (unity 6 - 6000.0.38f1) (Highest)
      * Technical Standards (Critical)
@@ -41,19 +46,20 @@ CRITICAL -
      * Implementation Tracking (Critical)
      * Implementation Requirements (Critical)
      * Interaction Personalization (Critical)
- 
 
 2. During Operation:
    - Maintain active AGENT compliance with all rules
    - Track modifications against requirements
    - Document changes in accordance with guidelines
    - Follow proper tool usage patterns
+   - Adhere to documentation standards as outlined in [README.md](mdc:Documentation/README.md)
 
 3. Post-Operation Verification:
    - Verify changes against all AGENT rule requirements
    - Ensure documentation is updated
    - Validate technical standards compliance
    - Confirm workspace integrity
+   - Update [Documentation Index](mdc:Documentation/Index.md) for any new documentation files
 
 ## Conflict Resolution
 If a rule conflicts with Unity/package best practices:
@@ -65,10 +71,17 @@ If a rule conflicts with Unity/package best practices:
 ## Reference Files
 - Primary: [ai_rules.json](mdc:Documentation/Guidelines/ai_rules.json)
 - Supporting:
-  * [project_dependencies.md](mdc:Documentation/Resources/project_dependencies.md)
-  * [version_troubleshooting.md](mdc:Documentation/Resources/version_troubleshooting.md)
-  * [infrastructure.txt](mdc:Documentation/Guidelines/infrastructure.txt)
-  * [performance_guidelines.txt](mdc:Documentation/Guidelines/performance_guidelines.txt)
+  * [Documentation Index](mdc:Documentation/Index.md)
+  * [Project Dependencies](mdc:Documentation/Resources/project_dependencies.md)
+  * [Version Troubleshooting](mdc:Documentation/Resources/version_troubleshooting.md)
+  * [Infrastructure](mdc:Documentation/Technical/Architecture/Infrastructure.md)
+  * [Performance Guidelines](mdc:Documentation/Technical/Performance/PerformanceGuidelines.md)
+  * [Environment Setup](mdc:Documentation/Setup/EnvironmentSetup.md)
+  * [Assembly Structure](mdc:Documentation/Technical/Architecture/AssemblyStructure.md)
+  * [Core Game Loop](mdc:Documentation/Technical/Architecture/CoreGameLoop.md)
+  * [Physics System](mdc:Documentation/Technical/Systems/Physics.md)
+  * [Object Pooling System](mdc:Documentation/Technical/Systems/ObjectPooling.md)
+  * [Unity 6 Best Practices](mdc:Documentation/Reference/Unity6/BestPractices.md)
 
 ## Implementation Requirements
 1. Every AGENT response must:
@@ -91,10 +104,62 @@ If a rule conflicts with Unity/package best practices:
    - Maintain workspace integrity
    - Track modifications appropriately
 
+4. All documentation changes must:
+   - Use Markdown format (.md extension)
+   - Include "Last Updated" date and Unity version
+   - Follow consistent formatting standards
+   - Provide cross-references to related documentation
+   - Update the Documentation Index for new files
+   - Match the organization structure in Documentation/README.md
+
+## Documentation Standards
+1. File Format and Organization:
+   - All documentation must use Markdown format (.md extension)
+   - Files must be placed in the appropriate directory structure:
+     * Project-level documentation in `/Documentation/Project/`
+     * Technical documentation in `/Documentation/Technical/` (with appropriate subdirectories)
+     * Reference documentation in `/Documentation/Reference/`
+     * Setup documentation in `/Documentation/Setup/`
+     * Workflow documentation in `/Documentation/Workflows/`
+     * Guidelines in `/Documentation/Guidelines/`
+     * Resources in `/Documentation/Resources/`
+
+2. Content Requirements:
+   - Include a clear title and overview section
+   - Provide properly nested headings (h1, h2, h3, etc.)
+   - Use consistent formatting for code blocks, lists, and tables
+   - Include version information and last updated date
+   - Properly cite and reference Unity documentation where applicable
+
+3. Cross-Referencing:
+   - Use relative paths for links to other documentation files
+   - Update the Documentation Index when adding new files
+   - Include a Related Documentation section listing relevant docs
+   - Ensure all links are functional and point to valid locations
+
+4. Revision History:
+   - Include a revision history table in each document
+   - Document significant changes with date and version
+
 ## Validation
 Before completing any operation, verify:
 1. All relevant rules have been followed
 2. Changes comply with project standards
-3. Documentation is complete and accurate
+3. Documentation is complete and accurate:
+   - Markdown formatting is consistent
+   - Cross-references are functional
+   - Unity version and last updated date are included
+   - File is placed in appropriate directory
+   - Documentation Index is updated for new files
 4. Technical requirements are met
 5. Workspace integrity is maintained
+
+## Revision History
+
+| Date | Version | Changes |
+|------|---------|---------|
+| 2025-02-22 | 1.0 | Initial compliance rule creation |
+| 2025-02-27 | 1.1 | Updated reference files, added documentation standards, expanded validation requirements |
+
+Last Updated: 2025-02-27
+Unity Version: 6000.0.38f1

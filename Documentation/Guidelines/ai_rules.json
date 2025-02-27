@@ -13,10 +13,11 @@
             "track_dependencies": true
         },
         "reference_files": [
+            "Documentation/Index.md",
             "Documentation/Resources/project_dependencies.md",
             "Documentation/Resources/version_troubleshooting.md",
-            "Documentation/Guidelines/infrastructure.txt",
-            "Documentation/Guidelines/performance_guidelines.txt"
+            "Documentation/Technical/Architecture/Infrastructure.md",
+            "Documentation/Technical/Performance/PerformanceGuidelines.md"
         ]
     },
     "cursor_first_operations": {
@@ -42,8 +43,9 @@
             }
         },
         "reference_files": [
-            "Documentation/Guidelines/infrastructure.txt",
-            "Documentation/Guidelines/performance_guidelines.txt"
+            "Documentation/Technical/Architecture/Infrastructure.md",
+            "Documentation/Technical/Performance/PerformanceGuidelines.md",
+            "Documentation/Reference/Unity6/BestPractices.md"
         ]
     },
     "cursor_integration": {
@@ -78,7 +80,8 @@
         "reference_files": [
             "Documentation/Resources/project_dependencies.md",
             "Documentation/Resources/version_troubleshooting.md",
-            "Documentation/Guidelines/infrastructure.txt",
+            "Documentation/Technical/Architecture/Infrastructure.md",
+            "Documentation/Reference/Unity6/BestPractices.md",
             "Packages/manifest.json"
         ],
         "package_versions": {
@@ -93,8 +96,8 @@
     "technical_standards": {
         "priority": "high",
         "sources": [
-            "Documentation/Guidelines/performance_guidelines.txt",
-            "Documentation/Guidelines/infrastructure.txt"
+            "Documentation/Technical/Performance/PerformanceGuidelines.md",
+            "Documentation/Technical/Architecture/Infrastructure.md"
         ],
         "requirements": {
             "performance": {
@@ -102,7 +105,7 @@
                 "target_fps": 60,
                 "max_memory": 1024,
                 "respect_pooling": true,
-                "reference_file": "Documentation/Guidelines/performance_guidelines.txt",
+                "reference_file": "Documentation/Technical/Performance/PerformanceGuidelines.md",
                 "monitoring": {
                     "use_profiler_recorder": true,
                     "check_interval": 0.5,
@@ -113,7 +116,7 @@
                 "follow_patterns": true,
                 "maintain_scalability": true,
                 "ensure_testability": true,
-                "reference_file": "Documentation/Guidelines/infrastructure.txt",
+                "reference_file": "Documentation/Technical/Architecture/Infrastructure.md",
                 "testing": {
                     "use_performance_testing": true,
                     "implement_play_mode_tests": true,
@@ -125,9 +128,9 @@
     "project_alignment": {
         "priority": "medium",
         "sources": [
-            "Documentation/Architecture/checklists/core_game_loop_checklist.txt",
+            "Documentation/Technical/Architecture/CoreGameLoop.md",
             "Documentation/Resources/project_dependencies.md",
-            "Documentation/Guidelines/infrastructure.txt"
+            "Documentation/Technical/Architecture/Infrastructure.md"
         ],
         "checks": {
             "verify_architecture": true,
@@ -142,9 +145,9 @@
         "document_changes": true,
         "verify_completion": true,
         "reference_files": [
-            "Documentation/Architecture/checklists/core_game_loop_checklist.txt",
+            "Documentation/Technical/Architecture/CoreGameLoop.md",
             "Documentation/Resources/version_troubleshooting.md#version-update-checklist",
-            "Documentation/Guidelines/performance_guidelines.txt"
+            "Documentation/Technical/Performance/PerformanceGuidelines.md"
         ]
     },
     "error_handling": {
@@ -157,7 +160,7 @@
         },
         "reference_files": [
             "Documentation/Resources/version_troubleshooting.md#unity-6-console-error-codes",
-            "Documentation/Guidelines/infrastructure.txt"
+            "Documentation/Technical/Architecture/Infrastructure.md"
         ]
     },
     "documentation": {
@@ -169,10 +172,12 @@
             "verify_guidelines": true
         },
         "reference_files": [
+            "Documentation/Index.md",
+            "Documentation/README.md",
             "Documentation/Resources/project_dependencies.md",
             "Documentation/Resources/version_troubleshooting.md",
-            "Documentation/Guidelines/infrastructure.txt",
-            "Documentation/Guidelines/performance_guidelines.txt"
+            "Documentation/Technical/Architecture/Infrastructure.md",
+            "Documentation/Technical/Performance/PerformanceGuidelines.md"
         ]
     },
     "interaction_personalization": {
