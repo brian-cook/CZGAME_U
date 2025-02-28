@@ -173,6 +173,19 @@ namespace CZ.Core.Enemy
             IDamageable damageable = target.GetComponent<IDamageable>();
             if (damageable != null)
             {
+                // Check if the target has hit effects interface for directional knockback
+                IHitEffects hitEffects = target.GetComponent<IHitEffects>();
+                if (hitEffects != null)
+                {
+                    // Set the damage source position to this enemy's position
+                    hitEffects.SetDamageSourcePosition(transform.position);
+                    
+                    if (enableDebugLogs)
+                    {
+                        CZLogger.LogDebug($"[EnemyDamageDealer] Set damage source position: {transform.position}", LogCategory.Enemy);
+                    }
+                }
+                
                 // Apply damage using the correct method signature from IDamageable interface
                 damageable.TakeDamage(damageAmount, damageType);
                 
