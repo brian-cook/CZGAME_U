@@ -33,14 +33,14 @@ namespace CZ.Core.VFX
         [BoxGroup("Visual Effects")]
         [SerializeField]
         [InfoBox("Knockback force when taking damage", EInfoBoxType.Normal)]
-        [MinValue(0f), MaxValue(10f)]
-        private float knockbackForce = 2f;
+        [MinValue(0f), MaxValue(20f)]
+        private float knockbackForce = 5f;
 
         [BoxGroup("Visual Effects")]
         [SerializeField]
         [InfoBox("Duration of knockback effect", EInfoBoxType.Normal)]
-        [MinValue(0f), MaxValue(0.5f)]
-        private float knockbackDuration = 0.1f;
+        [MinValue(0f), MaxValue(1f)]
+        private float knockbackDuration = 0.25f;
 
         [BoxGroup("Visual Effects")]
         [SerializeField]
@@ -53,6 +53,12 @@ namespace CZ.Core.VFX
         [InfoBox("Duration of scale pulse effect", EInfoBoxType.Normal)]
         [MinValue(0f), MaxValue(0.5f)]
         private float scalePulseDuration = 0.1f;
+
+        [BoxGroup("Visual Effects")]
+        [SerializeField]
+        [InfoBox("Force multiplier for critical damage", EInfoBoxType.Normal)]
+        [MinValue(1f), MaxValue(3f)]
+        private float criticalKnockbackMultiplier = 1.5f;
 
         [BoxGroup("Debug Settings")]
         [SerializeField]
@@ -68,6 +74,7 @@ namespace CZ.Core.VFX
         private Vector2 lastDamageDirection = Vector2.zero;
         private Vector2 damageSourcePosition;
         private bool hasDamageSourcePosition;
+        private IDamageTypeProvider damageTypeProvider;
         #endregion
 
         #region Unity Lifecycle
@@ -131,6 +138,7 @@ namespace CZ.Core.VFX
             playerTransform = transform;
             playerRigidbody = GetComponent<Rigidbody2D>();
             originalScale = playerTransform.localScale;
+            damageTypeProvider = GetComponent<IDamageTypeProvider>();
 
             if (mainCamera == null)
             {
@@ -165,13 +173,20 @@ namespace CZ.Core.VFX
                 Debug.Log($"[PlayerHitEffects] Entity took {damageAmount} damage. Current health: {currentHealth}");
             }
 
+            // Get damage type if possible (to apply critical knockback)
+            DamageType damageType = DamageType.Normal;
+            if (damageTypeProvider != null && damageTypeProvider.LastDamageType != null)
+            {
+                damageType = damageTypeProvider.LastDamageType.Value;
+            }
+
             // Calculate damage direction (could be improved with actual damage source position)
             CalculateDamageDirection();
 
             // Apply all hit effects
             SpawnHitParticles();
             StartCoroutine(ApplyScreenShake());
-            ApplyKnockback();
+            ApplyKnockback(damageType);
             StartCoroutine(ApplyScalePulse());
         }
 
@@ -248,19 +263,27 @@ namespace CZ.Core.VFX
             }
         }
 
-        private void ApplyKnockback()
+        private void ApplyKnockback(DamageType damageType = DamageType.Normal)
         {
             if (playerRigidbody == null || knockbackForce <= 0f) return;
             
             // Apply knockback force in the direction of the damage
-            playerRigidbody.AddForce(lastDamageDirection * knockbackForce, ForceMode2D.Impulse);
+            // Use stronger knockback for critical hits
+            float actualKnockbackForce = knockbackForce;
+            if (damageType == DamageType.Critical)
+            {
+                actualKnockbackForce *= criticalKnockbackMultiplier;
+            }
+            
+            // Add stronger instant force
+            playerRigidbody.AddForce(lastDamageDirection * actualKnockbackForce, ForceMode2D.Impulse);
             
             // Reset velocity after duration
             StartCoroutine(ResetKnockback());
             
             if (enableDebugLogs)
             {
-                Debug.Log($"[PlayerHitEffects] Applied knockback in direction: {lastDamageDirection}");
+                Debug.Log($"[PlayerHitEffects] Applied knockback in direction: {lastDamageDirection} with force: {actualKnockbackForce}");
             }
         }
 
@@ -270,6 +293,19 @@ namespace CZ.Core.VFX
             
             if (playerRigidbody != null)
             {
+                // Gradually slow down instead of immediate stop
+                float elapsed = 0f;
+                float slowdownDuration = 0.1f;
+                Vector2 currentVelocity = playerRigidbody.linearVelocity;
+                
+                while (elapsed < slowdownDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = elapsed / slowdownDuration;
+                    playerRigidbody.linearVelocity = Vector2.Lerp(currentVelocity, Vector2.zero, t);
+                    yield return null;
+                }
+                
                 playerRigidbody.linearVelocity = Vector2.zero;
             }
         }

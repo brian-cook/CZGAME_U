@@ -1,0 +1,21 @@
+{
+    "name": "CZ.Core.Debug",
+    "rootNamespace": "CZ.Core.Debug",
+    "references": [
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "CZ.Core",
+        "CZ.Core.Player",
+        "CZ.Core.Interfaces",
+        "NaughtyAttributes.Core",
+        "CZ.Core.Logging"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+} 

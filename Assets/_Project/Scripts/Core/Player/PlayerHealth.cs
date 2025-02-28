@@ -74,6 +74,11 @@ namespace CZ.Core.Player
         public event Action<int, int> OnDamaged; // damage amount, current health
 
         /// <summary>
+        /// Event fired when player takes damage (with damage type)
+        /// </summary>
+        public event Action<int, int, DamageType> OnDamagedWithType; // damage amount, current health, damage type
+
+        /// <summary>
         /// Event fired when player health changes
         /// </summary>
         public event Action<int, int> OnHealthChanged; // current health, max health
@@ -284,6 +289,7 @@ namespace CZ.Core.Player
             
             // Invoke events
             OnDamaged?.Invoke(actualDamage, currentHealth);
+            OnDamagedWithType?.Invoke(actualDamage, currentHealth, damageType);
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
             
             if (enableDebugLogs)

@@ -7,6 +7,7 @@ using CZ.Core.Pooling;
 using CZ.Core.Interfaces;
 using static NaughtyAttributes.EInfoBoxType;
 using System.Linq;
+using System.Collections;
 
 namespace CZ.Core.Player
 {
@@ -16,7 +17,7 @@ namespace CZ.Core.Player
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(CircleCollider2D))]
     [RequireComponent(typeof(PlayerHealth))]
-    public class PlayerController : MonoBehaviour, IPositionProvider, IPlayerReference
+    public class PlayerController : MonoBehaviour, IPositionProvider, IPlayerReference, IDamageTypeProvider
     {
         #region Components
         private Rigidbody2D rb;
@@ -82,6 +83,11 @@ namespace CZ.Core.Player
         public float MaxVelocity => maxVelocity;
         
         /// <summary>
+        /// Gets the last damage type that was applied to the player
+        /// </summary>
+        public DamageType? LastDamageType { get; private set; }
+        
+        /// <summary>
         /// Test method to simulate input. Only available in editor and development builds.
         /// </summary>
         public void TestInput(Vector2 input)
@@ -130,12 +136,7 @@ namespace CZ.Core.Player
             InitializeProjectilePool();
             
             // Subscribe to health events
-            if (playerHealth != null)
-            {
-                playerHealth.OnDeath += HandlePlayerDeath;
-                playerHealth.OnRespawn += HandlePlayerRespawn;
-                Debug.Log("[PlayerController] Subscribed to PlayerHealth events");
-            }
+            SetupPlayerHealthEventHandlers();
         }
 
         private void SetupComponents()
@@ -224,6 +225,16 @@ namespace CZ.Core.Player
                     }
                     movementTrail.material = sharedTrailMaterial;
                 }
+            }
+            
+            // Ensure we have IHitEffects for knockback and visual effects
+            var hitEffects = GetComponent<IHitEffects>();
+            if (hitEffects == null)
+            {
+                // Add a default implementation of IHitEffects if needed
+                // We should create this in the Player namespace to avoid circular dependencies
+                hitEffects = gameObject.AddComponent<PlayerDamageEffects>();
+                Debug.Log("[PlayerController] Added IHitEffects component for knockback and visual feedback");
             }
             
             isInitialized = true;
@@ -418,7 +429,6 @@ namespace CZ.Core.Player
             
             if (controls != null)
             {
-                // Ensure Player actions are disabled first
                 controls.Player.Move.performed -= OnMove;
                 controls.Player.Move.canceled -= OnMove;
                 controls.Player.Attack.performed -= OnAttack;
@@ -426,16 +436,14 @@ namespace CZ.Core.Player
                 controls.Player.GamepadAim.performed -= OnGamepadAim;
                 controls.Player.GamepadAim.canceled -= OnGamepadAim;
                 controls.Player.Disable();
-                
-                // Then disable and dispose the entire controls
                 controls.Disable();
-                controls.Dispose();
-                controls = null;
             }
             
             // Unsubscribe from health events
             if (playerHealth != null)
             {
+                playerHealth.OnDamaged -= OnPlayerDamaged;
+                playerHealth.OnDamagedWithType -= OnPlayerDamagedWithType;
                 playerHealth.OnDeath -= HandlePlayerDeath;
                 playerHealth.OnRespawn -= HandlePlayerRespawn;
             }
@@ -638,6 +646,54 @@ namespace CZ.Core.Player
         #endregion
 
         #region Health Management
+        private void SetupPlayerHealthEventHandlers()
+        {
+            if (playerHealth != null)
+            {
+                // Subscribe to events
+                playerHealth.OnDamaged += OnPlayerDamaged;
+                playerHealth.OnDamagedWithType += OnPlayerDamagedWithType;
+                playerHealth.OnDeath += HandlePlayerDeath;
+                playerHealth.OnRespawn += HandlePlayerRespawn;
+            }
+        }
+        
+        private void OnPlayerDamaged(int damageAmount, int currentHealth)
+        {
+            // Basic version without damage type - mainly keeping for compatibility
+            // Main logic is now in OnPlayerDamagedWithType
+        }
+
+        private void OnPlayerDamagedWithType(int damageAmount, int currentHealth, DamageType damageType)
+        {
+            // Store the damage type
+            if (damageAmount > 0)
+            {
+                // Use the actual damage type from the event
+                HandleDamage(damageAmount, Vector2.zero, damageType);
+                
+                if (enableDebugLogs)
+                {
+                    Debug.Log($"[PlayerController] Player took {damageAmount} damage of type {damageType}");
+                }
+            }
+        }
+        
+        private void HandleDamage(float damageAmount, Vector2 damageSourcePosition, DamageType damageType)
+        {
+            // Store damage type for effects system
+            LastDamageType = damageType;
+            
+            // Clear damage type after a short delay
+            StartCoroutine(ClearLastDamageType());
+        }
+        
+        private IEnumerator ClearLastDamageType()
+        {
+            yield return new WaitForSeconds(0.5f);
+            LastDamageType = null;
+        }
+        
         private void HandlePlayerDeath()
         {
             isDead = true;
