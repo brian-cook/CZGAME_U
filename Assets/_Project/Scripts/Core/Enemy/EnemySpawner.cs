@@ -13,7 +13,8 @@ namespace CZ.Core.Enemy
     public class EnemySpawner : MonoBehaviour
     {
         [Header("Spawn Configuration")]
-        [SerializeField, Required] private GameObject enemyPrefab;
+        [SerializeField, Required] private List<GameObject> enemyPrefabs = new List<GameObject>();
+        [SerializeField, Required] private GameObject defaultEnemyPrefab;
         [SerializeField] private float spawnInterval = 1f;
         [SerializeField] private int maxEnemiesPerWave = 5;
         
@@ -29,7 +30,7 @@ namespace CZ.Core.Enemy
         private static readonly ProfilerMarker s_despawnMarker =
             new(ProfilerCategory.Scripts, "EnemySpawner.DespawnEnemy");
         
-        private ObjectPool<BaseEnemy> enemyPool;
+        private Dictionary<GameObject, ObjectPool<BaseEnemy>> enemyPools = new Dictionary<GameObject, ObjectPool<BaseEnemy>>();
         private bool isSpawning;
         private float nextSpawnTime;
         private HashSet<BaseEnemy> activeEnemies = new HashSet<BaseEnemy>();
@@ -95,7 +96,7 @@ namespace CZ.Core.Enemy
             CZLogger.LogInfo("Start called", LogCategory.Enemy);
             
             // Verify component state
-            CZLogger.LogDebug($"Component State - IsInitialized: {isInitialized}, IsInitializing: {isInitializing}, HasPrefab: {enemyPrefab != null}", LogCategory.Enemy);
+            CZLogger.LogDebug($"Component State - IsInitialized: {isInitialized}, IsInitializing: {isInitializing}, HasPrefabs: {enemyPrefabs.Count > 0}", LogCategory.Enemy);
             
             // Find target position provider
             targetPositionProvider = PositionProviderHelper.FindPositionProvider();
@@ -109,14 +110,15 @@ namespace CZ.Core.Enemy
                 CZLogger.LogDebug("IPositionProvider found successfully", LogCategory.Enemy);
             }
             
-            if (enemyPrefab != null)
+            // If we have prefabs (including the default one), initialize pool for each
+            if (enemyPrefabs.Count > 0 || defaultEnemyPrefab != null)
             {
-                CZLogger.LogInfo($"Initializing pool with prefab: {enemyPrefab.name}", LogCategory.Enemy);
-                InitializePool();
+                CZLogger.LogInfo($"Initializing pools for {enemyPrefabs.Count} enemy types", LogCategory.Enemy);
+                InitializePools();
             }
             else
             {
-                CZLogger.LogError("No enemy prefab assigned in inspector!", LogCategory.Enemy);
+                CZLogger.LogError("No enemy prefabs assigned in inspector!", LogCategory.Enemy);
             }
             
             // Subscribe to GameManager after initialization
@@ -152,11 +154,11 @@ namespace CZ.Core.Enemy
                     string reason = !isInitialized ? "not initialized" : "in emergency memory state";
                     CZLogger.LogWarning($"Cannot start spawning - {reason} when game state changed to Playing (Init: {isInitialized}, Initializing: {isInitializing})", LogCategory.Enemy);
                     
-                    // Attempt late initialization if we have a prefab and not in emergency mode
-                    if (enemyPrefab != null && !isInitializing && !GameManager.Instance.IsInEmergencyMode)
+                    // Attempt late initialization if we have prefabs and not in emergency mode
+                    if ((enemyPrefabs.Count > 0 || defaultEnemyPrefab != null) && !isInitializing && !GameManager.Instance.IsInEmergencyMode)
                     {
                         CZLogger.LogInfo("Attempting late initialization", LogCategory.Enemy);
-                        InitializePool();
+                        InitializePools();
                         if (isInitialized)
                         {
                             StartSpawning();
@@ -166,69 +168,166 @@ namespace CZ.Core.Enemy
             }
         }
         
-        private void InitializePool()
+        private void InitializePools()
         {
             using var _ = s_poolInitMarker.Auto();
             
-            if (isInitialized || isInitializing) return;
+            if (isInitialized)
+            {
+                CZLogger.LogInfo("Enemy pools already initialized", LogCategory.Enemy);
+                return;
+            }
             
             isInitializing = true;
             
-            if (enemyPrefab == null)
+            // Ensure defaultEnemyPrefab is assigned - if no enemy prefabs are set, create one by default
+            if (enemyPrefabs.Count == 0 && defaultEnemyPrefab != null)
             {
-                CZLogger.LogError("Enemy prefab is not set! Please assign a prefab in the inspector.", LogCategory.Enemy);
+                CZLogger.LogInfo($"No prefabs in list. Adding default prefab {defaultEnemyPrefab.name}", LogCategory.Enemy);
+                enemyPrefabs.Add(defaultEnemyPrefab);
+            }
+            
+            if (enemyPrefabs.Count == 0)
+            {
+                CZLogger.LogError("No enemy prefabs assigned! Please assign at least one prefab in the inspector.", LogCategory.Enemy);
                 isInitializing = false;
                 return;
             }
             
-            var baseEnemy = enemyPrefab.GetComponent<BaseEnemy>();
-            if (baseEnemy == null)
+            bool allPoolsInitialized = true;
+            
+            CZLogger.LogInfo($"Starting initialization of {enemyPrefabs.Count} enemy pools", LogCategory.Enemy);
+            
+            // Validate enemy prefabs before pool creation
+            for (int i = enemyPrefabs.Count - 1; i >= 0; i--)
             {
-                CZLogger.LogError("Enemy prefab must have BaseEnemy component!", LogCategory.Enemy);
+                if (enemyPrefabs[i] == null)
+                {
+                    CZLogger.LogWarning($"Null enemy prefab found at index {i}! Removing from list.", LogCategory.Enemy);
+                    enemyPrefabs.RemoveAt(i);
+                    continue;
+                }
+                
+                BaseEnemy baseEnemy = enemyPrefabs[i].GetComponent<BaseEnemy>();
+                if (baseEnemy == null)
+                {
+                    CZLogger.LogError($"Enemy prefab {enemyPrefabs[i].name} at index {i} does not have a BaseEnemy component! Removing from list.", LogCategory.Enemy);
+                    enemyPrefabs.RemoveAt(i);
+                    continue;
+                }
+            }
+            
+            // Check again after removing invalid prefabs
+            if (enemyPrefabs.Count == 0)
+            {
+                CZLogger.LogError("No valid enemy prefabs left after validation! Cannot initialize pools.", LogCategory.Enemy);
                 isInitializing = false;
                 return;
             }
             
-            try
+            // Initialize a pool for each enemy prefab
+            foreach (var prefab in enemyPrefabs)
             {
-                // Ensure prefab is inactive before creating pool
-                enemyPrefab.SetActive(false);
+                CZLogger.LogInfo($"Initializing pool for prefab: {prefab.name}", LogCategory.Enemy);
                 
-                // Get memory-aware pool size from GameManager
-                int initialPoolSize = Mathf.Min(maxEnemiesPerWave, 5); // Start with smaller initial size
-                int maxPoolSize = Mathf.Min(maxEnemiesPerWave * 2, 20); // Cap maximum size
+                if (enemyPools.ContainsKey(prefab))
+                {
+                    CZLogger.LogDebug($"Pool for {prefab.name} already exists. Skipping.", LogCategory.Enemy);
+                    continue;
+                }
                 
-                // Use PoolManager instead of local pool
-                enemyPool = PoolManager.Instance.CreatePool(
-                    createFunc: () => {
-                        var obj = Instantiate(enemyPrefab).GetComponent<BaseEnemy>();
-                        obj.gameObject.SetActive(false);
-                        return obj;
-                    },
-                    initialSize: initialPoolSize,
-                    maxSize: maxPoolSize,
-                    poolName: "EnemyPool"
-                );
+                var baseEnemy = prefab.GetComponent<BaseEnemy>();
+                if (baseEnemy == null)
+                {
+                    CZLogger.LogError($"Enemy prefab {prefab.name} must have BaseEnemy component!", LogCategory.Enemy);
+                    allPoolsInitialized = false;
+                    continue;
+                }
                 
+                try
+                {
+                    // Store original prefab activation state
+                    bool wasActive = prefab.activeSelf;
+                    
+                    // Ensure prefab is inactive before creating pool
+                    if (wasActive)
+                    {
+                        CZLogger.LogDebug($"Deactivating prefab {prefab.name} before pool creation", LogCategory.Enemy);
+                        prefab.SetActive(false);
+                    }
+                    
+                    // Get memory-aware pool size from GameManager
+                    int initialPoolSize = Mathf.Min(maxEnemiesPerWave, 5); // Start with smaller initial size
+                    int maxPoolSize = Mathf.Min(maxEnemiesPerWave * 2, 20); // Cap maximum size
+                    
+                    CZLogger.LogInfo($"Creating pool for {prefab.name} with initial size {initialPoolSize} and max size {maxPoolSize}", LogCategory.Enemy);
+                    
+                    // Use PoolManager instead of local pool for each prefab
+                    ObjectPool<BaseEnemy> pool = PoolManager.Instance.CreatePool(
+                        createFunc: () => {
+                            var inst = Instantiate(prefab);
+                            var enemyComponent = inst.GetComponent<BaseEnemy>();
+                            
+                            if (enemyComponent == null)
+                            {
+                                CZLogger.LogError($"Failed to get BaseEnemy component from instantiated prefab {prefab.name}", LogCategory.Enemy);
+                                Destroy(inst); // Clean up the instance
+                                return null;
+                            }
+                            
+                            inst.SetActive(false);
+                            return enemyComponent;
+                        },
+                        initialSize: initialPoolSize,
+                        maxSize: maxPoolSize,
+                        poolName: $"EnemyPool_{prefab.name}"
+                    );
+                    
+                    if (pool == null)
+                    {
+                        CZLogger.LogError($"Failed to create pool for {prefab.name}", LogCategory.Enemy);
+                        allPoolsInitialized = false;
+                        continue;
+                    }
+                    
+                    // Add pool to dictionary
+                    enemyPools[prefab] = pool;
+                    
+                    // Restore original prefab state if needed
+                    if (wasActive && !prefab.activeSelf)
+                    {
+                        CZLogger.LogDebug($"Restoring prefab {prefab.name} active state to {wasActive}", LogCategory.Enemy);
+                        prefab.SetActive(true);
+                    }
+                    
+                    CZLogger.LogInfo($"Pool for {prefab.name} created successfully with {pool.CurrentCount} instances", LogCategory.Enemy);
+                }
+                catch (System.Exception e)
+                {
+                    CZLogger.LogError($"Failed to create pool for {prefab.name}: {e.Message}\n{e.StackTrace}", LogCategory.Enemy);
+                    allPoolsInitialized = false;
+                }
+            }
+            
+            if (allPoolsInitialized && enemyPools.Count > 0)
+            {
+                CZLogger.LogInfo($"All {enemyPools.Count} enemy pools initialized successfully", LogCategory.Enemy);
                 isInitialized = true;
-                CZLogger.LogInfo($"Pool initialized with {initialPoolSize} initial enemies and {maxPoolSize} max size.", LogCategory.Enemy);
             }
-            catch (System.Exception e)
+            else
             {
-                CZLogger.LogError($"Failed to initialize enemy pool: {e.Message}", LogCategory.Enemy);
-                isInitialized = false;
+                CZLogger.LogError($"Failed to initialize all enemy pools. Successful pools: {enemyPools.Count}, Failed pools: {enemyPrefabs.Count - enemyPools.Count}", LogCategory.Enemy);
+                isInitialized = enemyPools.Count > 0; // At least we can spawn from the pools that did initialize
             }
-            finally
-            {
-                isInitializing = false;
-            }
+            
+            isInitializing = false;
         }
         
-        public void SetEnemyPrefab(GameObject prefab)
+        public void AddEnemyPrefab(GameObject prefab)
         {
             if (prefab == null)
             {
-                CZLogger.LogError("Cannot set null enemy prefab!", LogCategory.Enemy);
+                CZLogger.LogError("Cannot add null enemy prefab!", LogCategory.Enemy);
                 return;
             }
             
@@ -238,36 +337,130 @@ namespace CZ.Core.Enemy
                 return;
             }
             
-            // Only reinitialize if the prefab actually changed
-            if (enemyPrefab != prefab)
+            // Add to prefabs list if not already there
+            if (!enemyPrefabs.Contains(prefab))
             {
-                enemyPrefab = prefab;
-                if (gameObject.activeInHierarchy)
+                enemyPrefabs.Add(prefab);
+                
+                // If we're already initialized, create a pool for this prefab
+                if (isInitialized && !enemyPools.ContainsKey(prefab))
                 {
-                    InitializePool();
+                    try
+                    {
+                        // Ensure prefab is inactive
+                        prefab.SetActive(false);
+                        
+                        // Create pool for new prefab
+                        int initialPoolSize = Mathf.Min(maxEnemiesPerWave, 5);
+                        int maxPoolSize = Mathf.Min(maxEnemiesPerWave * 2, 20);
+                        
+                        ObjectPool<BaseEnemy> pool = PoolManager.Instance.CreatePool(
+                            createFunc: () => {
+                                var obj = Instantiate(prefab).GetComponent<BaseEnemy>();
+                                obj.gameObject.SetActive(false);
+                                return obj;
+                            },
+                            initialSize: initialPoolSize,
+                            maxSize: maxPoolSize,
+                            poolName: $"EnemyPool_{prefab.name}"
+                        );
+                        
+                        enemyPools.Add(prefab, pool);
+                        CZLogger.LogInfo($"Pool for {prefab.name} created successfully.", LogCategory.Enemy);
+                    }
+                    catch (System.Exception e)
+                    {
+                        CZLogger.LogError($"Failed to create pool for {prefab.name}: {e.Message}", LogCategory.Enemy);
+                    }
                 }
             }
         }
         
+        public void RemoveEnemyPrefab(GameObject prefab)
+        {
+            if (prefab == null) return;
+            
+            // Remove from list
+            enemyPrefabs.Remove(prefab);
+            
+            // Cleanup pool if it exists
+            if (enemyPools.TryGetValue(prefab, out var pool))
+            {
+                // Despawn any active enemies of this type
+                var enemiesToDespawn = activeEnemies.Where(e => e.gameObject.name.Contains(prefab.name)).ToList();
+                foreach (var enemy in enemiesToDespawn)
+                {
+                    DespawnEnemy(enemy);
+                }
+                
+                // Remove from pools dictionary
+                enemyPools.Remove(prefab);
+                
+                // Note: PoolManager doesn't provide a method to destroy individual pools
+                // The pool will be garbage collected when no longer referenced
+                CZLogger.LogInfo($"Removed prefab {prefab.name} and cleared its pool references.", LogCategory.Enemy);
+            }
+        }
+        
+        public void SetDefaultEnemyPrefab(GameObject prefab)
+        {
+            if (prefab == null)
+            {
+                CZLogger.LogError("Cannot set null default enemy prefab!", LogCategory.Enemy);
+                return;
+            }
+            
+            if (prefab.GetComponent<BaseEnemy>() == null)
+            {
+                CZLogger.LogError("Prefab must have BaseEnemy component!", LogCategory.Enemy);
+                return;
+            }
+            
+            defaultEnemyPrefab = prefab;
+            
+            // Add to prefabs list if not already there
+            if (!enemyPrefabs.Contains(prefab))
+            {
+                AddEnemyPrefab(prefab);
+            }
+        }
+        
+        /// <summary>
+        /// Backwards compatibility method for setting a single enemy prefab.
+        /// Sets the prefab as both the default and adds it to the prefab list.
+        /// </summary>
+        /// <param name="prefab">The enemy prefab to set</param>
+        public void SetEnemyPrefab(GameObject prefab)
+        {
+            // Clear existing prefabs for backward compatibility (tests expect single prefab behavior)
+            enemyPrefabs.Clear();
+            
+            // Use new methods
+            SetDefaultEnemyPrefab(prefab);
+            AddEnemyPrefab(prefab);
+            
+            CZLogger.LogInfo($"Using backward compatibility SetEnemyPrefab with {prefab?.name ?? "null"}", LogCategory.Enemy);
+        }
+        
         public void SetSpawnCount(int count)
         {
-            maxEnemiesPerWave = Mathf.Clamp(count, 1, 100);
-            if (isInitialized && !isInitializing)
+            if (count < 0)
             {
-                // Reinitialize pool with new size
-                isInitialized = false;
-                InitializePool();
+                CZLogger.LogWarning("Invalid spawn count (negative value). Setting to 0.", LogCategory.Enemy);
+                maxEnemiesPerWave = 0;
+            }
+            else
+            {
+                maxEnemiesPerWave = count;
+                CZLogger.LogInfo($"Spawn count set to {count}", LogCategory.Enemy);
             }
         }
         
         public void StartSpawning()
         {
-            if (!isInitialized)
-            {
-                CZLogger.LogError("Cannot start spawning - pool not initialized!", LogCategory.Enemy);
-                return;
-            }
+            if (isSpawning) return;
             
+            CZLogger.LogInfo("Starting enemy spawning", LogCategory.Enemy);
             isSpawning = true;
             nextSpawnTime = Time.time;
         }
@@ -281,169 +474,281 @@ namespace CZ.Core.Enemy
         {
             using var _ = s_despawnMarker.Auto();
             
-            if (!isInitialized)
+            if (activeEnemies.Count > 0)
             {
-                CZLogger.LogWarning("Cannot despawn enemies - pool not initialized!", LogCategory.Enemy);
-                return;
-            }
-            
-            // Create a temporary list to avoid collection modification during enumeration
-            var enemiesToDespawn = activeEnemies.ToList();
-            foreach (var enemy in enemiesToDespawn)
-            {
-                if (enemy != null)
+                CZLogger.LogInfo($"Despawning {activeEnemies.Count} active enemies", LogCategory.Enemy);
+                
+                var enemiesToDespawn = activeEnemies.ToList(); // Create copy to avoid collection modification issues
+                foreach (var enemy in enemiesToDespawn)
                 {
-                    enemyPool.Return(enemy);
+                    if (enemy != null)
+                    {
+                        DespawnEnemy(enemy);
+                    }
+                }
+                
+                activeEnemies.Clear();
+            }
+        }
+        
+        private void DespawnEnemy(BaseEnemy enemy)
+        {
+            if (enemy == null) return;
+            
+            using var _ = s_despawnMarker.Auto();
+            
+            // Remove from active list
+            activeEnemies.Remove(enemy);
+            
+            // Call OnDespawn and return to pool
+            enemy.OnDespawn();
+            enemy.gameObject.SetActive(false);
+            
+            // Find the original prefab for this enemy
+            var prefabFound = false;
+            foreach (var prefab in enemyPrefabs)
+            {
+                if (enemy.gameObject.name.Contains(prefab.name) && enemyPools.TryGetValue(prefab, out var pool))
+                {
+                    pool.Return(enemy);
+                    prefabFound = true;
+                    break;
                 }
             }
             
-            activeEnemies.Clear();
+            if (!prefabFound)
+            {
+                CZLogger.LogWarning($"Could not find matching pool for enemy {enemy.gameObject.name}. Destroying instead.", LogCategory.Enemy);
+                Destroy(enemy.gameObject);
+            }
         }
         
         private void Update()
         {
-            if (!isInitialized || !isSpawning || !isGamePlaying || targetPositionProvider == null)
+            if (!isInitialized || !isGamePlaying || !isSpawning) return;
+            
+            // Get target position from provider or debug value
+            Vector3 currentPlayerPos;
+            bool hasValidPosition = false;
+            
+            // First try to get position from position provider
+            if (targetPositionProvider != null)
             {
-                return;
+                try
+                {
+                    currentPlayerPos = targetPositionProvider.GetPosition();
+                    hasValidPosition = true;
+                }
+                catch (System.Exception e)
+                {
+                    CZLogger.LogWarning($"Error getting position from position provider: {e.Message}", LogCategory.Enemy);
+                    currentPlayerPos = debugTargetPosition; // Fallback to debug position
+                }
+            }
+            else
+            {
+                // Fallback to debug position
+                currentPlayerPos = debugTargetPosition;
             }
             
-            Vector3 currentPlayerPos = targetPositionProvider.GetPosition();
+            // Validate that we have a usable position - if debugTargetPosition is Vector3.zero, 
+            // it might indicate it hasn't been set
+            if (!hasValidPosition && currentPlayerPos == Vector3.zero)
+            {
+                CZLogger.LogWarning("No valid target position available for enemy spawning. Using default of (0,0,10).", LogCategory.Enemy);
+                currentPlayerPos = new Vector3(0, 0, 10); // Use a safe default value off-center
+            }
             
-            // Ensure we always update targets when the player moves
-            bool shouldUpdateTargets = Time.time >= nextTargetUpdateTime;
-            if (shouldUpdateTargets)
+            // Check if it's time to spawn a new enemy
+            if (Time.time >= nextSpawnTime && activeEnemies.Count < maxEnemiesPerWave)
+            {
+                // Pick a random enemy type from the available prefabs
+                SpawnRandomEnemy(currentPlayerPos);
+                
+                // Set time for next spawn
+                nextSpawnTime = Time.time + spawnInterval;
+            }
+            
+            // Update target position for all enemies periodically
+            if (Time.time >= nextTargetUpdateTime)
             {
                 UpdateEnemyTargets(currentPlayerPos);
                 nextTargetUpdateTime = Time.time + targetUpdateInterval;
-                
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                CZLogger.LogDebug($"Scheduled next target update in {targetUpdateInterval}s", LogCategory.Enemy);
-                #endif
-            }
-            
-            // Handle spawning
-            if (activeEnemies.Count < maxEnemiesPerWave && Time.time >= nextSpawnTime)
-            {
-                SpawnEnemy(currentPlayerPos);
-                nextSpawnTime = Time.time + spawnInterval;
             }
         }
         
         private void UpdateEnemyTargets(Vector3 currentPlayerPos)
         {
-            if (targetPositionProvider == null)
+            foreach (var enemy in activeEnemies)
             {
-                CZLogger.LogError("Cannot update targets - IPositionProvider is null!", LogCategory.Enemy);
+                if (enemy != null)
+                {
+                    enemy.SetTarget(currentPlayerPos);
+                }
+            }
+        }
+        
+        private void SpawnRandomEnemy(Vector3 currentPlayerPos)
+        {
+            if (enemyPrefabs.Count == 0)
+            {
+                CZLogger.LogError("No enemy prefabs available for spawning", LogCategory.Enemy);
                 return;
             }
             
-            Vector3 targetPos = Application.isEditor && !Application.isPlaying ? debugTargetPosition : currentPlayerPos;
+            int randomIndex = UnityEngine.Random.Range(0, enemyPrefabs.Count);
+            GameObject selectedPrefab = enemyPrefabs[randomIndex];
             
-            int updatedCount = 0;
-            int failedCount = 0;
-            
-            // Use cached active enemies instead of FindObjectsByType
-            foreach (var enemy in activeEnemies)
+            if (selectedPrefab == null)
             {
-                if (enemy != null && enemy.gameObject.activeInHierarchy)
-                {
-                    try 
-                    {
-                        enemy.SetTarget(targetPos);
-                        updatedCount++;
-                    }
-                    catch (System.Exception e)
-                    {
-                        failedCount++;
-                        CZLogger.LogError($"Failed to update enemy target: {e.Message}", LogCategory.Enemy);
-                    }
-                }
+                CZLogger.LogError("Selected prefab is null", LogCategory.Enemy);
+                return;
             }
             
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            CZLogger.LogDebug($"Target update complete - Updated: {updatedCount}, Failed: {failedCount}, Target: {targetPos}", LogCategory.Enemy);
-            #endif
+            SpawnEnemy(selectedPrefab, currentPlayerPos);
         }
         
-        private void SpawnEnemy(Vector3 currentPlayerPos)
+        private void SpawnEnemy(GameObject prefab, Vector3 currentPlayerPos)
         {
             using var _ = s_spawnMarker.Auto();
             
-            if (!isInitialized)
+            if (prefab == null)
             {
-                CZLogger.LogError("Cannot spawn enemy - pool not initialized!", LogCategory.Enemy);
+                CZLogger.LogError("Cannot spawn null prefab", LogCategory.Enemy);
                 return;
             }
             
-            var enemy = enemyPool.Get();
-            if (enemy != null)
+            if (!isInitialized)
             {
+                CZLogger.LogError($"Cannot spawn enemy - pools not initialized. Prefab: {prefab.name}", LogCategory.Enemy);
+                return;
+            }
+            
+            if (!enemyPools.TryGetValue(prefab, out var pool))
+            {
+                CZLogger.LogWarning($"No pool found for prefab {prefab.name}. Available pools: {string.Join(", ", enemyPools.Keys.Select(p => p?.name ?? "null"))}", LogCategory.Enemy);
+                return;
+            }
+            
+            try
+            {
+                // Check if pool is valid
+                if (pool == null)
+                {
+                    CZLogger.LogError($"Pool for prefab {prefab.name} is null", LogCategory.Enemy);
+                    return;
+                }
+                
+                // Log pool stats before getting enemy
+                var stats = pool.GetStats();
+                CZLogger.LogDebug($"Pool stats for {prefab.name}: Current={stats.current}, Active={pool.ActiveCount}, Peak={stats.peak}", LogCategory.Enemy);
+                
+                // Get enemy from pool
+                BaseEnemy enemy = pool.Get();
+                if (enemy == null)
+                {
+                    CZLogger.LogWarning("Failed to get enemy from pool", LogCategory.Enemy);
+                    return;
+                }
+                
+                // Additional null checks for enemy components
+                if (enemy.GameObject == null)
+                {
+                    CZLogger.LogError("Enemy.GameObject is null after retrieving from pool", LogCategory.Enemy);
+                    return;
+                }
+                
+                if (enemy.transform == null)
+                {
+                    CZLogger.LogError("Enemy.transform is null after retrieving from pool", LogCategory.Enemy);
+                    return;
+                }
+                
+                // Calculate spawn position away from player
+                Vector3 randomDir = Random.insideUnitCircle.normalized;
+                float spawnDistance = Random.Range(minSpawnDistance, spawnRadius);
+                Vector3 spawnPosition = currentPlayerPos + new Vector3(randomDir.x, randomDir.y, 0) * spawnDistance;
+                
+                // Position the enemy
+                enemy.transform.position = spawnPosition;
+                
+                // Ensure enemy is active before calling other methods
+                if (!enemy.GameObject.activeSelf)
+                {
+                    enemy.GameObject.SetActive(true);
+                }
+                
+                // Initialize the enemy with more exception handling
+                try {
+                    // The ObjectPool no longer calls OnSpawn, so we need to call it here
+                    enemy.OnSpawn();
+                } catch (System.Exception e) {
+                    CZLogger.LogError($"Error during enemy.OnSpawn(): {e.Message}", LogCategory.Enemy);
+                    return; // Don't continue if OnSpawn fails
+                }
+                
+                // Validate target position before attempting to set it
+                if (float.IsNaN(currentPlayerPos.x) || float.IsNaN(currentPlayerPos.y) || float.IsNaN(currentPlayerPos.z) ||
+                    float.IsInfinity(currentPlayerPos.x) || float.IsInfinity(currentPlayerPos.y) || float.IsInfinity(currentPlayerPos.z))
+                {
+                    CZLogger.LogError($"Invalid target position {currentPlayerPos} (contains NaN or Infinity)", LogCategory.Enemy);
+                    // Use the enemy's current position as a fallback to avoid errors
+                    Vector3 fallbackPosition = enemy.transform.position + new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f), 0);
+                    try {
+                        enemy.SetTarget(fallbackPosition);
+                        CZLogger.LogWarning($"Used fallback target position {fallbackPosition} for enemy", LogCategory.Enemy);
+                    } catch (System.Exception e) {
+                        CZLogger.LogError($"Error setting fallback target for enemy: {e.Message}", LogCategory.Enemy);
+                    }
+                }
+                else
+                {
+                    // Set target position with normal position
+                    try {
+                        enemy.SetTarget(currentPlayerPos);
+                    } catch (System.Exception e) {
+                        CZLogger.LogError($"Error setting target for enemy: {e.Message}", LogCategory.Enemy);
+                        // Continue execution even if target setting fails
+                    }
+                }
+                
+                // Add to active enemies
                 activeEnemies.Add(enemy);
                 
-                // Calculate spawn position relative to spawner
-                float angle = Random.Range(0f, 360f);
-                float distance = Random.Range(minSpawnDistance, spawnRadius);
-                Vector2 spawnOffset = Quaternion.Euler(0, 0, angle) * Vector2.right * distance;
-                
-                // Position enemy
-                enemy.transform.position = (Vector2)transform.position + spawnOffset;
-                
-                // Set initial target
-                enemy.SetTarget(currentPlayerPos);
-                
-                CZLogger.LogInfo($"Spawned enemy at {enemy.transform.position}. Active count: {activeEnemies.Count}", LogCategory.Enemy);
+                CZLogger.LogDebug($"Spawned {enemy.GameObject.name} at {spawnPosition}", LogCategory.Enemy);
             }
-            else
+            catch (System.Exception e)
             {
-                CZLogger.LogError("Failed to get enemy from pool!", LogCategory.Enemy);
+                CZLogger.LogError($"Failed to spawn enemy: {e.Message}\n{e.StackTrace}", LogCategory.Enemy);
             }
         }
         
-        /// <summary>
-        /// Sets a fixed target position for testing purposes.
-        /// This method is primarily used by the test framework and should not be used in gameplay.
-        /// </summary>
-        /// <param name="position">The target position to set</param>
         public void SetTargetPosition(Vector3 position)
         {
+            // For manual setting of target position when no position provider exists
+            // Useful for testing or special gameplay situations
             debugTargetPosition = position;
-            if (isInitialized)
-            {
-                UpdateEnemyTargets(position);
-            }
         }
         
         private void OnDrawGizmosSelected()
         {
-            // Draw spawn area
+            // Draw the spawn area in the editor
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, spawnRadius);
+            
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, minSpawnDistance);
-            
-            // Draw debug target position if set (for tests)
-            if (debugTargetPosition != Vector3.zero)
-            {
-                Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(debugTargetPosition, 0.5f);
-            }
         }
         
         private void OnDestroy()
         {
-            CZLogger.LogInfo("OnDestroy called", LogCategory.Enemy);
-            if (GameManager.Instance != null)
+            // Cleanup pools when destroyed
+            foreach (var pool in enemyPools.Values)
             {
-                GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+                // Pool cleanup is handled by PoolManager
             }
             
-            if (enemyPool != null)
-            {
-                DespawnAllEnemies();
-                enemyPool.Clear();
-            }
-            
-            activeEnemies.Clear();
+            UnsubscribeFromGameManager();
         }
     }
 } 

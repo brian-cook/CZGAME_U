@@ -6,6 +6,7 @@ using CZ.Core.Interfaces;
 using CZ.Core.Resource;
 using CZ.Core.Logging;
 using CZ.Core.Configuration;
+using System;
 
 namespace CZ.Core.Enemy
 {
@@ -14,6 +15,12 @@ namespace CZ.Core.Enemy
     [RequireComponent(typeof(Rigidbody2D))]
     public class BaseEnemy : MonoBehaviour, IPoolable, IDamageable
     {
+        #region Events
+        // Delegate and event for enemy defeat
+        public delegate void EnemyDefeatedHandler(BaseEnemy enemy);
+        public event EnemyDefeatedHandler OnEnemyDefeated;
+        #endregion
+
         #region Components
         private SpriteRenderer spriteRenderer;
         private CircleCollider2D circleCollider;
@@ -122,15 +129,49 @@ namespace CZ.Core.Enemy
         // IDamageable interface properties
         public int CurrentHealth => currentHealth;
         public int MaxHealth => maxHealth;
+        
+        // Protected properties for derived classes
+        protected Rigidbody2D Rb => rb;
+        protected int CurrentHealthValue 
+        { 
+            get => currentHealth; 
+            set => currentHealth = value; 
+        }
+        protected int MaxHealthValue 
+        { 
+            get => maxHealth; 
+            set => maxHealth = value; 
+        }
+        protected float MoveSpeedValue 
+        { 
+            get => moveSpeed; 
+            set => moveSpeed = value; 
+        }
+        protected bool IsDeadValue 
+        { 
+            get => IsDead; 
+            set => isDying = value; 
+        }
         #endregion
 
         #region Unity Lifecycle
         private void Awake()
         {
+            // Store original color for flash effect
+            if (TryGetComponent(out SpriteRenderer sr))
+            {
+                originalColor = sr.color;
+            }
+            else
+            {
+                originalColor = Color.white;
+            }
+            
+            // Initialize components
             InitializeComponents();
         }
 
-        private void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             if (!isInitialized) return;
             MoveTowardsTarget();
@@ -173,18 +214,28 @@ namespace CZ.Core.Enemy
         #endregion
 
         #region Initialization
-        private void InitializeComponents()
+        protected virtual void InitializeComponents()
         {
-            if (isInitialized) return;
+            if (isInitialized)
+            {
+                CZLogger.LogDebug("Enemy components already initialized", LogCategory.Enemy);
+                return;
+            }
             
             try
             {
-                // Get required components
+                // Set up required components
                 spriteRenderer = GetComponent<SpriteRenderer>();
                 if (spriteRenderer == null)
                 {
                     CZLogger.LogError("Enemy is missing SpriteRenderer component", LogCategory.Enemy);
                     return;
+                }
+                
+                // Ensure we have a valid sprite
+                if (spriteRenderer.sprite == null)
+                {
+                    CZLogger.LogWarning("Enemy SpriteRenderer has null sprite. Enemy visuals will be invisible.", LogCategory.Enemy);
                 }
                 
                 // Set up collider based on sprite size
@@ -225,8 +276,16 @@ namespace CZ.Core.Enemy
                 rb.mass = 1.5f;
                 
                 // Configure collider based on our intended collision behavior
-                float spriteSize = Mathf.Max(spriteRenderer.bounds.size.x, spriteRenderer.bounds.size.y);
-                circleCollider.radius = spriteSize * collisionRadius;
+                if (spriteRenderer.sprite != null)
+                {
+                    float spriteSize = Mathf.Max(spriteRenderer.bounds.size.x, spriteRenderer.bounds.size.y);
+                    circleCollider.radius = spriteSize * collisionRadius;
+                }
+                else
+                {
+                    // Default fallback size if sprite is null
+                    circleCollider.radius = collisionRadius;
+                }
                 
                 // Important: We must NOT use trigger colliders for physical collisions
                 circleCollider.isTrigger = false;
@@ -234,47 +293,33 @@ namespace CZ.Core.Enemy
                 // Create or assign a physics material to improve collisions
                 if (circleCollider.sharedMaterial == null)
                 {
-                    // Create a physics material to prevent enemies from sticking to each other
-                    PhysicsMaterial2D physicsMaterial = new PhysicsMaterial2D("EnemyPhysicsMaterial");
-                    physicsMaterial.friction = 0.1f;       // Slight friction to prevent excessive sliding
-                    physicsMaterial.bounciness = 0.3f;    // Moderate bounce for better collision response
-                    
-                    // Apply the material to the collider
-                    circleCollider.sharedMaterial = physicsMaterial;
-                    
-                    CZLogger.LogInfo($"Created and applied physics material to enemy collider", LogCategory.Enemy);
+                    try
+                    {
+                        // Create a physics material to prevent enemies from sticking to each other
+                        PhysicsMaterial2D physicsMaterial = new PhysicsMaterial2D("EnemyPhysicsMaterial");
+                        physicsMaterial.friction = 0.1f;       // Slight friction to prevent excessive sliding
+                        physicsMaterial.bounciness = 0.3f;    // Moderate bounce for better collision response
+                        
+                        // Apply the material to the collider
+                        circleCollider.sharedMaterial = physicsMaterial;
+                        
+                        CZLogger.LogInfo($"Created and applied physics material to enemy collider", LogCategory.Enemy);
+                    }
+                    catch (System.Exception e)
+                    {
+                        CZLogger.LogWarning($"Failed to create physics material: {e.Message}. Using default physics material.", LogCategory.Enemy);
+                    }
                 }
                 
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                CZLogger.LogInfo($"Configured collider - Radius: {circleCollider.radius:F2}, IsTrigger: {false}, Mass: {rb.mass:F2}", LogCategory.Enemy);
-                #endif
-                
-                // Store original color and create material instance
-                originalColor = Color.white; // Default color
-                if (sharedMaterial == null)
-                {
-                    sharedMaterial = new Material(Shader.Find("Sprites/Default"));
-                    CZLogger.LogInfo("Created new material for enemy", LogCategory.Enemy);
-                }
-                
-                materialInstance = new Material(sharedMaterial);
-                spriteRenderer.material = materialInstance;
-                spriteRenderer.color = originalColor;
-                
-                // Ensure we have an EnemyDamageDealer component
-                EnemyDamageDealer damageDealer = GetComponent<EnemyDamageDealer>();
-                if (damageDealer == null)
-                {
-                    damageDealer = gameObject.AddComponent<EnemyDamageDealer>();
-                    CZLogger.LogInfo("Added EnemyDamageDealer component to enemy", LogCategory.Enemy);
-                }
-                
+                // Mark as initialized
                 isInitialized = true;
-                CZLogger.LogInfo($"Initialized enemy: {gameObject.name}", LogCategory.Enemy);
+                
+                CZLogger.LogInfo($"Enemy {gameObject.name} components initialized successfully", LogCategory.Enemy);
             }
             catch (System.Exception e)
             {
-                CZLogger.LogError($"Error initializing enemy: {e.Message}\nStack trace: {e.StackTrace}", LogCategory.Enemy);
+                CZLogger.LogError($"Error initializing enemy components: {e.Message}", LogCategory.Enemy);
+                isInitialized = false;
             }
         }
         #endregion
@@ -284,66 +329,87 @@ namespace CZ.Core.Enemy
         {
             if (!isInitialized || !hasValidTarget) return;
 
-            // Calculate distance to target
-            Vector2 toTarget = ((Vector2)targetPosition - rb.position);
-            float distance = toTarget.magnitude;
-            
-            // Calculate direction and desired velocity
-            Vector2 direction = toTarget.normalized;
-            Vector2 targetVelocity = direction * moveSpeed;
-            
-            // Adjust velocity based on distance to target
-            if (distance < stoppingDistance)
+            // Safety check for missing rigidbody - this could happen if it was destroyed
+            if (rb == null)
             {
-                float speedMultiplier = Mathf.Clamp01(distance / stoppingDistance);
-                targetVelocity *= speedMultiplier;
-            }
-            
-            // Check if target is stale
-            float targetAge = Time.time - lastTargetUpdateTime;
-            bool isTargetStale = targetAge > targetUpdateTimeout;
-            
-            if (isTargetStale)
-            {
-                // For stale targets, maintain some movement but reduce speed over time
-                float stalenessFactor = Mathf.Clamp01(1.0f - (targetAge - targetUpdateTimeout) / targetUpdateTimeout);
-                stalenessFactor = Mathf.Max(0.3f, stalenessFactor); // Never go below 30% speed
-                targetVelocity *= stalenessFactor;
+                CZLogger.LogError("Rigidbody2D is null in MoveTowardsTarget. Re-initializing components.", LogCategory.Enemy);
+                InitializeComponents();
                 
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                if (rb.linearVelocity.magnitude > 0.1f)
+                // If we still don't have a rigidbody, we can't move
+                if (rb == null)
                 {
-                    CZLogger.LogWarning($"Using stale target data. Age: {targetAge:F2}s, Speed: {rb.linearVelocity.magnitude:F2}", LogCategory.Enemy);
+                    CZLogger.LogError("Failed to re-initialize Rigidbody2D. Cannot move enemy.", LogCategory.Enemy);
+                    return;
                 }
-                #endif
             }
-            
-            // Apply movement with improved responsiveness
-            float lerpFactor = Time.fixedDeltaTime * velocityLerpSpeed;
-            if (isTargetStale)
+
+            try
             {
-                // Reduce lerp speed for stale targets to maintain more momentum
-                lerpFactor *= 0.5f;
+                // Calculate distance to target
+                Vector2 toTarget = ((Vector2)targetPosition - rb.position);
+                float distance = toTarget.magnitude;
+                
+                // Calculate direction and desired velocity
+                Vector2 direction = toTarget.normalized;
+                Vector2 targetVelocity = direction * moveSpeed;
+                
+                // Adjust velocity based on distance to target
+                if (distance < stoppingDistance)
+                {
+                    float speedMultiplier = Mathf.Clamp01(distance / stoppingDistance);
+                    targetVelocity *= speedMultiplier;
+                }
+                
+                // Check if target is stale
+                float targetAge = Time.time - lastTargetUpdateTime;
+                bool isTargetStale = targetAge > targetUpdateTimeout;
+                
+                if (isTargetStale)
+                {
+                    // For stale targets, maintain some movement but reduce speed over time
+                    float stalenessFactor = Mathf.Clamp01(1.0f - (targetAge - targetUpdateTimeout) / targetUpdateTimeout);
+                    stalenessFactor = Mathf.Max(0.3f, stalenessFactor); // Never go below 30% speed
+                    targetVelocity *= stalenessFactor;
+                    
+                    #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    if (rb.linearVelocity.magnitude > 0.1f)
+                    {
+                        CZLogger.LogDebug($"Moving toward stale target ({targetAge:F1}s old) - reducing speed to {stalenessFactor:P0}", LogCategory.Enemy);
+                    }
+                    #endif
+                }
+                
+                // Apply velocity with acceleration for smoother movement
+                rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * velocityLerpSpeed);
+                
+                // Optionally rotate to face movement direction
+                if (rb.linearVelocity.sqrMagnitude > 0.01f)
+                {
+                    float angle = Mathf.Atan2(rb.linearVelocity.y, rb.linearVelocity.x) * Mathf.Rad2Deg;
+                    transform.rotation = Quaternion.Euler(0, 0, angle);
+                }
             }
-            
-            // Apply velocity change
-            rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, targetVelocity, lerpFactor);
-            
-            // Update facing direction when moving
-            if (rb.linearVelocity.sqrMagnitude > 0.1f)
+            catch (System.Exception e)
             {
-                float angle = Mathf.Atan2(rb.linearVelocity.y, rb.linearVelocity.x) * Mathf.Rad2Deg;
-                transform.rotation = Quaternion.Euler(0, 0, angle);
+                CZLogger.LogError($"Error in MoveTowardsTarget: {e.Message}", LogCategory.Enemy);
             }
         }
         #endregion
 
         #region Public Methods
-        public void SetTarget(Vector3 position)
+        public virtual void SetTarget(Vector3 position)
         {
             if (!isInitialized)
             {
                 CZLogger.LogError("Cannot set target - enemy not initialized!", LogCategory.Enemy);
+                return;
+            }
+            
+            // Validate the input position to prevent setting invalid values
+            if (float.IsNaN(position.x) || float.IsNaN(position.y) || float.IsNaN(position.z) ||
+                float.IsInfinity(position.x) || float.IsInfinity(position.y) || float.IsInfinity(position.z))
+            {
+                CZLogger.LogError($"Cannot set invalid target position: {position} (contains NaN or Infinity)", LogCategory.Enemy);
                 return;
             }
             
@@ -363,12 +429,12 @@ namespace CZ.Core.Enemy
             }
         }
 
-        public void TakeDamage(int damage)
+        public virtual void TakeDamage(int damage)
         {
             TakeDamage(damage, DamageType.Normal);
         }
 
-        public void TakeDamage(int damage, DamageType damageType)
+        public virtual void TakeDamage(int damage, DamageType damageType)
         {
             if (isDying || !isInitialized) return;
 
@@ -444,13 +510,13 @@ namespace CZ.Core.Enemy
                     try
                     {
                         // Spawn experience with validation and offset
-                        float expRoll = Random.value * 100f;
+                        float expRoll = UnityEngine.Random.value * 100f;
                         if (expRoll <= experienceDropChance)
                         {
-                            int experienceDropCount = Random.Range(minExperienceDropCount, maxExperienceDropCount + 1);
+                            int experienceDropCount = UnityEngine.Random.Range(minExperienceDropCount, maxExperienceDropCount + 1);
                             for (int i = 0; i < experienceDropCount; i++)
                             {
-                                Vector3 expPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+                                Vector3 expPosition = spawnPosition + new Vector3(UnityEngine.Random.Range(-0.5f, 0.5f), UnityEngine.Random.Range(-0.5f, 0.5f), 0);
                                 var expResource = ResourceManager.Instance.SpawnResource(ResourceType.Experience, expPosition);
                                 if (expResource != null)
                                 {
@@ -462,10 +528,10 @@ namespace CZ.Core.Enemy
                         }
 
                         // Random chance for health drop with validation and offset
-                        float healthRoll = Random.value * 100f;
+                        float healthRoll = UnityEngine.Random.value * 100f;
                         if (healthRoll <= healthDropChance)
                         {
-                            Vector3 healthPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+                            Vector3 healthPosition = spawnPosition + new Vector3(UnityEngine.Random.Range(-0.5f, 0.5f), UnityEngine.Random.Range(-0.5f, 0.5f), 0);
                             var healthResource = ResourceManager.Instance.SpawnResource(ResourceType.Health, healthPosition);
                             if (healthResource != null)
                             {
@@ -476,10 +542,10 @@ namespace CZ.Core.Enemy
                         }
 
                         // Random chance for power-up with validation and offset
-                        float powerUpRoll = Random.value * 100f;
+                        float powerUpRoll = UnityEngine.Random.value * 100f;
                         if (powerUpRoll <= powerUpDropChance)
                         {
-                            Vector3 powerUpPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+                            Vector3 powerUpPosition = spawnPosition + new Vector3(UnityEngine.Random.Range(-0.5f, 0.5f), UnityEngine.Random.Range(-0.5f, 0.5f), 0);
                             var powerUpResource = ResourceManager.Instance.SpawnResource(ResourceType.PowerUp, powerUpPosition);
                             if (powerUpResource != null)
                             {
@@ -490,10 +556,10 @@ namespace CZ.Core.Enemy
                         }
 
                         // Random chance for currency with validation and offset
-                        float currencyRoll = Random.value * 100f;
+                        float currencyRoll = UnityEngine.Random.value * 100f;
                         if (currencyRoll <= currencyDropChance)
                         {
-                            Vector3 currencyPosition = spawnPosition + new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0);
+                            Vector3 currencyPosition = spawnPosition + new Vector3(UnityEngine.Random.Range(-0.5f, 0.5f), UnityEngine.Random.Range(-0.5f, 0.5f), 0);
                             var currencyResource = ResourceManager.Instance.SpawnResource(ResourceType.Currency, currencyPosition);
                             if (currencyResource != null)
                             {
@@ -514,43 +580,43 @@ namespace CZ.Core.Enemy
                 {
                     CZLogger.LogError("ResourceManager not available for spawning resources", LogCategory.Enemy);
                 }
-            }
-            finally
-            {
+
+                // Trigger the OnEnemyDefeated event before returning to pool
+                OnEnemyDefeated?.Invoke(this);
+
                 // Always attempt to return to pool
                 ReturnToPool();
             }
+            catch (System.Exception e)
+            {
+                CZLogger.LogError($"Error in enemy death sequence: {e.Message}\n{e.StackTrace}", LogCategory.Enemy);
+            }
         }
 
-        public void OnSpawn()
+        public virtual void OnSpawn()
         {
-            // Reset health
+            // Make sure components are initialized
+            if (!isInitialized)
+            {
+                CZLogger.LogInfo($"Enemy {gameObject.name} not initialized during OnSpawn. Initializing now.", LogCategory.Enemy);
+                InitializeComponents();
+            }
+            
+            // Reset health and state
             currentHealth = maxHealth;
             isDying = false;
             deathTimer = 0f;
-            
-            // Reset damage flash
             damageFlashTimer = 0f;
+            hasValidTarget = false;
+            lastTargetUpdateTime = 0f;
+            
+            // Reset the sprite color
             if (spriteRenderer != null)
             {
-                // Save the original color if not already saved
-                if (originalColor == default(Color))
-                {
-                    originalColor = spriteRenderer.color;
-                }
-                else
-                {
-                    // Otherwise, restore it
-                    spriteRenderer.color = originalColor;
-                }
+                spriteRenderer.color = originalColor;
             }
             
-            // Reset collider and rigidbody
-            if (circleCollider != null)
-            {
-                circleCollider.enabled = true;
-            }
-            
+            // Reset any velocity
             if (rb != null)
             {
                 rb.simulated = true;
@@ -565,13 +631,12 @@ namespace CZ.Core.Enemy
                 Destroy(marker);
             }
             
-            isInitialized = true;
             gameObject.SetActive(true);
             
             CZLogger.LogInfo($"Enemy spawned: {gameObject.name} at {transform.position}", LogCategory.Enemy);
         }
 
-        public void OnDespawn()
+        public virtual void OnDespawn()
         {
             CZLogger.LogDebug($"Enemy despawning: {gameObject.name}", LogCategory.Enemy);
             // Clean up material instance if it exists

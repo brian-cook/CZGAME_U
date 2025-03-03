@@ -155,64 +155,80 @@ The Core Game Loop is composed of the following components:
 
 ### Enemy Systems ⚠️
 
-- [x] **Enemy AI Updates**
-  - [x] Behavior tree execution
-  - [x] Pathfinding calculations
-  - [x] Decision making logic
-  
-- [ ] **Enemy Type Implementation**
-  - [x] Basic enemies (fast/weak)
-  - [ ] Swift enemies
-    - **Cursor Tasks**:
-      - [ ] Create SwiftEnemyController script (high speed, low health)
-      - [ ] Implement unique movement patterns (erratic, burst movements)
-      - [ ] Add dodge behavior logic
-      - [ ] Set up animation state machine integration
-    - **Unity Manual Tasks**:
-      - [ ] Create Swift Enemy prefab in Unity 6 editor
-      - [ ] Attach SwiftEnemyController script to prefab
-      - [ ] Configure Physics2D components (smaller collider, lower mass)
-      - [ ] Set up Animator Controller with swift-specific animations
-      - [ ] Adjust NavMeshAgent parameters (higher speed, lower stopping distance)
-      - [ ] Configure object pooling settings (25 initial, 50 max)
-  - [ ] Tank enemies
-    - **Cursor Tasks**:
-      - [ ] Create TankEnemyController script (low speed, high health)
-      - [ ] Implement unique attack patterns (area effect, charge-up attacks)
-      - [ ] Add status effect resistance logic
-      - [ ] Set up visual feedback for damage states
-    - **Unity Manual Tasks**:
-      - [ ] Create Tank Enemy prefab in Unity 6 editor
-      - [ ] Attach TankEnemyController script to prefab
-      - [ ] Configure Physics2D components (larger collider, higher mass)
-      - [ ] Set up Animator Controller with tank-specific animations
-      - [ ] Adjust NavMeshAgent parameters (lower speed, higher stopping distance)
-      - [ ] Configure object pooling settings (15 initial, 30 max)
-      - [ ] Add particle systems for defensive/attack visual effects
-  - [ ] Ranged enemies
-  - [ ] Special/Elite enemies
-  - [ ] Boss encounters
-  
-- [ ] **Spawn System**
-  - [x] Basic enemy spawning
-  - [ ] Wave Management
-    - **Cursor Tasks**:
-      - [ ] Create WaveManager script with wave definition system
-      - [ ] Implement wave progression logic (difficulty curves)
-      - [ ] Add enemy type distribution controller
-      - [ ] Create wave event system (start/end handlers)
-      - [ ] Implement wave timeout and failure conditions
-    - **Unity Manual Tasks**:
-      - [ ] Create WaveManager GameObject in scene
-      - [ ] Attach WaveManager script to GameObject
-      - [ ] Configure wave settings in Inspector (count, timing, difficulty)
-      - [ ] Set up spawn points in scene with gizmo visualization
-      - [ ] Link enemy prefabs to spawn manager through Inspector
-      - [ ] Configure object pooling integration settings
-      - [ ] Set up UI events for wave notifications
-  - [ ] Difficulty scaling
-  - [ ] Zone-based spawning rules
-  - [ ] Enemy density control
+### Base Enemy Implementation
+- [x] Define base enemy class with health, movement, and damage handling
+- [x] Create simple enemy controller
+- [x] Implement object pooling for enemy spawning
+- [x] Set up basic collision detection with player
+- [x] Implement basic animation state machine
+
+### Swift Enemies
+**Cursor Tasks**:
+- [x] Create SwiftEnemyController script (high speed, low health)
+- [x] Implement unique movement patterns (erratic, burst movements)
+- [x] Add dodge behavior logic
+- [x] Set up animation state machine integration
+- [x] Create comprehensive enemy type documentation in EnemyTypes.md
+- [x] Implement unit tests for Swift Enemy functionality
+
+**Unity Manual Tasks**:
+- [ ] Create Swift Enemy prefab in Unity Editor
+- [ ] Set up animation state machine in Animator
+- [ ] Configure prefab settings per documentation
+- [ ] Test prefab in game scene
+
+### Tank Enemies
+**Cursor Tasks**:
+- [ ] Create TankEnemyController script (low speed, high health)
+- [ ] Implement unique attack patterns (area effect, charge-up attacks)
+- [ ] Add status effect resistance logic
+- [ ] Set up visual feedback for damage states
+
+**Unity Manual Tasks**:
+- [ ] Create Tank Enemy prefab in Unity Editor
+- [ ] Set up animation state machine in Animator
+- [ ] Configure Physics2D components (larger collider, higher mass)
+- [ ] Configure prefab settings per documentation
+- [ ] Add particle systems for defensive/attack visual effects
+- [ ] Test prefab in game scene
+
+### Ranged Enemies
+- [ ] Create RangedEnemyController script (medium speed, medium health)
+- [ ] Implement ranged attack patterns
+- [ ] Add projectile type integration
+- [ ] Set up projectile hitbox and damage calculation
+
+### Special/Elite Enemies
+- [ ] Create SpecialEnemyController script (high speed, high health)
+- [ ] Implement special attack patterns
+- [ ] Add status effect resistance logic
+- [ ] Set up visual feedback for damage states
+
+### Boss Encounters
+- [ ] Create BossEnemyController script (low speed, high health)
+- [ ] Implement boss-specific attack patterns
+- [ ] Add status effect resistance logic
+- [ ] Set up visual feedback for damage states
+
+### Spawn System
+- [x] Basic enemy spawning
+- [ ] Wave Management
+  - **Cursor Tasks**:
+    - [x] Design wave configuration data structure
+    - [x] Create wave spawning system
+    - [x] Implement difficulty progression
+    - [x] Set up wave completion triggers
+    - [x] Create UI feedback for wave status
+    - [x] Implement custom editor for WaveManager
+  - **Unity Manual Tasks**:
+    - [ ] Create WaveManager GameObject in scene
+    - [ ] Configure enemy prefabs in WaveManager
+    - [ ] Set up spawn points in the scene
+    - [ ] Connect UI elements to wave events
+    - [ ] Test wave progression in game
+- [ ] Difficulty scaling
+- [ ] Zone-based spawning rules
+- [ ] Enemy density control
 
 ### Progression Systems ⚠️
 

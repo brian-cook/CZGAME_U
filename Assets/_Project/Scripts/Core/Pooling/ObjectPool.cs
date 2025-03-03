@@ -105,16 +105,73 @@ namespace CZ.Core.Pooling
             if (pool.Count > 0)
             {
                 obj = pool.Dequeue();
-                System.Threading.Interlocked.Increment(ref activeCount);
-                obj.GameObject.SetActive(true);
-                obj.OnSpawn();
-                return obj;
+                if (obj == null || obj.GameObject == null)
+                {
+                    CZLogger.LogError($"Pool '{poolName}' returned null or invalid object from queue. Attempting to create new instance.", LogCategory.Pool);
+                    return CreateNewPoolObject();
+                }
+                
+                try
+                {
+                    System.Threading.Interlocked.Increment(ref activeCount);
+                    if (!obj.GameObject.activeSelf)
+                    {
+                        obj.GameObject.SetActive(true);
+                    }
+                    // Note: The caller is responsible for calling obj.OnSpawn() after getting the object
+                    return obj;
+                }
+                catch (System.Exception e)
+                {
+                    CZLogger.LogError($"Pool '{poolName}' error when activating object: {e.Message}", LogCategory.Pool);
+                    System.Threading.Interlocked.Decrement(ref activeCount); // Revert counter
+                    return CreateNewPoolObject(); // Try creating a new one instead
+                }
             }
             
-            if (TotalCount < maxSize && ShouldExpandPool())
+            return CreateNewPoolObject();
+        }
+        
+        /// <summary>
+        /// Creates a new pool object with proper error handling
+        /// </summary>
+        private T CreateNewPoolObject()
+        {
+            // Check if we can expand the pool
+            if (TotalCount >= maxSize)
             {
-                isExpanding = true;
+                var currentMemory = totalMemoryRecorder.LastValue / (1024f * 1024f);
+                CZLogger.LogWarning($"Pool '{poolName}' at capacity. Size: {TotalCount}, Max: {maxSize}, Memory: {currentMemory:F2}MB/{memoryThresholdMB}MB. Waiting for object return.", LogCategory.Pool);
+                return default;
+            }
+            
+            if (!ShouldExpandPool())
+            {
+                CZLogger.LogWarning($"Pool '{poolName}' cannot expand due to memory threshold.", LogCategory.Pool);
+                return default;
+            }
+            
+            // Try to create a new object
+            isExpanding = true;
+            T obj = default;
+            
+            try
+            {
                 obj = createFunc();
+                
+                if (obj == null)
+                {
+                    CZLogger.LogError($"Pool '{poolName}' createFunc returned null object", LogCategory.Pool);
+                    isExpanding = false;
+                    return default;
+                }
+                
+                if (obj.GameObject == null)
+                {
+                    CZLogger.LogError($"Pool '{poolName}' createFunc returned object with null GameObject", LogCategory.Pool);
+                    isExpanding = false;
+                    return default;
+                }
                 
                 int newPeakCount = TotalCount + 1;
                 if (newPeakCount > peakCount)
@@ -123,18 +180,28 @@ namespace CZ.Core.Pooling
                 }
                 
                 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                CZLogger.LogWarning($"Pool '{poolName}' expanded. Size: {TotalCount + 1}, Peak: {peakCount}, Memory: {totalMemoryRecorder.LastValue / (1024f * 1024f):F2}MB", LogCategory.Pool);
+                CZLogger.LogInfo($"Pool '{poolName}' expanded. Size: {TotalCount + 1}, Peak: {peakCount}, Memory: {totalMemoryRecorder.LastValue / (1024f * 1024f):F2}MB", LogCategory.Pool);
                 #endif
                 
                 System.Threading.Interlocked.Increment(ref activeCount);
-                obj.GameObject.SetActive(true);
-                obj.OnSpawn();
+                if (!obj.GameObject.activeSelf)
+                {
+                    obj.GameObject.SetActive(true);
+                }
+                // Note: The caller is responsible for calling obj.OnSpawn() after getting the object
+                
                 return obj;
             }
-            
-            var currentMemory = totalMemoryRecorder.LastValue / (1024f * 1024f);
-            CZLogger.LogWarning($"Pool '{poolName}' at capacity. Size: {TotalCount}, Max: {maxSize}, Memory: {currentMemory:F2}MB/{memoryThresholdMB}MB. Waiting for object return.", LogCategory.Pool);
-            return default;
+            catch (System.Exception e)
+            {
+                CZLogger.LogError($"Pool '{poolName}' error creating new object: {e.Message}\n{e.StackTrace}", LogCategory.Pool);
+                isExpanding = false;
+                if (obj != null && obj.GameObject != null)
+                {
+                    System.Threading.Interlocked.Decrement(ref activeCount); // Revert counter if we incremented it
+                }
+                return default;
+            }
         }
         
         /// <summary>
