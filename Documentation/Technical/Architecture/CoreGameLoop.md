@@ -162,14 +162,54 @@ The Core Game Loop is composed of the following components:
   
 - [ ] **Enemy Type Implementation**
   - [x] Basic enemies (fast/weak)
-  - [ ] Tank enemies (slow/strong)
+  - [ ] Swift enemies
+    - **Cursor Tasks**:
+      - [ ] Create SwiftEnemyController script (high speed, low health)
+      - [ ] Implement unique movement patterns (erratic, burst movements)
+      - [ ] Add dodge behavior logic
+      - [ ] Set up animation state machine integration
+    - **Unity Manual Tasks**:
+      - [ ] Create Swift Enemy prefab in Unity 6 editor
+      - [ ] Attach SwiftEnemyController script to prefab
+      - [ ] Configure Physics2D components (smaller collider, lower mass)
+      - [ ] Set up Animator Controller with swift-specific animations
+      - [ ] Adjust NavMeshAgent parameters (higher speed, lower stopping distance)
+      - [ ] Configure object pooling settings (25 initial, 50 max)
+  - [ ] Tank enemies
+    - **Cursor Tasks**:
+      - [ ] Create TankEnemyController script (low speed, high health)
+      - [ ] Implement unique attack patterns (area effect, charge-up attacks)
+      - [ ] Add status effect resistance logic
+      - [ ] Set up visual feedback for damage states
+    - **Unity Manual Tasks**:
+      - [ ] Create Tank Enemy prefab in Unity 6 editor
+      - [ ] Attach TankEnemyController script to prefab
+      - [ ] Configure Physics2D components (larger collider, higher mass)
+      - [ ] Set up Animator Controller with tank-specific animations
+      - [ ] Adjust NavMeshAgent parameters (lower speed, higher stopping distance)
+      - [ ] Configure object pooling settings (15 initial, 30 max)
+      - [ ] Add particle systems for defensive/attack visual effects
   - [ ] Ranged enemies
   - [ ] Special/Elite enemies
   - [ ] Boss encounters
   
 - [ ] **Spawn System**
   - [x] Basic enemy spawning
-  - [ ] Wave management
+  - [ ] Wave Management
+    - **Cursor Tasks**:
+      - [ ] Create WaveManager script with wave definition system
+      - [ ] Implement wave progression logic (difficulty curves)
+      - [ ] Add enemy type distribution controller
+      - [ ] Create wave event system (start/end handlers)
+      - [ ] Implement wave timeout and failure conditions
+    - **Unity Manual Tasks**:
+      - [ ] Create WaveManager GameObject in scene
+      - [ ] Attach WaveManager script to GameObject
+      - [ ] Configure wave settings in Inspector (count, timing, difficulty)
+      - [ ] Set up spawn points in scene with gizmo visualization
+      - [ ] Link enemy prefabs to spawn manager through Inspector
+      - [ ] Configure object pooling integration settings
+      - [ ] Set up UI events for wave notifications
   - [ ] Difficulty scaling
   - [ ] Zone-based spawning rules
   - [ ] Enemy density control
@@ -472,7 +512,12 @@ The Core Game Loop is composed of the following components:
 
 - **Implementation Status**: 20% Complete
   - ⚠️ Additional enemy types (in progress)
-  - ❌ Spawn system refinement (not started)
+    - ⚠️ Swift enemies (in progress)
+    - ⚠️ Tank enemies (in progress)
+    - ❌ Ranged enemies (not started)
+  - ⚠️ Spawn system refinement (in progress)
+    - ⚠️ Wave Management implementation (in progress)
+    - ❌ Difficulty scaling (not started)
   - ⚠️ Wave management with pooling (in progress)
   - ❌ Difficulty scaling (not started)
   - ❌ Advanced AI zone awareness (not started)
@@ -494,6 +539,76 @@ The Core Game Loop is composed of the following components:
   - ❌ Sound design (not started)
   - ⚠️ Performance optimization (ongoing)
 
+## Additional Implementation Guidelines
+
+### Unity 6 Specific Implementation Notes
+
+#### Enemy Creation Best Practices
+
+- **Prefab Workflow**:
+  - Use prefab variants for enemy types (Unity 6 enhanced prefab system)
+  - Configure common components in base prefab
+  - Override specific properties in variant prefabs
+  - Utilize Prefab Mode for isolated testing
+
+- **Component Configuration**:
+  - Use SerializeField attributes for inspector visibility
+  - Implement property drawers for custom inspector layouts
+  - Utilize Unity 6's enhanced inspector for debugging
+  - Follow composition over inheritance for components
+
+- **Physics Setup**:
+  - Configure collision matrix in Project Settings
+  - Use Collider2D components with appropriate shapes
+  - Set layer-based collision filtering
+  - Optimize raycasts with LayerMask parameters
+
+- **Performance Considerations**:
+  - Use Unity Profiler to monitor enemy impact on performance
+  - Implement LOD system based on distance from player
+  - Use ObjectPooling for enemy instantiation
+  - Consider using Unity's Job System for enemy AI calculations
+
+#### Wave System Implementation
+
+- **ScriptableObject Usage**:
+  - Define wave configurations as ScriptableObjects
+  - Create difficulty curves using AnimationCurve
+  - Store enemy type distributions as serialized data
+  - Use asset references for prefab linking
+
+- **Event-Based Architecture**:
+  - Implement UnityEvents for wave system hooks
+  - Provide event callbacks for UI updates
+  - Use observer pattern for system communication
+  - Consider using Unity's new Input System for testing controls
+
+- **Testing Methodology**:
+  - Create test scenes for isolated wave testing
+  - Use Unity's Test Framework for validating wave behavior
+  - Implement debug visualization for spawn points and enemy paths
+  - Provide editor tools for wave configuration
+
+### Manual Testing Requirements
+
+1. **Performance Testing**:
+   - Test with maximum projected enemy count 
+   - Monitor frame rate using Unity Profiler
+   - Check memory usage during extended play sessions
+   - Verify object pooling efficiency
+
+2. **Gameplay Balance**:
+   - Test various wave configurations
+   - Verify enemy type distribution feels appropriate
+   - Ensure difficulty progression is smooth
+   - Check player ability to handle multiple enemy types
+
+3. **Visual Verification**:
+   - Confirm enemy animations play correctly
+   - Verify visual effects for attacks and damage
+   - Check proper scaling and positioning of all elements
+   - Ensure UI feedback is clear and responsive
+
 ## Related Documentation
 
 - [Object Pooling System](../Systems/ObjectPooling.md)
@@ -503,6 +618,7 @@ The Core Game Loop is composed of the following components:
 - [Infrastructure Plan](Infrastructure.md)
 - [Assembly Structure](AssemblyStructure.md)
 - [Project Plan](../../Project/ProjectPlan.md)
+- [Unity Resources](../../Resources/unity_resources.md)
 
 ## Revision History
 
@@ -511,6 +627,7 @@ The Core Game Loop is composed of the following components:
 | 2025-02-14 | 1.0 | Initial checklist creation |
 | 2025-02-27 | 1.1 | Converted to Markdown format with cross-references |
 | 2025-02-28 | 1.2 | Updated to align with Project Plan, added phase implementation tracking and Comfort Zone details |
+| 2025-03-05 | 1.3 | Added detailed implementation steps for swift and tank enemies, enhanced wave system with Unity 6 specific tasks |
 
-Last Updated: 2025-02-28
+Last Updated: 2025-03-05
 Unity Version: 6000.0.38f1 
