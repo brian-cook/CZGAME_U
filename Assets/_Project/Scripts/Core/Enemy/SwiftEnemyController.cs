@@ -126,6 +126,16 @@ namespace CZ.Core.Enemy
             lastDirectionChangeTime = Time.time;
             lastDodgeTime = -dodgeCooldown; // Allow immediate first dodge
             currentMoveDirection = Random.insideUnitCircle.normalized;
+            
+            // Ensure the sprite renderer is enabled
+            SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.enabled = true;
+            }
+            
+            // Ensure proper layer assignment
+            gameObject.layer = LayerMask.NameToLayer("Enemy");
         }
         
         protected virtual void Start()
@@ -390,18 +400,32 @@ namespace CZ.Core.Enemy
         {
             base.OnSpawn();
             
-            // Initialize swift-specific state
-            isDodging = false;
-            lastDirectionChangeTime = Time.time;
-            lastDodgeTime = Time.time - (dodgeCooldown * 0.5f); // Allow dodge after short delay
+            // Ensure the game object and sprite renderer are enabled when spawned
+            gameObject.SetActive(true);
             
-            // Reset animator parameters
+            SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.enabled = true;
+                spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1f); // Ensure full opacity
+            }
+            
+            // Reset state variables
+            isDodging = false;
+            if (dodgeCoroutine != null)
+            {
+                StopCoroutine(dodgeCoroutine);
+                dodgeCoroutine = null;
+            }
+            
+            // Ensure the animator is in the proper state if we have one
             if (animator != null)
             {
-                animator.SetFloat(speedParameterName, 0f);
-                animator.ResetTrigger(dodgeTriggerName);
-                animator.ResetTrigger(damageTriggerName);
+                animator.SetFloat(speedParameterName, 0);
+                animator.enabled = true;
             }
+            
+            Debug.Log($"[SwiftEnemy] OnSpawn complete - Sprite visible: {(spriteRenderer ? spriteRenderer.enabled : false)}, Layer: {gameObject.layer}");
         }
         
         /// <summary>
@@ -409,14 +433,19 @@ namespace CZ.Core.Enemy
         /// </summary>
         public override void OnDespawn()
         {
-            // Stop any active dodge coroutine
+            base.OnDespawn();
+            
+            // Ensure we stop any active coroutines
             if (dodgeCoroutine != null)
             {
                 StopCoroutine(dodgeCoroutine);
                 dodgeCoroutine = null;
             }
             
-            base.OnDespawn();
+            isDodging = false;
+            
+            // Log despawn for debugging
+            Debug.Log("[SwiftEnemy] Successfully despawned");
         }
         
         /// <summary>

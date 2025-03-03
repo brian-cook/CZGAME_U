@@ -579,11 +579,33 @@ namespace CZ.Core.Enemy
         
         private void UpdateEnemyTargets(Vector3 currentPlayerPos)
         {
-            foreach (var enemy in activeEnemies)
+            if (activeEnemies.Count == 0) return;
+            
+            // Create a copy of the collection to avoid modification issues during iteration
+            var enemiesCopy = activeEnemies.ToArray();
+            
+            foreach (var enemy in enemiesCopy)
             {
-                if (enemy != null)
+                if (enemy == null) continue;
+                
+                try
                 {
-                    enemy.SetTarget(currentPlayerPos);
+                    // Check if the enemy is still active (could have been despawned in another process)
+                    if (enemy.gameObject.activeInHierarchy)
+                    {
+                        enemy.SetTarget(currentPlayerPos);
+                    }
+                    else
+                    {
+                        // Remove inactive enemies from our tracking list
+                        activeEnemies.Remove(enemy);
+                        CZLogger.LogDebug($"Removed inactive enemy from tracking list, Active count: {activeEnemies.Count}", LogCategory.Enemy);
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    CZLogger.LogError($"Error updating target for enemy {enemy.name}: {e.Message}", LogCategory.Enemy);
+                    // Continue with other enemies even if one fails
                 }
             }
         }
@@ -612,115 +634,91 @@ namespace CZ.Core.Enemy
         {
             using var _ = s_spawnMarker.Auto();
             
-            if (prefab == null)
+            if (!isInitialized || !isGamePlaying)
             {
-                CZLogger.LogError("Cannot spawn null prefab", LogCategory.Enemy);
-                return;
-            }
-            
-            if (!isInitialized)
-            {
-                CZLogger.LogError($"Cannot spawn enemy - pools not initialized. Prefab: {prefab.name}", LogCategory.Enemy);
+                CZLogger.LogWarning("Cannot spawn enemy - system not initialized or game not playing", LogCategory.Enemy);
                 return;
             }
             
             if (!enemyPools.TryGetValue(prefab, out var pool))
             {
-                CZLogger.LogWarning($"No pool found for prefab {prefab.name}. Available pools: {string.Join(", ", enemyPools.Keys.Select(p => p?.name ?? "null"))}", LogCategory.Enemy);
+                CZLogger.LogError($"Pool for prefab {prefab.name} not found!", LogCategory.Enemy);
                 return;
             }
             
             try
             {
-                // Check if pool is valid
-                if (pool == null)
-                {
-                    CZLogger.LogError($"Pool for prefab {prefab.name} is null", LogCategory.Enemy);
-                    return;
-                }
-                
-                // Log pool stats before getting enemy
-                var stats = pool.GetStats();
-                CZLogger.LogDebug($"Pool stats for {prefab.name}: Current={stats.current}, Active={pool.ActiveCount}, Peak={stats.peak}", LogCategory.Enemy);
+                // Generate spawn position
+                Vector3 spawnPosition = GenerateSpawnPosition(currentPlayerPos);
                 
                 // Get enemy from pool
                 BaseEnemy enemy = pool.Get();
                 if (enemy == null)
                 {
-                    CZLogger.LogWarning("Failed to get enemy from pool", LogCategory.Enemy);
+                    CZLogger.LogError($"Failed to get enemy from pool for {prefab.name}", LogCategory.Enemy);
                     return;
                 }
                 
-                // Additional null checks for enemy components
-                if (enemy.GameObject == null)
-                {
-                    CZLogger.LogError("Enemy.GameObject is null after retrieving from pool", LogCategory.Enemy);
-                    return;
-                }
-                
-                if (enemy.transform == null)
-                {
-                    CZLogger.LogError("Enemy.transform is null after retrieving from pool", LogCategory.Enemy);
-                    return;
-                }
-                
-                // Calculate spawn position away from player
-                Vector3 randomDir = Random.insideUnitCircle.normalized;
-                float spawnDistance = Random.Range(minSpawnDistance, spawnRadius);
-                Vector3 spawnPosition = currentPlayerPos + new Vector3(randomDir.x, randomDir.y, 0) * spawnDistance;
-                
-                // Position the enemy
+                // Move enemy to spawn position
                 enemy.transform.position = spawnPosition;
                 
-                // Ensure enemy is active before calling other methods
-                if (!enemy.GameObject.activeSelf)
+                // Ensure the enemy object is active
+                enemy.gameObject.SetActive(true);
+                
+                // Ensure sprite renderer is visible
+                SpriteRenderer spriteRenderer = enemy.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null)
                 {
-                    enemy.GameObject.SetActive(true);
+                    spriteRenderer.enabled = true;
+                    // Ensure full opacity
+                    spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1f);
                 }
                 
-                // Initialize the enemy with more exception handling
-                try {
-                    // The ObjectPool no longer calls OnSpawn, so we need to call it here
-                    enemy.OnSpawn();
-                } catch (System.Exception e) {
-                    CZLogger.LogError($"Error during enemy.OnSpawn(): {e.Message}", LogCategory.Enemy);
-                    return; // Don't continue if OnSpawn fails
-                }
+                // Ensure proper layer
+                enemy.gameObject.layer = LayerMask.NameToLayer("Enemy");
                 
-                // Validate target position before attempting to set it
-                if (float.IsNaN(currentPlayerPos.x) || float.IsNaN(currentPlayerPos.y) || float.IsNaN(currentPlayerPos.z) ||
-                    float.IsInfinity(currentPlayerPos.x) || float.IsInfinity(currentPlayerPos.y) || float.IsInfinity(currentPlayerPos.z))
-                {
-                    CZLogger.LogError($"Invalid target position {currentPlayerPos} (contains NaN or Infinity)", LogCategory.Enemy);
-                    // Use the enemy's current position as a fallback to avoid errors
-                    Vector3 fallbackPosition = enemy.transform.position + new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f), 0);
-                    try {
-                        enemy.SetTarget(fallbackPosition);
-                        CZLogger.LogWarning($"Used fallback target position {fallbackPosition} for enemy", LogCategory.Enemy);
-                    } catch (System.Exception e) {
-                        CZLogger.LogError($"Error setting fallback target for enemy: {e.Message}", LogCategory.Enemy);
-                    }
-                }
-                else
-                {
-                    // Set target position with normal position
-                    try {
-                        enemy.SetTarget(currentPlayerPos);
-                    } catch (System.Exception e) {
-                        CZLogger.LogError($"Error setting target for enemy: {e.Message}", LogCategory.Enemy);
-                        // Continue execution even if target setting fails
-                    }
-                }
+                // Force initialization if needed by calling OnSpawn (this should happen in the pool)
+                // But we explicitly call it here to ensure initialization
+                enemy.OnSpawn();
                 
-                // Add to active enemies
+                // Add to active enemies list
                 activeEnemies.Add(enemy);
                 
-                CZLogger.LogDebug($"Spawned {enemy.GameObject.name} at {spawnPosition}", LogCategory.Enemy);
+                // After we're sure the enemy is initialized, set the target
+                try {
+                    // Point towards target
+                    if (targetPositionProvider != null)
+                    {
+                        enemy.SetTarget(targetPositionProvider.GetPosition());
+                    }
+                    else
+                    {
+                        // Fallback to player position
+                        enemy.SetTarget(currentPlayerPos);
+                    }
+                }
+                catch (System.Exception targetEx) {
+                    CZLogger.LogError($"Error setting target for enemy: {targetEx.Message}", LogCategory.Enemy);
+                    // Continue even if target setting fails - enemy will still be active
+                }
+                
+                CZLogger.LogDebug($"Spawned enemy {enemy.name} at {spawnPosition}, Active count: {activeEnemies.Count}", LogCategory.Enemy);
             }
             catch (System.Exception e)
             {
-                CZLogger.LogError($"Failed to spawn enemy: {e.Message}\n{e.StackTrace}", LogCategory.Enemy);
+                CZLogger.LogError($"Error spawning enemy: {e.Message}", LogCategory.Enemy);
             }
+        }
+        
+        private Vector3 GenerateSpawnPosition(Vector3 currentPlayerPos)
+        {
+            // Calculate spawn position away from player
+            Vector3 randomDir = Random.insideUnitCircle.normalized;
+            float spawnDistance = Random.Range(minSpawnDistance, spawnRadius);
+            Vector3 spawnPosition = currentPlayerPos + new Vector3(randomDir.x, randomDir.y, 0) * spawnDistance;
+            
+            CZLogger.LogDebug($"Generated spawn position: {spawnPosition} (Distance from player: {spawnDistance})", LogCategory.Enemy);
+            return spawnPosition;
         }
         
         public void SetTargetPosition(Vector3 position)

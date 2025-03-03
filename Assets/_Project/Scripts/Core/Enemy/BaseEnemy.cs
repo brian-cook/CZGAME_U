@@ -401,8 +401,16 @@ namespace CZ.Core.Enemy
         {
             if (!isInitialized)
             {
-                CZLogger.LogError("Cannot set target - enemy not initialized!", LogCategory.Enemy);
-                return;
+                // Instead of just logging an error, try to initialize
+                CZLogger.LogWarning("Enemy not initialized in SetTarget call. Attempting to initialize now.", LogCategory.Enemy);
+                InitializeComponents();
+                
+                // Check if initialization succeeded
+                if (!isInitialized)
+                {
+                    CZLogger.LogError("Failed to initialize enemy during SetTarget call!", LogCategory.Enemy);
+                    return;
+                }
             }
             
             // Validate the input position to prevent setting invalid values
@@ -413,20 +421,13 @@ namespace CZ.Core.Enemy
                 return;
             }
             
-            // Always update the target time to prevent false staleness
+            // Set the target position and update tracking variables
+            hasValidTarget = true;
+            targetPosition = position;
+            lastKnownTargetPosition = position;
             lastTargetUpdateTime = Time.time;
             
-            // Only update position if it's actually different
-            if (position != lastKnownTargetPosition || !hasValidTarget)
-            {
-                targetPosition = position;
-                lastKnownTargetPosition = position;
-                hasValidTarget = true;
-                
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                CZLogger.LogDebug($"Target updated to: {position}, Distance: {((Vector2)position - rb.position).magnitude:F2}", LogCategory.Enemy);
-                #endif
-            }
+            CZLogger.LogDebug($"Set target position to {position} for {gameObject.name}", LogCategory.Enemy);
         }
 
         public virtual void TakeDamage(int damage)
@@ -595,11 +596,17 @@ namespace CZ.Core.Enemy
 
         public virtual void OnSpawn()
         {
-            // Make sure components are initialized
+            // Ensure we're initialized first
             if (!isInitialized)
             {
                 CZLogger.LogInfo($"Enemy {gameObject.name} not initialized during OnSpawn. Initializing now.", LogCategory.Enemy);
                 InitializeComponents();
+                
+                // If initialization failed, log an error but continue
+                if (!isInitialized)
+                {
+                    CZLogger.LogError($"Failed to initialize enemy {gameObject.name} during OnSpawn!", LogCategory.Enemy);
+                }
             }
             
             // Reset health and state
@@ -610,13 +617,20 @@ namespace CZ.Core.Enemy
             hasValidTarget = false;
             lastTargetUpdateTime = 0f;
             
-            // Reset the sprite color
+            // Make sure colliders are enabled
+            if (circleCollider != null)
+            {
+                circleCollider.enabled = true;
+            }
+            
+            // Reset the sprite color and ensure visibility
             if (spriteRenderer != null)
             {
                 spriteRenderer.color = originalColor;
+                spriteRenderer.enabled = true;
             }
             
-            // Reset any velocity
+            // Reset any velocity and ensure physics are active
             if (rb != null)
             {
                 rb.simulated = true;
@@ -631,9 +645,13 @@ namespace CZ.Core.Enemy
                 Destroy(marker);
             }
             
+            // Ensure the layer is set correctly
+            gameObject.layer = LayerMask.NameToLayer("Enemy");
+            
+            // Activate the game object
             gameObject.SetActive(true);
             
-            CZLogger.LogInfo($"Enemy spawned: {gameObject.name} at {transform.position}", LogCategory.Enemy);
+            CZLogger.LogInfo($"Enemy spawned: {gameObject.name} at {transform.position}, Initialized: {isInitialized}", LogCategory.Enemy);
         }
 
         public virtual void OnDespawn()

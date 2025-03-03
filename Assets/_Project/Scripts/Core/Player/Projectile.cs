@@ -14,6 +14,7 @@ namespace CZ.Core.Player
         private CircleCollider2D circleCollider;
         private TrailRenderer projectileTrail;
         private static Material sharedProjectileMaterial;
+        private SpriteRenderer spriteRenderer;
         #endregion
 
         #region Configuration
@@ -86,6 +87,16 @@ namespace CZ.Core.Player
                     projectileTrail.material = sharedProjectileMaterial;
                 }
             }
+            
+            // Get sprite renderer component
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null)
+            {
+                Debug.LogWarning("[Projectile] No SpriteRenderer found, projectile may not be visible");
+            }
+            
+            // Set proper layer
+            gameObject.layer = LayerMask.NameToLayer("Default");
 
             isInitialized = true;
         }
@@ -139,10 +150,24 @@ namespace CZ.Core.Player
             isActive = true;
             currentLifetime = 0f;
             owner = null; // Reset owner reference
+            
+            // Ensure the game object is active
+            gameObject.SetActive(true);
+            
+            // Enable trail renderer
             if (projectileTrail != null)
             {
                 projectileTrail.emitting = true;
             }
+            
+            // Ensure sprite renderer is visible
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.enabled = true;
+                spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1f);
+            }
+            
+            Debug.Log($"[Projectile] OnSpawn - Position: {transform.position}, Sprite visible: {(spriteRenderer != null ? spriteRenderer.enabled : false)}");
         }
 
         public void OnDespawn()
@@ -157,6 +182,8 @@ namespace CZ.Core.Player
             {
                 projectileTrail.emitting = false;
             }
+            
+            Debug.Log("[Projectile] OnDespawn - Projectile returned to pool");
         }
         #endregion
 
@@ -172,7 +199,13 @@ namespace CZ.Core.Player
                 transform.rotation = Quaternion.Euler(0, 0, angle);
             }
             
-            Debug.Log($"[Projectile] Initialized with direction: {direction}, owner: {(owner != null ? owner.name : "none")}");
+            // Ensure the sprite renderer is visible
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.enabled = true;
+            }
+            
+            Debug.Log($"[Projectile] Initialized with direction: {direction}, owner: {(owner != null ? owner.name : "none")}, Position: {transform.position}");
         }
 
         private void ReturnToPool()
