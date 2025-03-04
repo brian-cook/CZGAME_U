@@ -39,6 +39,7 @@ namespace CZ.Core.Player
         private bool isInitialized;
         private bool isActive;
         private GameObject owner; // Reference to the object that fired this projectile
+        private bool warnedAboutMissingLayer = false;
         #endregion
 
         #region Unity Lifecycle
@@ -92,11 +93,44 @@ namespace CZ.Core.Player
             spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer == null)
             {
-                Debug.LogWarning("[Projectile] No SpriteRenderer found, projectile may not be visible");
+                Debug.LogWarning("[Projectile] No SpriteRenderer found, adding one");
+                spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
+                
+                // Set default sprite if none exists
+                if (spriteRenderer.sprite == null)
+                {
+                    spriteRenderer.sprite = Resources.Load<Sprite>("DefaultProjectile");
+                    Debug.Log("[Projectile] Added default sprite to projectile");
+                }
             }
             
-            // Set proper layer
-            gameObject.layer = LayerMask.NameToLayer("Default");
+            // Ensure sprite is visible with proper material
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.enabled = true;
+                spriteRenderer.color = Color.white; // Ensure full visibility
+                
+                // Use appropriate shader for 2D rendering
+                spriteRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                Debug.Log($"[Projectile] Set sprite material to Sprites/Default");
+            }
+            
+            // Set proper layer for visibility and collision
+            // Try to use Projectile layer but fall back to Default if it doesn't exist
+            int projectileLayer = LayerMask.NameToLayer("Projectile");
+            if (projectileLayer >= 0)
+            {
+                gameObject.layer = projectileLayer;
+                Debug.Log($"[Projectile] Layer set to: Projectile");
+            }
+            else
+            {
+                gameObject.layer = LayerMask.NameToLayer("Default");
+                Debug.LogWarning($"[Projectile] Projectile layer not found, using Default layer instead. Please add a Projectile layer in Project Settings.");
+            }
+            
+            // Ensure the projectile is active
+            gameObject.SetActive(true);
 
             isInitialized = true;
         }
@@ -199,13 +233,43 @@ namespace CZ.Core.Player
                 transform.rotation = Quaternion.Euler(0, 0, angle);
             }
             
-            // Ensure the sprite renderer is visible
+            // Ensure the sprite renderer is visible with proper settings
             if (spriteRenderer != null)
             {
                 spriteRenderer.enabled = true;
+                spriteRenderer.color = Color.white; // Full opacity
+                
+                // Use appropriate shader for 2D rendering
+                if (spriteRenderer.material == null || spriteRenderer.material.shader.name.Contains("Lit"))
+                {
+                    spriteRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                }
             }
             
-            Debug.Log($"[Projectile] Initialized with direction: {direction}, owner: {(owner != null ? owner.name : "none")}, Position: {transform.position}");
+            // Ensure projectile trail is active
+            if (projectileTrail != null)
+            {
+                projectileTrail.emitting = true;
+            }
+            
+            // Set proper layer - try to use Projectile layer but fall back to Default if it doesn't exist
+            int projectileLayer = LayerMask.NameToLayer("Projectile");
+            if (projectileLayer >= 0)
+            {
+                gameObject.layer = projectileLayer;
+            }
+            else
+            {
+                gameObject.layer = LayerMask.NameToLayer("Default");
+                // Only log warning once per session
+                if (!warnedAboutMissingLayer)
+                {
+                    Debug.LogWarning($"[Projectile] Projectile layer not found, using Default layer instead. Please add a Projectile layer in Project Settings.");
+                    warnedAboutMissingLayer = true;
+                }
+            }
+            
+            Debug.Log($"[Projectile] Initialized with direction: {direction}, owner: {(owner != null ? owner.name : "none")}, Position: {transform.position}, Sprite visible: {(spriteRenderer != null ? spriteRenderer.enabled : false)}, Layer: {LayerMask.LayerToName(gameObject.layer)}");
         }
 
         private void ReturnToPool()

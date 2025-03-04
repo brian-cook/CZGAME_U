@@ -29,6 +29,7 @@ namespace CZ.Core.Configuration
         
         private int playerLayer;
         private int enemyLayer;
+        private int projectileLayer;
         private bool setupComplete = false;
 
         private void Awake()
@@ -295,6 +296,7 @@ namespace CZ.Core.Configuration
             int defaultLayer = LayerMask.NameToLayer("Default");
             playerLayer = LayerMask.NameToLayer("Player");
             enemyLayer = LayerMask.NameToLayer("Enemy");
+            projectileLayer = LayerMask.NameToLayer("Projectile");
             int waterLayer = LayerMask.NameToLayer("Water");
             int uiLayer = LayerMask.NameToLayer("UI");
 
@@ -310,12 +312,21 @@ namespace CZ.Core.Configuration
                 Debug.LogError("[Physics2DSetup] Enemy layer not found. Please create this layer in the project settings.");
                 Debug.LogError("[Physics2DSetup] To create the Enemy layer: Go to Edit > Project Settings > Tags and Layers > Add Layer > Set slot 9 to 'Enemy'");
             }
+            
+            // Check if Projectile layer exists
+            if (projectileLayer < 0)
+            {
+                Debug.LogError("[Physics2DSetup] Projectile layer not found. Please create this layer in the project settings.");
+                Debug.LogError("[Physics2DSetup] To create the Projectile layer: Go to Edit > Project Settings > Tags and Layers > Add Layer > Set slot 10 to 'Projectile'");
+                // If projectile layer doesn't exist, use Default layer as fallback
+                projectileLayer = defaultLayer;
+            }
 
             // Log the layer configuration if enabled
             if (logLayerSetup)
             {
                 Debug.Log($"[Physics2DSetup] Layer setup - Default: {defaultLayer}, Player: {playerLayer}, Enemy: {enemyLayer}, " +
-                          $"Water: {waterLayer}, UI: {uiLayer}");
+                          $"Projectile: {projectileLayer}, Water: {waterLayer}, UI: {uiLayer}");
             }
 
             // Force layer collision to be enabled when possible
@@ -331,6 +342,22 @@ namespace CZ.Core.Configuration
                 // CRITICAL: Ensure Enemy-Enemy collisions are explicitly enabled
                 Physics2D.IgnoreLayerCollision(enemyLayer, enemyLayer, false);
                 Debug.Log("[Physics2DSetup] Explicitly enforced Enemy-Enemy collisions");
+                
+                // Projectile collision setup
+                if (projectileLayer >= 0 && projectileLayer != defaultLayer)
+                {
+                    // Projectiles should collide with enemies
+                    Physics2D.IgnoreLayerCollision(projectileLayer, enemyLayer, false);
+                    Debug.Log("[Physics2DSetup] Explicitly enabled Projectile-Enemy collisions");
+                    
+                    // Projectiles should not collide with player (source)
+                    Physics2D.IgnoreLayerCollision(projectileLayer, playerLayer, true);
+                    Debug.Log("[Physics2DSetup] Explicitly disabled Projectile-Player collisions");
+                    
+                    // Projectiles should not collide with other projectiles
+                    Physics2D.IgnoreLayerCollision(projectileLayer, projectileLayer, true);
+                    Debug.Log("[Physics2DSetup] Explicitly disabled Projectile-Projectile collisions");
+                }
                 
                 // Force-enable contact pairs between enemies
                 Physics2D.queriesHitTriggers = true;
@@ -359,6 +386,16 @@ namespace CZ.Core.Configuration
                 // Check if player-enemy collisions are enabled
                 bool playerEnemyCollision = !Physics2D.GetIgnoreLayerCollision(playerLayer, enemyLayer);
                 Debug.Log($"[Physics2DSetup] Player-Enemy collisions: {(playerEnemyCollision ? "Enabled" : "Disabled")}");
+                
+                // Log projectile collisions
+                if (projectileLayer >= 0 && projectileLayer != defaultLayer)
+                {
+                    bool projectileEnemyCollision = !Physics2D.GetIgnoreLayerCollision(projectileLayer, enemyLayer);
+                    Debug.Log($"[Physics2DSetup] Projectile-Enemy collisions: {(projectileEnemyCollision ? "Enabled" : "Disabled")}");
+                    
+                    bool projectilePlayerCollision = !Physics2D.GetIgnoreLayerCollision(projectileLayer, playerLayer);
+                    Debug.Log($"[Physics2DSetup] Projectile-Player collisions: {(projectilePlayerCollision ? "Enabled" : "Disabled")}");
+                }
             }
         }
     }

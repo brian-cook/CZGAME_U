@@ -9,9 +9,15 @@ using Unity.Profiling;
 namespace CZ.Core.Enemy
 {
     /// <summary>
-    /// Controller for the Swift Enemy type that implements fast, erratic movement patterns 
-    /// and dodging behavior.
+    /// SwiftEnemyController implements a fast-moving enemy type that can dodge player attacks
     /// </summary>
+    /// <remarks>
+    /// This class extends BaseEnemy and adds:
+    /// - Fast, agile movement with randomness
+    /// - Dodge capability to avoid player and projectiles
+    /// - Animation control through Animator
+    /// - Screen boundary correction to prevent enemies moving offscreen
+    /// </remarks>
     [RequireComponent(typeof(Animator))]
     public class SwiftEnemyController : BaseEnemy
     {
@@ -48,8 +54,8 @@ namespace CZ.Core.Enemy
         
         [BoxGroup("Movement Settings")]
         [SerializeField, Range(0f, 1f)]
-        [InfoBox("Randomness of movement (0=direct, 1=erratic)", EInfoBoxType.Normal)]
-        private float movementRandomness = 0.3f;
+        [InfoBox("How random the movement direction should be (0 = direct, 1 = random)", EInfoBoxType.Normal)]
+        private float movementRandomness = 0.5f;
         
         [BoxGroup("Movement Settings")]
         [SerializeField, MinValue(0.1f), MaxValue(2f)]
@@ -98,7 +104,7 @@ namespace CZ.Core.Enemy
         
         [BoxGroup("Animation")]
         [SerializeField]
-        [InfoBox("Parameter name for damage trigger", EInfoBoxType.Normal)]
+        [InfoBox("Parameter name for taking damage", EInfoBoxType.Normal)]
         private string damageTriggerName = "TakeDamage";
         #endregion
 
@@ -110,6 +116,15 @@ namespace CZ.Core.Enemy
         private Coroutine dodgeCoroutine;
         private System.Random randomGenerator;
         private int seed;
+
+        // Add property to store target
+        private Transform targetTransform;
+
+        // Property to access the target transform
+        protected Transform TargetTransform => targetTransform;
+
+        // Add helpful property method to check if we have a valid target
+        protected bool HasValidTarget => TargetTransform != null;
         #endregion
 
         #region Unity Lifecycle
@@ -149,78 +164,149 @@ namespace CZ.Core.Enemy
             }
         }
 
+        // Override the base class's FixedUpdate method
         protected override void FixedUpdate()
         {
-            if (isDodging) return;
+            // Call base implementation first
+            base.FixedUpdate();
             
-            // Update movement
-            UpdateMovement();
-            
-            // Check for dodge opportunities
-            if (canDodge && Time.time > lastDodgeTime + dodgeCooldown)
-            {
-                s_dodgeMarker.Begin();
-                try
+            if (IsDead) return;
+
+            try {
+                // Update enemy position based on current direction and speed
+                UpdateMovement();
+                
+                // Check for dodge opportunities if not already dodging
+                if (!isDodging && Time.time - lastDodgeTime > dodgeCooldown)
                 {
                     CheckForDodgeOpportunity();
                 }
-                finally
+                
+                // Update animator if available
+                if (animator != null)
                 {
-                    s_dodgeMarker.End();
+                    try
+                    {
+                        float currentSpeed = Rb.linearVelocity.magnitude / MoveSpeedValue;
+                        animator.SetFloat(speedParameterName, currentSpeed);
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogError($"[SwiftEnemy] Error updating animator: {e.Message}");
+                    }
                 }
+                
+                // Ensure enemy stays within reasonable boundaries
+                KeepEnemyOnScreen();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[SwiftEnemy] Error in FixedUpdate: {e.Message}");
+            }
+        }
+
+        // Override SetTarget from BaseEnemy to also store the transform
+        public override void SetTarget(Vector3 position)
+        {
+            // Set transform if we have a valid CurrentTarget
+            if (CurrentTarget != null)
+            {
+                targetTransform = CurrentTarget;
             }
             
-            // Update animator
-            if (animator != null)
-            {
-                animator.SetFloat(speedParameterName, Rb.linearVelocity.magnitude);
-            }
+            // Call base implementation
+            base.SetTarget(position);
+        }
+
+        // Make sure this is implemented to update targetTransform
+        public void SetTargetTransformForTesting(Transform target)
+        {
+            targetTransform = target;
+            
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // In editor or development builds, we can use the testing mechanism
+            // This might be a Transform that isn't part of a typical Entity
+            CurrentTarget = target; 
+            CZLogger.LogDebug($"Target transform set via testing method: {(target != null ? target.name : "null")}", LogCategory.Enemy);
+            #endif
         }
         #endregion
 
         #region Movement Methods
         private void UpdateMovement()
         {
-            s_movementMarker.Begin();
-            
-            try
+            using (s_movementMarker.Auto())
             {
-                // Check if it's time to change direction
-                if (Time.time - lastDirectionChangeTime > directionChangeInterval)
+                try
                 {
-                    // Calculate base direction toward target
-                    Vector2 toTarget = ((Vector2)transform.position - Rb.position).normalized;
+                    // Don't update movement if dodging
+                    if (isDodging) return;
                     
-                    // Apply randomness to direction
-                    Vector2 randomDirection = Random.insideUnitCircle.normalized;
-                    Vector2 newDirection = Vector2.Lerp(toTarget, randomDirection, movementRandomness);
+                    // Change direction periodically with some randomness
+                    if (Time.time - lastDirectionChangeTime > directionChangeInterval)
+                    {
+                        // Get direction toward target if we have one
+                        Vector2 targetDirection = Vector2.zero;
+                        if (TargetTransform != null)
+                        {
+                            // Calculate direction toward player (this is the key fix - we want to move TOWARD the player)
+                            targetDirection = ((Vector2)TargetTransform.position - (Vector2)transform.position).normalized;
+                            
+                            // Add some randomness but still favor moving toward player
+                            Vector2 randomOffset = Random.insideUnitCircle * movementRandomness;
+                            currentMoveDirection = (targetDirection * (1f - movementRandomness) + randomOffset).normalized;
+                            
+                            Debug.Log($"[SwiftEnemy] Updated movement direction toward target: {currentMoveDirection}");
+                        }
+                        else
+                        {
+                            // No target, move randomly with some persistence
+                            Vector2 randomDirection = Random.insideUnitCircle.normalized;
+                            currentMoveDirection = (currentMoveDirection * (1f - movementRandomness) + randomDirection * movementRandomness).normalized;
+                        }
+                        
+                        // Set timer for next direction change
+                        lastDirectionChangeTime = Time.time;
+                    }
                     
-                    // Update current direction
-                    currentMoveDirection = newDirection.normalized;
-                    lastDirectionChangeTime = Time.time;
+                    // Calculate target velocity based on current direction
+                    Vector2 targetVelocity = currentMoveDirection * MoveSpeedValue;
+                    
+                    // Apply movement with appropriate agility
+                    Rb.linearVelocity = Vector2.Lerp(Rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * agility);
+                    
+                    // Update facing direction based on movement
+                    if (Rb.linearVelocity.sqrMagnitude > 0.1f)
+                    {
+                        float angle = Mathf.Atan2(Rb.linearVelocity.y, Rb.linearVelocity.x) * Mathf.Rad2Deg;
+                        transform.rotation = Quaternion.Euler(0, 0, angle);
+                    }
+                    
+                    // Update animator speed parameter
+                    if (animator != null)
+                    {
+                        float speed = Rb.linearVelocity.magnitude / MoveSpeedValue;
+                        animator.SetFloat(speedParameterName, speed);
+                    }
                 }
-                
-                // Calculate target velocity based on current direction
-                Vector2 targetVelocity = currentMoveDirection * MoveSpeedValue;
-                
-                // Apply movement with appropriate agility
-                Rb.linearVelocity = Vector2.Lerp(Rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * agility);
-                
-                // Update facing direction based on movement
-                if (Rb.linearVelocity.sqrMagnitude > 0.1f)
+                finally
                 {
-                    float angle = Mathf.Atan2(Rb.linearVelocity.y, Rb.linearVelocity.x) * Mathf.Rad2Deg;
-                    transform.rotation = Quaternion.Euler(0, 0, angle);
+                    s_movementMarker.End();
                 }
-            }
-            finally
-            {
-                s_movementMarker.End();
             }
         }
         
         private void CheckForDodgeOpportunity()
         {
+            // If dodging is disabled, return immediately
+            if (!canDodge) return;
+
+            // Don't check for dodges too frequently
+            if (Time.time - lastDodgeTime < dodgeCooldown)
+            {
+                return;
+            }
+
             // Find potential threats (projectiles or player) within detection range
             Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, dodgeDetectionRange, LayerMask.GetMask("Player", "Projectile"));
             
@@ -248,14 +334,15 @@ namespace CZ.Core.Enemy
                         float dotProduct = Vector2.Dot(threatDirection, threatVelocity);
                         
                         // If threat is moving toward us and random check passes
-                        if (dotProduct < -0.5f && Random.value < dodgeProbability)
+                        // Use reduced dodge probability to make it less frequent
+                        if (dotProduct < -0.5f && Random.value < dodgeProbability * 0.7f)
                         {
                             // Execute dodge
                             PerformDodge(threatDirection);
                             break;
                         }
                     }
-                    else if (Random.value < dodgeProbability * 0.5f)
+                    else if (Random.value < dodgeProbability * 0.3f) // Reduced probability even further
                     {
                         // Occasionally dodge even without velocity info
                         PerformDodge(threatDirection);
@@ -293,21 +380,25 @@ namespace CZ.Core.Enemy
             {
                 StopCoroutine(dodgeCoroutine);
             }
-            dodgeCoroutine = StartCoroutine(DodgeCoroutine(dodgeDirection));
             
-            CZLogger.LogDebug($"Swift enemy performing dodge in direction: {dodgeDirection}", LogCategory.Enemy);
+            // Use reduced dodge force to prevent going too far off screen
+            float adjustedDodgeForce = Mathf.Min(dodgeForce, 8f);
+            
+            dodgeCoroutine = StartCoroutine(DodgeCoroutine(dodgeDirection, adjustedDodgeForce));
+            
+            CZLogger.LogDebug($"Swift enemy performing dodge in direction: {dodgeDirection} with force: {adjustedDodgeForce}", LogCategory.Enemy);
         }
         
-        private IEnumerator DodgeCoroutine(Vector2 dodgeDirection)
+        private IEnumerator DodgeCoroutine(Vector2 dodgeDirection, float force)
         {
             isDodging = true;
             
             // Apply dodge force
             Rb.linearVelocity = Vector2.zero; // Reset velocity first
-            Rb.AddForce(dodgeDirection * dodgeForce, ForceMode2D.Impulse);
+            Rb.AddForce(dodgeDirection * force, ForceMode2D.Impulse);
             
-            // Temporarily disable standard movement
-            yield return new WaitForSeconds(0.3f);
+            // Temporary disable standard movement
+            yield return new WaitForSeconds(0.2f); // Reduced from 0.3f for quicker recovery
             
             // Gradual slow down after dodge
             float slowdownTime = 0.2f;
@@ -323,6 +414,14 @@ namespace CZ.Core.Enemy
             Rb.linearVelocity = Vector2.zero;
             isDodging = false;
             dodgeCoroutine = null;
+            
+            // Force an update of movement direction toward player
+            if (TargetTransform != null)
+            {
+                Vector2 toPlayer = ((Vector2)TargetTransform.position - (Vector2)transform.position).normalized;
+                currentMoveDirection = toPlayer;
+                lastDirectionChangeTime = Time.time;
+            }
         }
         #endregion
 
@@ -337,7 +436,7 @@ namespace CZ.Core.Enemy
             // Play damage animation if not dead
             if (!IsDead && animator != null)
             {
-                animator.SetTrigger("TakeDamage");
+                animator.SetTrigger(damageTriggerName);
             }
         }
         
@@ -351,7 +450,7 @@ namespace CZ.Core.Enemy
             // Play damage animation if not dead
             if (!IsDead && animator != null)
             {
-                animator.SetTrigger("TakeDamage");
+                animator.SetTrigger(damageTriggerName);
             }
         }
         #endregion
@@ -403,11 +502,24 @@ namespace CZ.Core.Enemy
             // Ensure the game object and sprite renderer are enabled when spawned
             gameObject.SetActive(true);
             
+            // Update target transform if we have a CurrentTarget
+            if (CurrentTarget != null)
+            {
+                targetTransform = CurrentTarget.transform;
+            }
+            
             SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
                 spriteRenderer.enabled = true;
                 spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1f); // Ensure full opacity
+                
+                // Fix material issues - ensure we're using Sprites/Default shader for proper rendering
+                if (spriteRenderer.material == null || spriteRenderer.material.shader.name.Contains("Lit"))
+                {
+                    spriteRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                    Debug.Log("[SwiftEnemy] Updated sprite material to Sprites/Default");
+                }
             }
             
             // Reset state variables
@@ -423,9 +535,19 @@ namespace CZ.Core.Enemy
             {
                 animator.SetFloat(speedParameterName, 0);
                 animator.enabled = true;
+                animator.Rebind(); // Reset animator state
+                
+                // Check if there's a controller and warn if not
+                if (animator.runtimeAnimatorController == null)
+                {
+                    Debug.LogWarning("[SwiftEnemy] Animator has no controller assigned!");
+                }
             }
             
-            Debug.Log($"[SwiftEnemy] OnSpawn complete - Sprite visible: {(spriteRenderer ? spriteRenderer.enabled : false)}, Layer: {gameObject.layer}");
+            // Ensure proper layer for collisions
+            gameObject.layer = LayerMask.NameToLayer("Enemy");
+            
+            Debug.Log($"[SwiftEnemy] OnSpawn complete - Sprite visible: {(spriteRenderer ? spriteRenderer.enabled : false)}, Layer: {LayerMask.LayerToName(gameObject.layer)}, Material: {(spriteRenderer ? spriteRenderer.material.shader.name : "none")}");
         }
         
         /// <summary>
@@ -447,17 +569,6 @@ namespace CZ.Core.Enemy
             // Log despawn for debugging
             Debug.Log("[SwiftEnemy] Successfully despawned");
         }
-        
-        /// <summary>
-        /// Helper method for testing - stores a reference to the target transform
-        /// </summary>
-        /// <param name="target">Target transform to store</param>
-        public void SetTargetTransformForTesting(Transform target)
-        {
-            #if UNITY_EDITOR
-            CurrentTarget = target;
-            #endif
-        }
         #endregion
 
         #region Testing Support
@@ -475,5 +586,38 @@ namespace CZ.Core.Enemy
         }
         #endif
         #endregion
+
+        // Add a method to keep the enemy on screen
+        private void KeepEnemyOnScreen()
+        {
+            // Get screen boundaries with some padding
+            if (Camera.main == null) return;
+            
+            float padding = 2f; // Units beyond screen edge before correcting
+            
+            Vector3 viewportPosition = Camera.main.WorldToViewportPoint(transform.position);
+            bool needsCorrection = false;
+            
+            // Check if we're too far outside the viewport
+            if (viewportPosition.x < -padding || viewportPosition.x > 1 + padding || 
+                viewportPosition.y < -padding || viewportPosition.y > 1 + padding)
+            {
+                needsCorrection = true;
+            }
+            
+            if (needsCorrection)
+            {
+                // Calculate direction toward center of screen
+                Vector3 screenCenter = new Vector3(0.5f, 0.5f, viewportPosition.z);
+                Vector3 worldCenter = Camera.main.ViewportToWorldPoint(screenCenter);
+                Vector2 directionToCenter = ((Vector2)worldCenter - (Vector2)transform.position).normalized;
+                
+                // Set movement direction toward center
+                currentMoveDirection = directionToCenter;
+                lastDirectionChangeTime = Time.time + directionChangeInterval; // Prevent immediate direction change
+                
+                Debug.Log($"[SwiftEnemy] Correcting position to stay on screen. Current position: {transform.position}, Direction to center: {directionToCenter}");
+            }
+        }
     }
 } 

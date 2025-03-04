@@ -311,6 +311,14 @@ namespace CZ.Core.Enemy
                     }
                 }
                 
+                // Add EnemyDamageDealer component if missing
+                EnemyDamageDealer damageDealer = GetComponent<EnemyDamageDealer>();
+                if (damageDealer == null)
+                {
+                    damageDealer = gameObject.AddComponent<EnemyDamageDealer>();
+                    CZLogger.LogInfo($"Added EnemyDamageDealer component to enemy", LogCategory.Enemy);
+                }
+                
                 // Mark as initialized
                 isInitialized = true;
                 
@@ -628,6 +636,13 @@ namespace CZ.Core.Enemy
             {
                 spriteRenderer.color = originalColor;
                 spriteRenderer.enabled = true;
+                
+                // Fix material issues - ensure we're using Sprites/Default shader for proper rendering
+                if (spriteRenderer.material == null || spriteRenderer.material.shader.name.Contains("Lit"))
+                {
+                    spriteRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                    CZLogger.LogInfo("[BaseEnemy] Updated sprite material to Sprites/Default", LogCategory.Enemy);
+                }
             }
             
             // Reset any velocity and ensure physics are active

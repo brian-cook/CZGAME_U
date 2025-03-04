@@ -15,6 +15,7 @@ namespace CZ.Editor
         // Define layer slots for required layers
         private const int PLAYER_LAYER_INDEX = 8; // Recommended index for Player layer
         private const int ENEMY_LAYER_INDEX = 9;  // Recommended index for Enemy layer
+        private const int PROJECTILE_LAYER_INDEX = 10; // Recommended index for Projectile layer
         
         // Tags needed for the project
         private static readonly string[] requiredTags = new string[] 
@@ -75,6 +76,13 @@ namespace CZ.Editor
             else if (enemyLayerProp.stringValue != "Enemy")
             {
                 Debug.LogWarning($"[LayerSetupEditor] Layer at index {ENEMY_LAYER_INDEX} is '{enemyLayerProp.stringValue}' instead of 'Enemy'");
+            }
+            
+            // Check and add Projectile layer
+            if (LayerMask.NameToLayer("Projectile") == -1)
+            {
+                Debug.LogWarning("[LayerSetupEditor] Projectile layer is missing. Add a layer named 'Projectile' at index " + PROJECTILE_LAYER_INDEX);
+                Debug.LogWarning("[LayerSetupEditor] To add this layer: Edit > Project Settings > Tags and Layers");
             }
             
             // Apply changes

@@ -92,7 +92,7 @@ CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scrip
 CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:144)
 CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:40)
 
-[Performance] [GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1106.24MB)
+[Performance] [GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1108.65MB)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -102,7 +102,7 @@ CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scrip
 CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:144)
 CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:40)
 
-[Performance] [GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 622.06MB)
+[Performance] [GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 619.23MB)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -112,7 +112,7 @@ CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scrip
 CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:144)
 CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:40)
 
-[Performance] [GameManager] Initial memory reading: 1106.25MB
+[Performance] [GameManager] Initial memory reading: 1108.66MB
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -121,7 +121,7 @@ CZ.Core.GameManager:InitializePerformanceMonitoring () (at Assets/_Project/Scrip
 CZ.Core.GameManager:InitializeManager () (at Assets/_Project/Scripts/Core/GameManager.cs:144)
 CZ.Core.GameManager:Awake () (at Assets/_Project/Scripts/Core/GameManager.cs:40)
 
-[Performance] [GameManager] Setting initial memory baseline to: 1106.25MB
+[Performance] [GameManager] Setting initial memory baseline to: 1108.66MB
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -698,7 +698,7 @@ CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs
 CZ.Core.GameManager/<AutoStartGame>d__46:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:505)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[Performance] [GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1152.81MB)
+[Performance] [GameManager] Successfully initialized memory recorder with counter: Total Used Memory (Current: 1183.02MB)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -710,7 +710,7 @@ CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs
 CZ.Core.GameManager/<AutoStartGame>d__46:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:505)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[Performance] [GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 625.80MB)
+[Performance] [GameManager] Successfully initialized GC recorder with counter: GC Used Memory (Current: 622.84MB)
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -722,7 +722,7 @@ CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs
 CZ.Core.GameManager/<AutoStartGame>d__46:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:505)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[Performance] [GameManager] Initial memory reading: 1152.83MB
+[Performance] [GameManager] Initial memory reading: 1183.03MB
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -733,7 +733,7 @@ CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs
 CZ.Core.GameManager/<AutoStartGame>d__46:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:505)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[Performance] [GameManager] Setting initial memory baseline to: 1152.83MB
+[Performance] [GameManager] Setting initial memory baseline to: 1183.03MB
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
 CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
@@ -905,24 +905,380 @@ CZ.Core.GameManager:StartGame () (at Assets/_Project/Scripts/Core/GameManager.cs
 CZ.Core.GameManager/<AutoStartGame>d__46:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:505)
 UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
 
-[Enemy] Cannot set target - enemy not initialized!
-UnityEngine.Debug:LogError (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:139)
-CZ.Core.Logging.LoggingManager:LogError (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:152)
-CZ.Core.Logging.CZLogger:LogError (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:12)
-CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:404)
-CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:661)
-CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:608)
+[Enemy] Enemy SwiftEnemy(Clone) not initialized during OnSpawn. Initializing now.
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.Enemy.BaseEnemy:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:602)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:500)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
 CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
 
-[Enemy] Cannot set target - enemy not initialized!
-UnityEngine.Debug:LogError (object)
-CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:139)
-CZ.Core.Logging.LoggingManager:LogError (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:152)
-CZ.Core.Logging.CZLogger:LogError (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:12)
-CZ.Core.Enemy.BaseEnemy:SetTarget (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:404)
-CZ.Core.Enemy.EnemySpawner:UpdateEnemyTargets (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:586)
-CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:575)
+[Enemy] Enemy SwiftEnemy(Clone) components initialized successfully
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.Enemy.BaseEnemy:InitializeComponents () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:317)
+CZ.Core.Enemy.BaseEnemy:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:603)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:500)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+[Enemy] Enemy spawned: SwiftEnemy(Clone) at (3.13, 6.48, 0.00), Initialized: True
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.Enemy.BaseEnemy:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:654)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:500)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+[SwiftEnemy] Updated sprite material to Sprites/Default
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:521)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:536)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+[SwiftEnemy] Animator has no controller assigned!
+UnityEngine.Debug:LogWarning (object)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:543)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+[SwiftEnemy] OnSpawn complete - Sprite visible: True, Layer: Enemy, Material: Sprites/Default
+UnityEngine.Debug:Log (object)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:550)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:UpdateMovement () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:289)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:177)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:191)
+
+[Physics2DSetup] Layer setup - Default: 0, Player: 8, Enemy: 9, Water: 4, UI: 5
+UnityEngine.Debug:Log (object)
+CZ.Core.Configuration.Physics2DSetup:ConfigurePhysicsLayers () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:317)
+CZ.Core.Configuration.Physics2DSetup/<EnforceCollisionsAfterDelay>d__11:MoveNext () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:94)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[Physics2DSetup] Explicitly enforced Enemy-Enemy collisions
+UnityEngine.Debug:Log (object)
+CZ.Core.Configuration.Physics2DSetup:ConfigurePhysicsLayers () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:333)
+CZ.Core.Configuration.Physics2DSetup/<EnforceCollisionsAfterDelay>d__11:MoveNext () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:94)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[Physics2DSetup] Player-Player collisions: Enabled
+UnityEngine.Debug:Log (object)
+CZ.Core.Configuration.Physics2DSetup:ConfigurePhysicsLayers () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:353)
+CZ.Core.Configuration.Physics2DSetup/<EnforceCollisionsAfterDelay>d__11:MoveNext () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:94)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[Physics2DSetup] Enemy-Enemy collisions: Enabled
+UnityEngine.Debug:Log (object)
+CZ.Core.Configuration.Physics2DSetup:ConfigurePhysicsLayers () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:357)
+CZ.Core.Configuration.Physics2DSetup/<EnforceCollisionsAfterDelay>d__11:MoveNext () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:94)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[Physics2DSetup] Player-Enemy collisions: Enabled
+UnityEngine.Debug:Log (object)
+CZ.Core.Configuration.Physics2DSetup:ConfigurePhysicsLayers () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:361)
+CZ.Core.Configuration.Physics2DSetup/<EnforceCollisionsAfterDelay>d__11:MoveNext () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:94)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[Physics2DSetup] Updated physics properties on 1 enemy components
+UnityEngine.Debug:Log (object)
+CZ.Core.Configuration.Physics2DSetup:UpdateEnemyPhysicsProperties () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:268)
+CZ.Core.Configuration.Physics2DSetup/<EnforceCollisionsAfterDelay>d__11:MoveNext () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:95)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[Physics2DSetup] Enemy #1: SwiftEnemy(Clone), Simulated: True, BodyType: Dynamic, Radius: 0.05, Mass: 1, CollisionDetectionMode: Continuous, SleepMode: NeverSleep
+UnityEngine.Debug:Log (object)
+CZ.Core.Configuration.Physics2DSetup/<EnforceCollisionsAfterDelay>d__11:MoveNext () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:110)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[Physics2DSetup] Found 1 enemies in the scene
+UnityEngine.Debug:Log (object)
+CZ.Core.Configuration.Physics2DSetup/<EnforceCollisionsAfterDelay>d__11:MoveNext () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:120)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetTrigger (string)
+CZ.Core.Enemy.SwiftEnemyController:PerformDodge (UnityEngine.Vector2) (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:375)
+CZ.Core.Enemy.SwiftEnemyController:CheckForDodgeOpportunity () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:341)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:182)
+
+[Enemy] Enemy spawned: SwiftEnemy(Clone) at (1.20, 7.95, 0.00), Initialized: True
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.Enemy.BaseEnemy:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:654)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:500)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:536)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:UpdateMovement () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:289)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:177)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:191)
+
+[PlayerController] Input System Status - Controls: True, Player Actions Enabled: True, Attack Action Enabled: True, Input Enabled Flag: True, Is Dead: False
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:DebugInputSystem () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:379)
+CZ.Core.Player.PlayerController:Update () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:362)
+
+[Performance] [GameManager] Initial cleanup completed. Memory: 1184.32MB (Delta: 1.29MB)
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.GameManager/<PerformInitialCleanup>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:481)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+[Performance] [GameManager] Adjusted thresholds - Warning: 1536.00MB, Critical: 1792.00MB, Emergency: 2048.00MB
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.GameManager/<PerformInitialCleanup>d__45:MoveNext () (at Assets/_Project/Scripts/Core/GameManager.cs:488)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetTrigger (string)
+CZ.Core.Enemy.SwiftEnemyController:PerformDodge (UnityEngine.Vector2) (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:375)
+CZ.Core.Enemy.SwiftEnemyController:CheckForDodgeOpportunity () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:341)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:182)
+
+[Enemy] Enemy spawned: SwiftEnemy(Clone) at (1.63, 10.06, 0.00), Initialized: True
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.Enemy.BaseEnemy:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:654)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:500)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:536)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:UpdateMovement () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:289)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:177)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:191)
+
+[Physics2DSetup] Updated physics properties on 2 enemy components
+UnityEngine.Debug:Log (object)
+CZ.Core.Configuration.Physics2DSetup:UpdateEnemyPhysicsProperties () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:268)
+CZ.Core.Configuration.Physics2DSetup:Update () (at Assets/_Project/Scripts/Core/Configuration/Physics2DSetup.cs:287)
+
+[Enemy] Enemy spawned: SwiftEnemy(Clone) at (-1.17, 7.61, 0.00), Initialized: True
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.Enemy.BaseEnemy:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:654)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:500)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:536)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:UpdateMovement () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:289)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:177)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:191)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetTrigger (string)
+CZ.Core.Enemy.SwiftEnemyController:PerformDodge (UnityEngine.Vector2) (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:375)
+CZ.Core.Enemy.SwiftEnemyController:CheckForDodgeOpportunity () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:341)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:182)
+
+[Enemy] Enemy spawned: SwiftEnemy(Clone) at (5.00, 1.73, 0.00), Initialized: True
+UnityEngine.Debug:Log (object)
+CZ.Core.Logging.LoggingManager:Log (string,CZ.Core.Logging.LogCategory,CZ.Core.Logging.LogPriority) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:145)
+CZ.Core.Logging.LoggingManager:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:162)
+CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:38)
+CZ.Core.Enemy.BaseEnemy:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/BaseEnemy.cs:654)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:500)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:OnSpawn () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:536)
+CZ.Core.Enemy.EnemySpawner:SpawnEnemy (UnityEngine.GameObject,UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:682)
+CZ.Core.Enemy.EnemySpawner:SpawnRandomEnemy (UnityEngine.Vector3) (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:630)
+CZ.Core.Enemy.EnemySpawner:Update () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:566)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:UpdateMovement () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:289)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:177)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetFloat (string,single)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:191)
+
+Animator is not playing an AnimatorController
+UnityEngine.Animator:SetTrigger (string)
+CZ.Core.Enemy.SwiftEnemyController:PerformDodge (UnityEngine.Vector2) (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:375)
+CZ.Core.Enemy.SwiftEnemyController:CheckForDodgeOpportunity () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:341)
+CZ.Core.Enemy.SwiftEnemyController:FixedUpdate () (at Assets/_Project/Scripts/Core/Enemy/SwiftEnemyController.cs:182)
+
+[PlayerController] OnAttack called - InputEnabled: True, IsDead: False, IsPerformed: True, Controls: True
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:523)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+[PlayerController] Attempting to fire projectile
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:539)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+[PlayerController] Getting projectile from pool
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:FireProjectile () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:595)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:540)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+[Projectile] No SpriteRenderer found, adding one
+UnityEngine.Debug:LogWarning (object)
+CZ.Core.Player.Projectile:SetupComponents () (at Assets/_Project/Scripts/Core/Player/Projectile.cs:95)
+CZ.Core.Player.Projectile:Awake () (at Assets/_Project/Scripts/Core/Player/Projectile.cs:47)
+UnityEngine.GameObject:SetActive (bool)
+CZ.Core.Pooling.ObjectPool`1<CZ.Core.Player.Projectile>:Get () (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:119)
+CZ.Core.Player.PlayerController:FireProjectile () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:596)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:540)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+[Projectile] Added default sprite to projectile
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.Projectile:SetupComponents () (at Assets/_Project/Scripts/Core/Player/Projectile.cs:102)
+CZ.Core.Player.Projectile:Awake () (at Assets/_Project/Scripts/Core/Player/Projectile.cs:47)
+UnityEngine.GameObject:SetActive (bool)
+CZ.Core.Pooling.ObjectPool`1<CZ.Core.Player.Projectile>:Get () (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:119)
+CZ.Core.Player.PlayerController:FireProjectile () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:596)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:540)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+[Projectile] Set sprite material to Sprites/Default
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.Projectile:SetupComponents () (at Assets/_Project/Scripts/Core/Player/Projectile.cs:114)
+CZ.Core.Player.Projectile:Awake () (at Assets/_Project/Scripts/Core/Player/Projectile.cs:47)
+UnityEngine.GameObject:SetActive (bool)
+CZ.Core.Pooling.ObjectPool`1<CZ.Core.Player.Projectile>:Get () (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:119)
+CZ.Core.Player.PlayerController:FireProjectile () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:596)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:540)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+A game object can only be in one layer. The layer needs to be in the range [0...31]
+UnityEngine.GameObject:set_layer (int)
+CZ.Core.Player.Projectile:SetupComponents () (at Assets/_Project/Scripts/Core/Player/Projectile.cs:118)
+CZ.Core.Player.Projectile:Awake () (at Assets/_Project/Scripts/Core/Player/Projectile.cs:47)
+UnityEngine.GameObject:SetActive (bool)
+CZ.Core.Pooling.ObjectPool`1<CZ.Core.Player.Projectile>:Get () (at Assets/_Project/Scripts/Core/Pooling/ObjectPool.cs:119)
+CZ.Core.Player.PlayerController:FireProjectile () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:596)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:540)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+[PlayerController] Using gamepad aim direction: (-1.00, -0.06)
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:FireProjectile () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:606)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:540)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+[PlayerController] Initializing projectile with direction: (-1.00, -0.06)
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:FireProjectile () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:632)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:540)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+A game object can only be in one layer. The layer needs to be in the range [0...31]
+UnityEngine.GameObject:set_layer (int)
+CZ.Core.Player.Projectile:Initialize (UnityEngine.Vector2,UnityEngine.GameObject) (at Assets/_Project/Scripts/Core/Player/Projectile.cs:244)
+CZ.Core.Player.PlayerController:FireProjectile () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:633)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:540)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+[Projectile] Initialized with direction: (-1.00, -0.06), owner: Player, Position: (1.75, 0.42, 0.00), Sprite visible: True, Layer: Default
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.Projectile:Initialize (UnityEngine.Vector2,UnityEngine.GameObject) (at Assets/_Project/Scripts/Core/Player/Projectile.cs:246)
+CZ.Core.Player.PlayerController:FireProjectile () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:633)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:540)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
+
+[PlayerController] Projectile fired successfully: Projectile(Clone)
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:FireProjectile () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:634)
+CZ.Core.Player.PlayerController:OnAttack (UnityEngine.InputSystem.InputAction/CallbackContext) (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:540)
+UnityEngine.InputSystem.LowLevel.NativeInputRuntime/<>c__DisplayClass7_0:<set_onUpdate>b__0 (UnityEngineInternal.Input.NativeInputUpdateType,UnityEngineInternal.Input.NativeInputEventBuffer*)
+UnityEngineInternal.Input.NativeInputSystem:NotifyUpdate (UnityEngineInternal.Input.NativeInputUpdateType,intptr)
 
 [ResourceManager] Starting application quit cleanup...
 UnityEngine.Debug:Log (object)
@@ -937,6 +1293,10 @@ CZ.Core.Resource.ResourceManager:OnApplicationQuit () (at Assets/_Project/Script
 UnityEngine.Debug:Log (object)
 CZ.Core.Resource.ResourceManager:OnApplicationQuit () (at Assets/_Project/Scripts/Core/Resource/ResourceManager.cs:296)
 
+[PlayerController] OnDisable - Input system disabled
+UnityEngine.Debug:Log (object)
+CZ.Core.Player.PlayerController:OnDisable () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:420)
+
 [LoggingManager] Instance requested during application quit, returning null
 UnityEngine.Debug:LogWarning (object)
 CZ.Core.Logging.LoggingManager:get_Instance () (at Assets/_Project/Scripts/Core/Logging/LoggingManager.cs:39)
@@ -947,8 +1307,4 @@ CZ.Core.Enemy.EnemySpawner:OnDisable () (at Assets/_Project/Scripts/Core/Enemy/E
 UnityEngine.Debug:Log (object)
 CZ.Core.Logging.CZLogger:LogInfo (string,CZ.Core.Logging.LogCategory) (at Assets/_Project/Scripts/Core/Logging/CZLogger.cs:42)
 CZ.Core.Enemy.EnemySpawner:OnDisable () (at Assets/_Project/Scripts/Core/Enemy/EnemySpawner.cs:59)
-
-[PlayerController] OnDisable - Input system disabled
-UnityEngine.Debug:Log (object)
-CZ.Core.Player.PlayerController:OnDisable () (at Assets/_Project/Scripts/Core/Player/PlayerController.cs:420)
 
