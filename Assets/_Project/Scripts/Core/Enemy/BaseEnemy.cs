@@ -224,102 +224,65 @@ namespace CZ.Core.Enemy
             
             try
             {
-                // Set up required components
+                // Get required components
                 spriteRenderer = GetComponent<SpriteRenderer>();
-                if (spriteRenderer == null)
-                {
-                    CZLogger.LogError("Enemy is missing SpriteRenderer component", LogCategory.Enemy);
-                    return;
-                }
-                
-                // Ensure we have a valid sprite
-                if (spriteRenderer.sprite == null)
-                {
-                    CZLogger.LogWarning("Enemy SpriteRenderer has null sprite. Enemy visuals will be invisible.", LogCategory.Enemy);
-                }
-                
-                // Set up collider based on sprite size
                 circleCollider = GetComponent<CircleCollider2D>();
-                if (circleCollider == null)
-                {
-                    circleCollider = gameObject.AddComponent<CircleCollider2D>();
-                    CZLogger.LogInfo("Added CircleCollider2D component to enemy", LogCategory.Enemy);
-                }
-                
-                // Set the Enemy layer for proper collision filtering
-                gameObject.layer = LayerMask.NameToLayer("Enemy");
-                
-                // Set up physics
                 rb = GetComponent<Rigidbody2D>();
-                if (rb == null)
+
+                // Configure components
+                if (circleCollider != null)
                 {
-                    rb = gameObject.AddComponent<Rigidbody2D>();
-                    CZLogger.LogInfo("Added Rigidbody2D component to enemy", LogCategory.Enemy);
-                }
-                
-                // Configure Rigidbody2D for proper physics behavior and collision detection
-                rb.gravityScale = 0f;
-                rb.linearDamping = 0.5f;
-                rb.angularDamping = 0.5f;
-                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-                rb.sleepMode = RigidbodySleepMode2D.NeverSleep; // Prevent sleeping to maintain collision response
-                rb.interpolation = RigidbodyInterpolation2D.Interpolate; // Smoother movement
-                rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // Prevent tunneling through colliders
-                
-                // IMPORTANT: Use Dynamic bodyType instead of isKinematic=false for proper collisions
-                rb.bodyType = RigidbodyType2D.Dynamic;
-                
-                // For enemies to collide with each other, this must be enabled
-                rb.simulated = true;
-                
-                // Add a small mass to improve collision stability
-                rb.mass = 1.5f;
-                
-                // Configure collider based on our intended collision behavior
-                if (spriteRenderer.sprite != null)
-                {
-                    float spriteSize = Mathf.Max(spriteRenderer.bounds.size.x, spriteRenderer.bounds.size.y);
-                    circleCollider.radius = spriteSize * collisionRadius;
-                }
-                else
-                {
-                    // Default fallback size if sprite is null
+                    // CRITICAL: Make sure collider is set up correctly for collision
+                    circleCollider.enabled = true;
+                    circleCollider.isTrigger = false; // Standard collider, not trigger
                     circleCollider.radius = collisionRadius;
+                    
+                    // Log collider settings for debugging
+                    Debug.Log($"[{GetType().Name}] Collider initialized: Radius={circleCollider.radius}, " +
+                              $"IsTrigger={circleCollider.isTrigger}, Enabled={circleCollider.enabled}, " +
+                              $"Layer={LayerMask.LayerToName(gameObject.layer)}");
                 }
-                
-                // Important: We must NOT use trigger colliders for physical collisions
-                circleCollider.isTrigger = false;
-                
-                // Create or assign a physics material to improve collisions
-                if (circleCollider.sharedMaterial == null)
+
+                if (rb != null)
                 {
-                    try
-                    {
-                        // Create a physics material to prevent enemies from sticking to each other
-                        PhysicsMaterial2D physicsMaterial = new PhysicsMaterial2D("EnemyPhysicsMaterial");
-                        physicsMaterial.friction = 0.1f;       // Slight friction to prevent excessive sliding
-                        physicsMaterial.bounciness = 0.3f;    // Moderate bounce for better collision response
-                        
-                        // Apply the material to the collider
-                        circleCollider.sharedMaterial = physicsMaterial;
-                        
-                        CZLogger.LogInfo($"Created and applied physics material to enemy collider", LogCategory.Enemy);
-                    }
-                    catch (System.Exception e)
-                    {
-                        CZLogger.LogWarning($"Failed to create physics material: {e.Message}. Using default physics material.", LogCategory.Enemy);
-                    }
+                    rb.gravityScale = 0f;
+                    rb.sleepMode = RigidbodySleepMode2D.StartAwake;
+                    rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+                    rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+                    rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+                    
+                    // Log rigidbody settings for debugging
+                    Debug.Log($"[{GetType().Name}] Rigidbody initialized: Type={rb.bodyType}, " +
+                              $"Simulated={rb.simulated}, Mass={rb.mass}, " +
+                              $"CollisionDetection={rb.collisionDetectionMode}, " +
+                              $"Interpolation={rb.interpolation}");
                 }
-                
-                // Add EnemyDamageDealer component if missing
-                EnemyDamageDealer damageDealer = GetComponent<EnemyDamageDealer>();
-                if (damageDealer == null)
+
+                // Make sure we set the proper layer
+                gameObject.layer = LayerMask.NameToLayer("Enemy");
+
+                // Instantiate material if needed for effects
+                if (spriteRenderer != null && materialInstance == null)
                 {
-                    damageDealer = gameObject.AddComponent<EnemyDamageDealer>();
-                    CZLogger.LogInfo($"Added EnemyDamageDealer component to enemy", LogCategory.Enemy);
+                    // Create a material instance for this enemy
+                    if (sharedMaterial == null)
+                    {
+                        sharedMaterial = new Material(Shader.Find("Sprites/Default"))
+                        {
+                            hideFlags = HideFlags.DontSave
+                        };
+                    }
+                    
+                    materialInstance = new Material(sharedMaterial);
+                    spriteRenderer.material = materialInstance;
                 }
-                
-                // Mark as initialized
+
+                // Ensure material is properly set up
+                if (spriteRenderer != null && materialInstance != null)
+                {
+                    spriteRenderer.material = materialInstance;
+                }
+
                 isInitialized = true;
                 
                 CZLogger.LogInfo($"Enemy {gameObject.name} components initialized successfully", LogCategory.Enemy);
@@ -447,6 +410,12 @@ namespace CZ.Core.Enemy
         {
             if (isDying || !isInitialized) return;
 
+            // Add detailed logging for debugging projectile hits
+            Debug.Log($"[{GetType().Name}] Taking {damage} damage of type {damageType}. Current health: {currentHealth}/{maxHealth}, " +
+                      $"Position: {transform.position}, Active: {gameObject.activeInHierarchy}, " +
+                      $"ColliderEnabled: {(circleCollider != null ? circleCollider.enabled.ToString() : "N/A")}, " +
+                      $"Layer: {LayerMask.LayerToName(gameObject.layer)}");
+
             // Apply damage modifiers based on damage type
             int actualDamage = CalculateDamage(damage, damageType);
             
@@ -457,6 +426,7 @@ namespace CZ.Core.Enemy
             
             if (currentHealth <= 0 && !isDying)
             {
+                Debug.Log($"[{GetType().Name}] Enemy defeated by damage of type {damageType}");
                 StartDeathSequence();
             }
             
@@ -711,6 +681,115 @@ namespace CZ.Core.Enemy
             gameObject.SetActive(false);
             CZLogger.LogInfo($"Enemy despawned: {gameObject.name}", LogCategory.Enemy);
         }
+        #endregion
+
+        #region Collision Handling
+        
+        /// <summary>
+        /// OnCollisionEnter2D is called when this collider/rigidbody has begun touching another rigidbody/collider
+        /// </summary>
+        /// <param name="collision">The collision data containing information about the collision</param>
+        protected virtual void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (isDying || !isInitialized) return;
+            
+            // Check if colliding with a projectile
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Projectile"))
+            {
+                // Log for debugging
+                CZLogger.LogInfo($"[{GetType().Name}] Hit by projectile: {collision.gameObject.name} at position {transform.position}", LogCategory.Enemy);
+
+                try
+                {
+                    // Use reflection to get Projectile component type
+                    var projectileType = System.Type.GetType("CZ.Core.Player.Projectile, CZ.Core.Player");
+                    if (projectileType == null)
+                    {
+                        CZLogger.LogWarning($"[{GetType().Name}] Could not find Projectile type via reflection", LogCategory.Enemy);
+                        return;
+                    }
+                    
+                    var projectileComponent = collision.gameObject.GetComponent(projectileType);
+                    if (projectileComponent != null)
+                    {
+                        // Use reflection to get the Damage property
+                        var damageProperty = projectileType.GetProperty("Damage");
+                        if (damageProperty == null)
+                        {
+                            CZLogger.LogWarning($"[{GetType().Name}] Could not find Damage property on Projectile", LogCategory.Enemy);
+                            return;
+                        }
+                        
+                        int damage = (int)damageProperty.GetValue(projectileComponent);
+                        TakeDamage(damage);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    CZLogger.LogError($"[{GetType().Name}] Error processing projectile collision: {ex.Message}", LogCategory.Enemy);
+                }
+            }
+            else if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+            {
+                // Log collision with player
+                Debug.Log($"[{GetType().Name}] Collided with player at position {transform.position}");
+                
+                // Use reflection to get PlayerController component
+                var playerController = collision.gameObject.GetComponent(System.Type.GetType("CZ.Core.Player.PlayerController, CZ.Core.Player"));
+                if (playerController != null)
+                {
+                    // Use reflection to call TakeDamage method
+                    playerController.GetType().GetMethod("TakeDamage").Invoke(playerController, new object[] { 10 });
+                }
+            }
+        }
+        
+        /// <summary>
+        /// OnTriggerEnter2D is called when the Collider2D other enters the trigger
+        /// </summary>
+        /// <param name="other">The other Collider2D involved in this collision</param>
+        protected virtual void OnTriggerEnter2D(Collider2D other)
+        {
+            if (isDying || !isInitialized) return;
+            
+            // Check if trigger entered by a projectile
+            if (other.gameObject.layer == LayerMask.NameToLayer("Projectile"))
+            {
+                // Log for debugging
+                CZLogger.LogInfo($"[{GetType().Name}] Trigger entered by projectile: {other.gameObject.name} at position {transform.position}", LogCategory.Enemy);
+
+                try
+                {
+                    // Use reflection to get Projectile component type
+                    var projectileType = System.Type.GetType("CZ.Core.Player.Projectile, CZ.Core.Player");
+                    if (projectileType == null)
+                    {
+                        CZLogger.LogWarning($"[{GetType().Name}] Could not find Projectile type via reflection", LogCategory.Enemy);
+                        return;
+                    }
+                    
+                    var projectileComponent = other.gameObject.GetComponent(projectileType);
+                    if (projectileComponent != null)
+                    {
+                        // Use reflection to get the Damage property
+                        var damageProperty = projectileType.GetProperty("Damage");
+                        if (damageProperty == null)
+                        {
+                            CZLogger.LogWarning($"[{GetType().Name}] Could not find Damage property on Projectile", LogCategory.Enemy);
+                            return;
+                        }
+                        
+                        int damage = (int)damageProperty.GetValue(projectileComponent);
+                        TakeDamage(damage);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    CZLogger.LogError($"[{GetType().Name}] Error processing projectile trigger: {ex.Message}", LogCategory.Enemy);
+                }
+            }
+        }
+        
         #endregion
 
         private void OnDestroy()

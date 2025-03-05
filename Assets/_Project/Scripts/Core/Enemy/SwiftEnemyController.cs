@@ -2,7 +2,6 @@ using UnityEngine;
 using NaughtyAttributes;
 using CZ.Core.Logging;
 using CZ.Core.Interfaces;
-using CZ.Core.Player;
 using System.Collections;
 using Unity.Profiling;
 
@@ -162,6 +161,35 @@ namespace CZ.Core.Enemy
                 Rb.linearDamping = 0.2f;  // Lower drag for more responsive movement
                 Rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             }
+            
+            // CRITICAL FIX: Ensure proper layer and collider settings
+            gameObject.layer = LayerMask.NameToLayer("Enemy");
+            
+            // Ensure colliders are properly set up for collision detection
+            var colliders = GetComponents<Collider2D>();
+            bool hasEnabledCollider = false;
+            
+            if (colliders != null && colliders.Length > 0)
+            {
+                foreach (var currentCollider in colliders)
+                {
+                    // Swift enemies should use non-trigger colliders to detect projectile hits
+                    currentCollider.isTrigger = false;
+                    currentCollider.enabled = true;
+                    hasEnabledCollider = true;
+                    
+                    // Log for debugging
+                    Debug.Log($"[SwiftEnemy] Set up collider: {currentCollider.GetType().Name}, enabled: {currentCollider.enabled}, trigger: {currentCollider.isTrigger}");
+                }
+                
+                // Make sure at least one collider is enabled
+                if (!hasEnabledCollider && colliders.Length > 0)
+                {
+                    // If no colliders were enabled, enable the first one
+                    colliders[0].enabled = true;
+                    Debug.LogWarning($"[SwiftEnemy] No enabled colliders found, enabling collider: {colliders[0].GetType().Name}");
+                }
+            }
         }
 
         // Override the base class's FixedUpdate method
@@ -298,55 +326,33 @@ namespace CZ.Core.Enemy
         
         private void CheckForDodgeOpportunity()
         {
-            // If dodging is disabled, return immediately
-            if (!canDodge) return;
-
-            // Don't check for dodges too frequently
-            if (Time.time - lastDodgeTime < dodgeCooldown)
+            using (s_dodgeMarker.Auto())
             {
-                return;
-            }
-
-            // Find potential threats (projectiles or player) within detection range
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, dodgeDetectionRange, LayerMask.GetMask("Player", "Projectile"));
-            
-            foreach (var collider in colliders)
-            {
-                // Skip if it's another enemy
-                if (collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
-                    continue;
+                if (!canDodge) return;
                 
-                // Check if it's a projectile or player
-                bool isProjectile = collider.GetComponent<Player.Projectile>() != null;
-                bool isPlayer = collider.GetComponent<Player.PlayerController>() != null;
+                // Find potential threats (projectiles or player) within detection range
+                Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, dodgeDetectionRange, LayerMask.GetMask("Player", "Projectile"));
                 
-                if (isProjectile || isPlayer)
+                foreach (var collider in colliders)
                 {
-                    // Calculate threat direction
-                    Vector2 threatDirection = (collider.transform.position - transform.position).normalized;
+                    // Skip if the collider is part of this enemy
+                    if (collider.gameObject == gameObject) continue;
                     
-                    // Check if threat is coming toward us (dot product)
-                    Rigidbody2D threatRb = collider.GetComponent<Rigidbody2D>();
+                    Vector2 threatPosition = collider.transform.position;
+                    Vector2 threatDirection = (threatPosition - (Vector2)transform.position).normalized;
                     
-                    if (threatRb != null)
+                    // Check if it's a projectile or player using interfaces
+                    bool isProjectile = collider.GetComponent<IProjectileIdentifier>() != null;
+                    bool isPlayer = collider.GetComponent<IPlayerIdentifier>() != null;
+                    
+                    if (isProjectile || isPlayer)
                     {
-                        Vector2 threatVelocity = threatRb.linearVelocity.normalized;
-                        float dotProduct = Vector2.Dot(threatDirection, threatVelocity);
-                        
-                        // If threat is moving toward us and random check passes
-                        // Use reduced dodge probability to make it less frequent
-                        if (dotProduct < -0.5f && Random.value < dodgeProbability * 0.7f)
+                        // Roll a random chance to dodge
+                        if (Random.value < dodgeProbability)
                         {
-                            // Execute dodge
                             PerformDodge(threatDirection);
                             break;
                         }
-                    }
-                    else if (Random.value < dodgeProbability * 0.3f) // Reduced probability even further
-                    {
-                        // Occasionally dodge even without velocity info
-                        PerformDodge(threatDirection);
-                        break;
                     }
                 }
             }
@@ -508,6 +514,35 @@ namespace CZ.Core.Enemy
                 targetTransform = CurrentTarget.transform;
             }
             
+            // CRITICAL FIX: Ensure proper layer is set
+            gameObject.layer = LayerMask.NameToLayer("Enemy");
+            
+            // CRITICAL FIX: Ensure all colliders are set up correctly
+            var colliders = GetComponents<Collider2D>();
+            bool hasEnabledCollider = false;
+            
+            if (colliders != null && colliders.Length > 0)
+            {
+                foreach (var currentCollider in colliders)
+                {
+                    // Swift enemies should use non-trigger colliders to detect projectile hits
+                    currentCollider.isTrigger = false;
+                    currentCollider.enabled = true;
+                    hasEnabledCollider = true;
+                    
+                    // Log for debugging
+                    Debug.Log($"[SwiftEnemy] Set up collider: {currentCollider.GetType().Name}, enabled: {currentCollider.enabled}, trigger: {currentCollider.isTrigger}");
+                }
+                
+                // Make sure at least one collider is enabled
+                if (!hasEnabledCollider && colliders.Length > 0)
+                {
+                    // If no colliders were enabled, enable the first one
+                    colliders[0].enabled = true;
+                    Debug.LogWarning($"[SwiftEnemy] No enabled colliders found, enabling collider: {colliders[0].GetType().Name}");
+                }
+            }
+            
             SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
@@ -543,9 +578,6 @@ namespace CZ.Core.Enemy
                     Debug.LogWarning("[SwiftEnemy] Animator has no controller assigned!");
                 }
             }
-            
-            // Ensure proper layer for collisions
-            gameObject.layer = LayerMask.NameToLayer("Enemy");
             
             Debug.Log($"[SwiftEnemy] OnSpawn complete - Sprite visible: {(spriteRenderer ? spriteRenderer.enabled : false)}, Layer: {LayerMask.LayerToName(gameObject.layer)}, Material: {(spriteRenderer ? spriteRenderer.material.shader.name : "none")}");
         }
@@ -619,5 +651,70 @@ namespace CZ.Core.Enemy
                 Debug.Log($"[SwiftEnemy] Correcting position to stay on screen. Current position: {transform.position}, Direction to center: {directionToCenter}");
             }
         }
+
+        #region Collision Handling
+
+        /// <summary>
+        /// OnCollisionEnter2D is called when this collider/rigidbody has begun touching another rigidbody/collider
+        /// </summary>
+        /// <param name="collision">The collision data containing information about the collision</param>
+        protected override void OnCollisionEnter2D(Collision2D collision)
+        {
+            // Check if colliding with a projectile
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Projectile"))
+            {
+                // Log for debugging
+                Debug.Log($"[SwiftEnemy] Hit by projectile: {collision.gameObject.name} at position {transform.position}");
+
+                // Use reflection to get Projectile component type
+                var projectileComponent = collision.gameObject.GetComponent(System.Type.GetType("CZ.Core.Player.Projectile, CZ.Core.Player"));
+                if (projectileComponent != null)
+                {
+                    // Use reflection to get the DamageValue property
+                    int damage = (int)projectileComponent.GetType().GetProperty("DamageValue").GetValue(projectileComponent);
+                    TakeDamage(damage);
+                    
+                    // If you need to handle the projectile differently, you can do so here
+                }
+            }
+            else if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+            {
+                // Log collision with player
+                Debug.Log($"[SwiftEnemy] Collided with player at position {transform.position}");
+                
+                // Use reflection to get PlayerController component
+                var playerController = collision.gameObject.GetComponent(System.Type.GetType("CZ.Core.Player.PlayerController, CZ.Core.Player"));
+                if (playerController != null)
+                {
+                    // Use reflection to call TakeDamage method
+                    playerController.GetType().GetMethod("TakeDamage").Invoke(playerController, new object[] { 10 });
+                }
+            }
+        }
+        
+        /// <summary>
+        /// OnTriggerEnter2D is called when the Collider2D other enters the trigger
+        /// </summary>
+        /// <param name="other">The other Collider2D involved in this collision</param>
+        protected override void OnTriggerEnter2D(Collider2D other)
+        {
+            // This serves as a backup method in case projectiles use triggers
+            if (other.gameObject.layer == LayerMask.NameToLayer("Projectile"))
+            {
+                // Log for debugging
+                Debug.Log($"[SwiftEnemy] Trigger entered by projectile: {other.gameObject.name} at position {transform.position}");
+
+                // Use reflection to get Projectile component
+                var projectileComponent = other.gameObject.GetComponent(System.Type.GetType("CZ.Core.Player.Projectile, CZ.Core.Player"));
+                if (projectileComponent != null)
+                {
+                    // Use reflection to get the DamageValue property
+                    int damage = (int)projectileComponent.GetType().GetProperty("DamageValue").GetValue(projectileComponent);
+                    TakeDamage(damage);
+                }
+            }
+        }
+        
+        #endregion
     }
 } 

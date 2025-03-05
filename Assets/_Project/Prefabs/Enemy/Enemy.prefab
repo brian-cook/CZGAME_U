@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3452107642329762167}
   - component: {fileID: 4191353785613264076}
   - component: {fileID: 4773301064735437958}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -56,7 +56,6 @@ MonoBehaviour:
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
   deathFadeDuration: 0.5
   collisionRadius: 0.25
-  useTriggerCollider: 0
   minExperienceDropCount: 1
   maxExperienceDropCount: 3
   experienceDropValue: 1
@@ -108,9 +107,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingLayerID: -1859213211
+  m_SortingLayer: 1
+  m_SortingOrder: 5
   m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -181,7 +180,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4

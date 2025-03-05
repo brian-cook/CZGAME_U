@@ -19,25 +19,59 @@ namespace CZ.Core
     public class GameManager : MonoBehaviour
     {
         #region Singleton Setup
-        private static GameManager instance;
-        public static GameManager Instance => instance;
+        private static GameManager _instance;
+        public static GameManager Instance
+        {
+            get
+            {
+                // If the instance doesn't exist, find it in the scene
+                if (_instance == null)
+                {
+                    _instance = FindFirstObjectByType<GameManager>();
+                    
+                    // If it still doesn't exist, create a new GameObject with the GameManager
+                    if (_instance == null)
+                    {
+                        GameObject gameManagerObject = new GameObject("GameManager");
+                        _instance = gameManagerObject.AddComponent<GameManager>();
+                    }
+                }
+                return _instance;
+            }
+        }
         
         private void Awake()
         {
-            // Initialize physics setup first
-            InitializePhysics2D();
-            
-            if (instance != null && instance != this)
+            // Ensure we're the only instance in the scene
+            if (_instance != null && _instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
-            instance = this;
+            
+            _instance = this;
+            
+            // Add CollisionDebugger if it doesn't exist
+            if (GetComponent<ICollisionDebugger>() == null)
+            {
+                // We need to get the concrete type through code that doesn't directly reference it
+                Type collisionDebuggerType = Type.GetType("CZ.Core.Debug.CollisionDebugger, CZ.Core.Debug");
+                if (collisionDebuggerType != null)
+                {
+                    gameObject.AddComponent(collisionDebuggerType);
+                    Debug.Log("[GameManager] Added CollisionDebugger component to GameManager");
+                }
+                else
+                {
+                    Debug.LogError("[GameManager] Could not find CollisionDebugger type. Make sure CZ.Core.Debug assembly is included in the project.");
+                }
+            }
+            
+            // Make sure this GameObject persists between scenes
             DontDestroyOnLoad(gameObject);
             
-            // Ensure configuration exists before initialization
-            EnsureMemoryConfiguration();
-            InitializeManager();
+            // Initialize all systems
+            InitializeSystems();
         }
         #endregion
 
@@ -126,6 +160,12 @@ namespace CZ.Core
         public event Action<GameState> OnGameStateChanged;
 
         private bool isMonitoring = false;
+
+        // Add collision-related fields
+        private float lastCollisionCheckTime = 0f;
+        private float collisionCheckInterval = 5f; // Check every 5 seconds
+        private int consecutiveFixAttempts = 0;
+        private int maxConsecutiveFixAttempts = 3;
         #endregion
 
         #region Initialization
@@ -693,10 +733,18 @@ namespace CZ.Core
         #region Performance Monitoring
         private void Update()
         {
+            // Check memory usage periodically
             if (Time.time - lastMemoryCheck >= MEMORY_CHECK_INTERVAL)
             {
                 MonitorPerformance();
                 lastMemoryCheck = Time.time;
+            }
+            
+            // Check for collision issues periodically
+            if (Time.time > lastCollisionCheckTime + collisionCheckInterval)
+            {
+                lastCollisionCheckTime = Time.time;
+                CheckAndFixCollisionIssues();
             }
         }
 
@@ -1001,6 +1049,37 @@ namespace CZ.Core
             lastCleanupTime = -CLEANUP_COOLDOWN;
             CZLogger.LogInfo("Performance Counters Reset", LogCategory.Performance);
         }
+
+        /// <summary>
+        /// Forces a fix of all collision-related issues
+        /// </summary>
+        public void ForceFixCollisions()
+        {
+            Debug.Log("[GameManager] Forcing fix of collision issues...");
+            
+            // Get the collision debugger component
+            ICollisionDebugger debugger = GetComponent<ICollisionDebugger>();
+            if (debugger != null)
+            {
+                // Call the emergency fix method
+                bool success = debugger.FixCriticalCollisionIssues();
+                Debug.Log($"[GameManager] Collision fix {(success ? "succeeded" : "failed")}");
+            }
+            else
+            {
+                Debug.LogError("[GameManager] No CollisionDebugger component found! Cannot fix collision issues.");
+            }
+        }
+        
+        /// <summary>
+        /// Public method that can be called from the Unity Editor to manually fix collisions
+        /// </summary>
+        [ContextMenu("Fix Collision Issues")]
+        public void FixCollisionIssuesFromEditor()
+        {
+            Debug.Log("[GameManager] Manual collision fix requested from Editor");
+            ForceFixCollisions();
+        }
         #endregion
 
         private void EnsureMemoryConfiguration()
@@ -1032,13 +1111,129 @@ namespace CZ.Core
             }
         }
 
+        /// <summary>
+        /// Initializes the Physics2D system with the correct settings
+        /// </summary>
         private void InitializePhysics2D()
         {
-            // Add the Physics2DSetup component if it doesn't exist
-            if (GetComponent<Physics2DSetup>() == null)
+            // Set up critical Physics2D settings
+            Physics2D.queriesHitTriggers = true;
+            Physics2D.queriesStartInColliders = false;
+            Physics2D.callbacksOnDisable = true;
+            
+            // Set up layer-specific collision settings
+            int projectileLayer = LayerMask.NameToLayer("Projectile");
+            int enemyLayer = LayerMask.NameToLayer("Enemy");
+            int playerLayer = LayerMask.NameToLayer("Player");
+            
+            if (projectileLayer >= 0 && enemyLayer >= 0)
             {
-                gameObject.AddComponent<Physics2DSetup>();
-                Debug.Log("[GameManager] Added Physics2DSetup component for collision configuration");
+                // Explicitly enable projectile-enemy collisions
+                Physics2D.IgnoreLayerCollision(projectileLayer, enemyLayer, false);
+                
+                bool collisionEnabled = !Physics2D.GetIgnoreLayerCollision(projectileLayer, enemyLayer);
+                Debug.Log($"[GameManager] Projectile-Enemy collisions: {(collisionEnabled ? "Enabled" : "Disabled")}");
+                
+                if (!collisionEnabled)
+                {
+                    Debug.LogError("[GameManager] Failed to enable Projectile-Enemy collisions! This is critical for gameplay.");
+                }
+            }
+            else
+            {
+                Debug.LogError($"[GameManager] Missing required layers! Projectile: {projectileLayer}, Enemy: {enemyLayer}. Please add them in Project Settings > Tags and Layers.");
+            }
+            
+            // Log configured settings for debugging
+            Debug.Log($"[GameManager] Physics2D settings initialized: " +
+                $"queriesHitTriggers={Physics2D.queriesHitTriggers}, " +
+                $"velocityIterations={Physics2D.velocityIterations}, " +
+                $"positionIterations={Physics2D.positionIterations}");
+            
+            // Let the collision debugger handle layer-specific settings
+            ICollisionDebugger debugger = GetComponent<ICollisionDebugger>();
+            if (debugger != null)
+            {
+                // Use the more comprehensive fix method instead of just verification
+                bool success = debugger.FixCriticalCollisionIssues();
+                
+                if (!success)
+                {
+                    Debug.LogWarning("[GameManager] Some collision issues could not be fixed automatically. Manual inspection may be required.");
+                }
+                else
+                {
+                    Debug.Log("[GameManager] All collision settings verified and fixed successfully.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[GameManager] CollisionDebugger component not found! Adding it now...");
+                // We need to get the concrete type through code that doesn't directly reference it
+                Type collisionDebuggerType = Type.GetType("CZ.Core.Debug.CollisionDebugger, CZ.Core.Debug");
+                if (collisionDebuggerType != null)
+                {
+                    Component component = gameObject.AddComponent(collisionDebuggerType);
+                    debugger = component as ICollisionDebugger;
+                    Debug.Log("[GameManager] Added CollisionDebugger component to assist with physics and collision issues");
+                    
+                    // Now that we've added it, run the fix
+                    if (debugger != null)
+                    {
+                        bool success = debugger.FixCriticalCollisionIssues();
+                        Debug.Log($"[GameManager] Initial collision fix {(success ? "succeeded" : "failed")}");
+                    }
+                }
+                else
+                {
+                    Debug.LogError("[GameManager] Could not find CollisionDebugger type. Make sure CZ.Core.Debug assembly is included in the project.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Initializes all core game systems in the correct order
+        /// </summary>
+        private void InitializeSystems()
+        {
+            // Initialize Physics2D first
+            InitializePhysics2D();
+            
+            // Initialize other systems
+            EnsureMemoryConfiguration();
+            InitializeManager();
+            
+            // Log that initialization is complete
+            Debug.Log("[GameManager] All core systems initialized successfully");
+        }
+
+        // Add a method to check and fix collision issues during gameplay
+        /// <summary>
+        /// Checks for and fixes collision issues during gameplay
+        /// </summary>
+        private void CheckAndFixCollisionIssues()
+        {
+            // Only check if we haven't exceeded the maximum number of consecutive fix attempts
+            if (consecutiveFixAttempts >= maxConsecutiveFixAttempts)
+            {
+                return;
+            }
+            
+            // Check if projectile-enemy collisions are enabled
+            bool projectileEnemyCollisionsEnabled = !Physics2D.GetIgnoreLayerCollision(
+                LayerMask.NameToLayer("Projectile"), 
+                LayerMask.NameToLayer("Enemy"));
+                
+            if (!projectileEnemyCollisionsEnabled)
+            {
+                Debug.LogWarning("[GameManager] Detected that projectile-enemy collisions are disabled! Fixing...");
+                ForceFixCollisions();
+                consecutiveFixAttempts++;
+            }
+            else
+            {
+                // Reset consecutive fix attempts if collisions are working
+                consecutiveFixAttempts = 0;
             }
         }
     }

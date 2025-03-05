@@ -30,7 +30,6 @@ namespace CZ.Core.Configuration
         private int playerLayer;
         private int enemyLayer;
         private int projectileLayer;
-        private bool setupComplete = false;
 
         private void Awake()
         {
@@ -61,11 +60,15 @@ namespace CZ.Core.Configuration
             Physics2D.velocityIterations = 12; // Increased from 8 for better stability
             Physics2D.positionIterations = 8;  // Increased from 3 for better positioning
             
-            // Enable these settings for better collision detection
+            // CRITICAL: Force enable these settings for better collision detection
+            // This ensures that triggers work properly across all objects
             Physics2D.queriesHitTriggers = true;
             Physics2D.queriesStartInColliders = false; // This often helps with overlap issues
             Physics2D.reuseCollisionCallbacks = true;
             Physics2D.callbacksOnDisable = true;
+            
+            // Make sure this is explicitly set to true to ensure triggers work correctly
+            Physics2D.queriesHitTriggers = true;
             
             // Auto-sync transforms ensures transform positions match physics positions
             Physics2D.autoSyncTransforms = true;
@@ -75,6 +78,7 @@ namespace CZ.Core.Configuration
                       $"VelocityIterations={Physics2D.velocityIterations}, " +
                       $"PositionIterations={Physics2D.positionIterations}, " +
                       $"PreventSleeping={preventRigidbodySleeping}, " +
+                      $"QueriesHitTriggers={Physics2D.queriesHitTriggers}, " +
                       $"EnemyColliderScaleFactor={enemyColliderScaleFactor}");
         }
         
@@ -94,8 +98,6 @@ namespace CZ.Core.Configuration
             yield return new WaitForSeconds(0.5f);
             ConfigurePhysicsLayers();
             UpdateEnemyPhysicsProperties();
-            
-            setupComplete = true;
             
             // Log the details about how many enemies and their current collision settings
             int enemyCount = 0;
@@ -272,21 +274,112 @@ namespace CZ.Core.Configuration
         
         private void Update()
         {
-            // Only run this if we need to enforce collisions every frame
-            if (setupComplete && enforceCollisionsEveryFrame)
+            if (enforceCollisionsEveryFrame)
             {
-                // Ensure Enemy-Enemy collisions are enabled
-                if (Physics2D.GetIgnoreLayerCollision(enemyLayer, enemyLayer))
-                {
-                    Physics2D.IgnoreLayerCollision(enemyLayer, enemyLayer, false);
-                    Debug.Log("[Physics2DSetup] Re-enabled Enemy-Enemy collisions during gameplay");
-                }
+                // Enforce collision matrix every frame to prevent issues
+                ConfigurePhysicsLayers();
                 
                 // We still need to check periodically, but only for new objects
                 if (Time.frameCount % 120 == 0) // Every 120 frames (reduced from 60)
                 {
                     UpdateEnemyPhysicsProperties();
+                    
+                    // Check for SwiftEnemy objects specifically
+                    CheckSwiftEnemyCollisions();
                 }
+            }
+        }
+        
+        /// <summary>
+        /// Specifically checks and fixes collision settings for SwiftEnemy objects
+        /// </summary>
+        private void CheckSwiftEnemyCollisions()
+        {
+            try
+            {
+                // Use Type.GetType to find the SwiftEnemyController type without direct namespace reference
+                System.Type swiftEnemyType = System.Type.GetType("CZ.Core.Enemy.SwiftEnemyController, CZ.Core.Enemy");
+                
+                if (swiftEnemyType == null)
+                {
+                    Debug.LogWarning("[Physics2DSetup] SwiftEnemyController type not found. Skipping SwiftEnemy collision check.");
+                    return;
+                }
+                
+                // Use FindObjectsOfType with Type parameter instead of generic version
+                var swiftEnemies = FindObjectsByType(swiftEnemyType, FindObjectsSortMode.None);
+                
+                if (swiftEnemies.Length > 0)
+                {
+                    Debug.Log($"[Physics2DSetup] Found {swiftEnemies.Length} SwiftEnemy objects to check");
+                    
+                    foreach (var obj in swiftEnemies)
+                    {
+                        // Cast to MonoBehaviour to access common properties
+                        MonoBehaviour swiftEnemy = obj as MonoBehaviour;
+                        if (swiftEnemy == null || !swiftEnemy.gameObject.activeInHierarchy) continue;
+                        
+                        // Ensure the layer is set to Enemy
+                        if (swiftEnemy.gameObject.layer != enemyLayer)
+                        {
+                            Debug.LogWarning($"[Physics2DSetup] SwiftEnemy {swiftEnemy.name} was on incorrect layer: {LayerMask.LayerToName(swiftEnemy.gameObject.layer)}. Setting to Enemy layer.");
+                            swiftEnemy.gameObject.layer = enemyLayer;
+                        }
+                        
+                        // Check all colliders
+                        var colliders = swiftEnemy.GetComponents<Collider2D>();
+                        bool hasEnabledCollider = false;
+                        
+                        foreach (var collider in colliders)
+                        {
+                            // Skip damage trigger colliders
+                            if (IsDamageTriggerCollider(collider)) continue;
+                            
+                            // Ensure the collider is enabled and not a trigger
+                            if (!collider.enabled)
+                            {
+                                Debug.LogWarning($"[Physics2DSetup] SwiftEnemy {swiftEnemy.name} has disabled collider. Enabling it.");
+                                collider.enabled = true;
+                            }
+                            
+                            // For physics collisions, we need non-trigger colliders
+                            if (collider.isTrigger)
+                            {
+                                Debug.LogWarning($"[Physics2DSetup] SwiftEnemy {swiftEnemy.name} has trigger collider. Setting to non-trigger for physics collisions.");
+                                collider.isTrigger = false;
+                            }
+                            
+                            hasEnabledCollider = true;
+                        }
+                        
+                        // If no enabled colliders were found, log a critical error
+                        if (!hasEnabledCollider)
+                        {
+                            Debug.LogError($"[Physics2DSetup] CRITICAL: SwiftEnemy {swiftEnemy.name} has no enabled colliders for physics!");
+                        }
+                        
+                        // Check rigidbody settings
+                        var rb = swiftEnemy.GetComponent<Rigidbody2D>();
+                        if (rb != null)
+                        {
+                            if (!rb.simulated)
+                            {
+                                Debug.LogWarning($"[Physics2DSetup] SwiftEnemy {swiftEnemy.name} has disabled rigidbody simulation. Enabling it.");
+                                rb.simulated = true;
+                            }
+                            
+                            if (rb.collisionDetectionMode != CollisionDetectionMode2D.Continuous)
+                            {
+                                Debug.LogWarning($"[Physics2DSetup] SwiftEnemy {swiftEnemy.name} not using continuous collision detection. Updating it.");
+                                rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[Physics2DSetup] Error in CheckSwiftEnemyCollisions: {ex.Message}\n{ex.StackTrace}");
             }
         }
 
@@ -346,9 +439,18 @@ namespace CZ.Core.Configuration
                 // Projectile collision setup
                 if (projectileLayer >= 0 && projectileLayer != defaultLayer)
                 {
-                    // Projectiles should collide with enemies
+                    // CRITICAL FIX: Force-enable Projectile-Enemy collisions and log status
                     Physics2D.IgnoreLayerCollision(projectileLayer, enemyLayer, false);
-                    Debug.Log("[Physics2DSetup] Explicitly enabled Projectile-Enemy collisions");
+                    bool projectileEnemyCollision = !Physics2D.GetIgnoreLayerCollision(projectileLayer, enemyLayer);
+                    Debug.Log($"[Physics2DSetup] CRITICAL: Projectile-Enemy collisions: {(projectileEnemyCollision ? "ENABLED" : "DISABLED")}");
+                    
+                    if (!projectileEnemyCollision)
+                    {
+                        // Try a second time with stronger logging if it didn't work
+                        Physics2D.IgnoreLayerCollision(projectileLayer, enemyLayer, false);
+                        projectileEnemyCollision = !Physics2D.GetIgnoreLayerCollision(projectileLayer, enemyLayer);
+                        Debug.LogWarning($"[Physics2DSetup] ⚠️ Second attempt - Projectile-Enemy collisions: {(projectileEnemyCollision ? "ENABLED" : "STILL DISABLED")}");
+                    }
                     
                     // Projectiles should not collide with player (source)
                     Physics2D.IgnoreLayerCollision(projectileLayer, playerLayer, true);

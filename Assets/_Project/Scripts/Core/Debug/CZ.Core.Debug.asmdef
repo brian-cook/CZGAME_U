@@ -3,9 +3,10 @@
     "rootNamespace": "CZ.Core.Debug",
     "references": [
         "GUID:75469ad4d38634e559750d17036d5f7c",
-        "CZ.Core",
         "CZ.Core.Player",
+        "CZ.Core.Enemy",
         "CZ.Core.Interfaces",
+        "CZ.Core.Pooling",
         "NaughtyAttributes.Core",
         "CZ.Core.Logging"
     ],

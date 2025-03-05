@@ -17,7 +17,7 @@ namespace CZ.Core.Player
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(CircleCollider2D))]
     [RequireComponent(typeof(PlayerHealth))]
-    public class PlayerController : MonoBehaviour, IPositionProvider, IPlayerReference, IDamageTypeProvider
+    public class PlayerController : MonoBehaviour, IPositionProvider, IPlayerReference, IDamageTypeProvider, IPlayerIdentifier
     {
         #region Components
         private Rigidbody2D rb;
@@ -270,8 +270,8 @@ namespace CZ.Core.Player
                         proj.gameObject.SetActive(false);
                         return proj;
                     },
-                    initialSize: 20,  // Reduced from 100 to improve initialization performance
-                    maxSize: 100,     // Reduced from 200 to prevent memory issues
+                    initialSize: 30,  // Increased from 20 to improve initial capacity
+                    maxSize: 150,     // Increased from 100 to allow more projectiles
                     poolName: "ProjectilePool"
                 );
 
@@ -281,7 +281,7 @@ namespace CZ.Core.Player
                     projectilePrefab.gameObject.SetActive(true);
                 }
 
-                Debug.Log("[PlayerController] Projectile pool initialized successfully with initial size: 20, max size: 100");
+                Debug.Log("[PlayerController] Projectile pool initialized successfully with initial size: 30, max size: 150");
             }
             catch (System.Exception e)
             {
@@ -783,7 +783,8 @@ namespace CZ.Core.Player
 
         #region IPlayerReference Implementation
         /// <summary>
-        /// The player's transform component
+        /// The player's transform component.
+        /// This property satisfies both IPlayerReference and IPlayerIdentifier interfaces.
         /// </summary>
         public Transform PlayerTransform => transform;
         
@@ -796,6 +797,19 @@ namespace CZ.Core.Player
         /// Whether the player is currently alive
         /// </summary>
         public bool IsPlayerAlive => playerHealth == null ? true : !playerHealth.IsDead;
+        #endregion
+
+        #region IPlayerIdentifier Implementation
+        /// <summary>
+        /// Gets the player's current position.
+        /// This provides the Position property required by IPlayerIdentifier.
+        /// </summary>
+        public Vector3 Position => transform.position;
+        
+        /// <summary>
+        /// Gets the player's current velocity.
+        /// </summary>
+        public Vector2 Velocity => rb != null ? rb.linearVelocity : Vector2.zero;
         #endregion
 
         #if UNITY_EDITOR

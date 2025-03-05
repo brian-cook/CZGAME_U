@@ -7,7 +7,7 @@ namespace CZ.Core.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(CircleCollider2D))]
-    public class Projectile : MonoBehaviour, IPoolable
+    public class Projectile : MonoBehaviour, IPoolable, IProjectileIdentifier
     {
         #region Components
         private Rigidbody2D rb;
@@ -42,6 +42,12 @@ namespace CZ.Core.Player
         private bool warnedAboutMissingLayer = false;
         #endregion
 
+        #region IProjectileIdentifier Implementation
+        public int Damage => damage;
+        public GameObject Owner => owner;
+        public Vector2 Velocity => rb != null ? rb.linearVelocity : Vector2.zero;
+        #endregion
+
         #region Unity Lifecycle
         private void Awake()
         {
@@ -64,8 +70,13 @@ namespace CZ.Core.Player
             circleCollider = GetComponent<CircleCollider2D>();
             if (circleCollider != null)
             {
-                circleCollider.radius = 0.2f;
+                circleCollider.radius = 0.3f;
                 circleCollider.isTrigger = true;
+                
+                // Make sure the collider is enabled
+                circleCollider.enabled = true;
+                
+                Debug.Log($"[Projectile] Collider set up with radius: {circleCollider.radius}, isTrigger: {circleCollider.isTrigger}");
             }
 
             if (projectileTrail == null)
@@ -148,7 +159,11 @@ namespace CZ.Core.Player
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!isActive) return;
+            if (!isActive) 
+            {
+                Debug.Log($"[Projectile] Ignoring collision as projectile is not active");
+                return;
+            }
 
             // Skip collision with owner
             if (owner != null && (other.gameObject == owner || other.transform.IsChildOf(owner.transform)))
@@ -156,15 +171,59 @@ namespace CZ.Core.Player
                 Debug.Log($"[Projectile] Ignoring collision with owner: {owner.name}");
                 return;
             }
+            
+            // Enhanced logging with more details for debugging
+            Debug.Log($"[Projectile] Collision with {other.gameObject.name}, Layer: {other.gameObject.layer} ({LayerMask.LayerToName(other.gameObject.layer)}), " +
+                $"Tag: {other.tag}, IsTrigger: {other.isTrigger}, Enabled: {other.enabled}, " +
+                $"Transform position: {other.transform.position}, My position: {transform.position}");
 
-            // Check for IDamageable interface first
-            var damageable = other.GetComponent<IDamageable>();
+            // Force update the collider in case it wasn't enabled
+            CircleCollider2D enemyCollider = other.GetComponent<CircleCollider2D>();
+            if (enemyCollider != null && !enemyCollider.enabled)
+            {
+                Debug.LogWarning($"[Projectile] Enemy collider was disabled! Enabling it.");
+                enemyCollider.enabled = true;
+            }
+
+            // Get IDamageable component more aggressively
+            IDamageable damageable = null;
+            
+            // Try direct component access
+            damageable = other.GetComponent<IDamageable>();
+            
+            // Try parent if not found
+            if (damageable == null)
+            {
+                damageable = other.GetComponentInParent<IDamageable>();
+            }
+            
+            // Try root object if still not found
+            if (damageable == null && other.transform.root != other.transform)
+            {
+                damageable = other.transform.root.GetComponent<IDamageable>();
+            }
+            
+            // Try all components in parent chain
+            if (damageable == null)
+            {
+                Transform current = other.transform;
+                while (current != null && damageable == null)
+                {
+                    damageable = current.GetComponent<IDamageable>();
+                    current = current.parent;
+                }
+            }
+            
             if (damageable != null)
             {
-                Debug.Log($"[Projectile] Hit damageable object: {other.gameObject.name}");
+                Debug.Log($"[Projectile] Hit damageable object: {other.gameObject.name}, applying {damage} damage");
                 damageable.TakeDamage(damage);
                 ReturnToPool();
                 return;
+            }
+            else
+            {
+                Debug.LogWarning($"[Projectile] Object {other.gameObject.name} does not implement IDamageable interface");
             }
 
             // Fallback to tag check if needed
@@ -172,6 +231,33 @@ namespace CZ.Core.Player
             {
                 Debug.Log($"[Projectile] Hit enemy with tag: {other.gameObject.name}");
                 ReturnToPool();
+                return;
+            }
+            
+            // Check if we hit other layers that should destroy the projectile
+            if (other.gameObject.layer == LayerMask.NameToLayer("Default") ||
+                other.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
+            {
+                Debug.Log($"[Projectile] Hit obstacle layer: {LayerMask.LayerToName(other.gameObject.layer)}");
+                ReturnToPool();
+                return;
+            }
+        }
+
+        private void OnValidate()
+        {
+            CircleCollider2D col = GetComponent<CircleCollider2D>();
+            if (col != null && !col.isTrigger)
+            {
+                Debug.LogError("[Projectile] CircleCollider2D MUST be a trigger for projectiles!");
+                col.isTrigger = true;
+            }
+            
+            Rigidbody2D rb = GetComponent<Rigidbody2D>();
+            if (rb != null && rb.collisionDetectionMode != CollisionDetectionMode2D.Continuous)
+            {
+                Debug.LogWarning("[Projectile] Rigidbody2D should use Continuous collision detection!");
+                rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             }
         }
         #endregion
@@ -201,7 +287,13 @@ namespace CZ.Core.Player
                 spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1f);
             }
             
-            Debug.Log($"[Projectile] OnSpawn - Position: {transform.position}, Sprite visible: {(spriteRenderer != null ? spriteRenderer.enabled : false)}");
+            // Make sure collider is enabled
+            if (circleCollider != null)
+            {
+                circleCollider.enabled = true;
+            }
+            
+            Debug.Log($"[Projectile] OnSpawn - Position: {transform.position}, Sprite visible: {(spriteRenderer != null ? spriteRenderer.enabled : false)}, Collider enabled: {(circleCollider != null ? circleCollider.enabled : false)}");
         }
 
         public void OnDespawn()
@@ -252,6 +344,12 @@ namespace CZ.Core.Player
                 projectileTrail.emitting = true;
             }
             
+            // Make sure collider is enabled for collision detection
+            if (circleCollider != null)
+            {
+                circleCollider.enabled = true;
+            }
+            
             // Set proper layer - try to use Projectile layer but fall back to Default if it doesn't exist
             int projectileLayer = LayerMask.NameToLayer("Projectile");
             if (projectileLayer >= 0)
@@ -284,6 +382,93 @@ namespace CZ.Core.Player
                 Debug.LogError("[Projectile] Failed to return to pool - pool not found!");
                 gameObject.SetActive(false);
             }
+        }
+
+        public void VerifyRequiredSettings()
+        {
+            // Log global Physics2D settings that are critical
+            Debug.Log($"[Projectile] Physics2D settings: queriesHitTriggers={Physics2D.queriesHitTriggers}, " +
+                      $"queriesStartInColliders={Physics2D.queriesStartInColliders}, " +
+                      $"callbacksOnDisable={Physics2D.callbacksOnDisable}");
+            
+            // Ensure layer is set to Projectile
+            int projectileLayer = LayerMask.NameToLayer("Projectile");
+            if (projectileLayer >= 0 && gameObject.layer != projectileLayer)
+            {
+                Debug.LogWarning($"[Projectile] Layer is not set to Projectile! Current: {LayerMask.LayerToName(gameObject.layer)}");
+                gameObject.layer = projectileLayer;
+            }
+            
+            // Verify collider settings
+            CircleCollider2D col = GetComponent<CircleCollider2D>();
+            if (col != null)
+            {
+                if (!col.enabled)
+                {
+                    Debug.LogWarning("[Projectile] Collider was disabled! Enabling it.");
+                    col.enabled = true;
+                }
+                
+                if (!col.isTrigger)
+                {
+                    Debug.LogWarning("[Projectile] Collider must be a trigger! Setting isTrigger to true.");
+                    col.isTrigger = true;
+                }
+            }
+            
+            // Force enable Physics2D.queriesHitTriggers
+            Physics2D.queriesHitTriggers = true;
+        }
+
+        public void Fire(Vector3 startPosition, Vector2 direction, GameObject projectileOwner)
+        {
+            // ... existing code ...
+            
+            owner = projectileOwner;
+            
+            if (rb != null)
+            {
+                rb.linearVelocity = direction.normalized * projectileSpeed;
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0, 0, angle);
+            }
+            
+            // Ensure the sprite renderer is visible with proper settings
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.enabled = true;
+                spriteRenderer.color = Color.white; // Full opacity
+                
+                // Use appropriate shader for 2D rendering
+                if (spriteRenderer.material == null || spriteRenderer.material.shader.name.Contains("Lit"))
+                {
+                    spriteRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                }
+            }
+            
+            // Ensure projectile trail is active
+            if (projectileTrail != null)
+            {
+                projectileTrail.emitting = true;
+            }
+            
+            // Make sure collider is enabled for collision detection
+            if (circleCollider != null)
+            {
+                circleCollider.enabled = true;
+            }
+            
+            // Set proper layer - try to use Projectile layer but fall back to Default if it doesn't exist
+            int projectileLayer = LayerMask.NameToLayer("Projectile");
+            if (projectileLayer >= 0)
+            {
+                gameObject.layer = projectileLayer;
+            }
+            
+            // NEW: Verify physics settings
+            VerifyRequiredSettings();
+            
+            // ... existing code ...
         }
         #endregion
     }
