@@ -664,30 +664,72 @@ namespace CZ.Core.Enemy
             if (collision.gameObject.layer == LayerMask.NameToLayer("Projectile"))
             {
                 // Log for debugging
-                Debug.Log($"[SwiftEnemy] Hit by projectile: {collision.gameObject.name} at position {transform.position}");
+                CZLogger.LogInfo($"[SwiftEnemy] Hit by projectile: {collision.gameObject.name} at position {transform.position}", LogCategory.Enemy);
 
-                // Use reflection to get Projectile component type
-                var projectileComponent = collision.gameObject.GetComponent(System.Type.GetType("CZ.Core.Player.Projectile, CZ.Core.Player"));
-                if (projectileComponent != null)
+                try
                 {
-                    // Use reflection to get the DamageValue property
-                    int damage = (int)projectileComponent.GetType().GetProperty("DamageValue").GetValue(projectileComponent);
-                    TakeDamage(damage);
-                    
-                    // If you need to handle the projectile differently, you can do so here
+                    // Use reflection to get Projectile component type
+                    var projectileType = System.Type.GetType("CZ.Core.Player.Projectile, CZ.Core.Player");
+                    if (projectileType == null)
+                    {
+                        CZLogger.LogWarning("[SwiftEnemy] Could not find Projectile type.", LogCategory.Enemy);
+                        return;
+                    }
+
+                    var projectileComponent = collision.gameObject.GetComponent(projectileType);
+                    if (projectileComponent != null)
+                    {
+                        // Use reflection to get the Damage property
+                        var damageProperty = projectileComponent.GetType().GetProperty("Damage");
+                        if (damageProperty == null)
+                        {
+                            CZLogger.LogWarning("[SwiftEnemy] Could not find Damage property on Projectile.", LogCategory.Enemy);
+                            return;
+                        }
+
+                        int damage = (int)damageProperty.GetValue(projectileComponent);
+                        TakeDamage(damage);
+                        
+                        // If you need to handle the projectile differently, you can do so here
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    CZLogger.LogError($"[SwiftEnemy] Error processing projectile collision: {ex.Message}", LogCategory.Enemy);
                 }
             }
             else if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
             {
                 // Log collision with player
-                Debug.Log($"[SwiftEnemy] Collided with player at position {transform.position}");
+                CZLogger.LogInfo($"[SwiftEnemy] Collided with player at position {transform.position}", LogCategory.Enemy);
                 
-                // Use reflection to get PlayerController component
-                var playerController = collision.gameObject.GetComponent(System.Type.GetType("CZ.Core.Player.PlayerController, CZ.Core.Player"));
-                if (playerController != null)
+                try
                 {
-                    // Use reflection to call TakeDamage method
-                    playerController.GetType().GetMethod("TakeDamage").Invoke(playerController, new object[] { 10 });
+                    // Use reflection to get PlayerController component
+                    var playerType = System.Type.GetType("CZ.Core.Player.PlayerController, CZ.Core.Player");
+                    if (playerType == null)
+                    {
+                        CZLogger.LogWarning("[SwiftEnemy] Could not find PlayerController type.", LogCategory.Enemy);
+                        return;
+                    }
+
+                    var playerController = collision.gameObject.GetComponent(playerType);
+                    if (playerController != null)
+                    {
+                        // Use reflection to call TakeDamage method
+                        var takeDamageMethod = playerController.GetType().GetMethod("TakeDamage");
+                        if (takeDamageMethod == null)
+                        {
+                            CZLogger.LogWarning("[SwiftEnemy] Could not find TakeDamage method on PlayerController.", LogCategory.Enemy);
+                            return;
+                        }
+
+                        takeDamageMethod.Invoke(playerController, new object[] { 10 });
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    CZLogger.LogError($"[SwiftEnemy] Error processing player collision: {ex.Message}", LogCategory.Enemy);
                 }
             }
         }
@@ -702,15 +744,36 @@ namespace CZ.Core.Enemy
             if (other.gameObject.layer == LayerMask.NameToLayer("Projectile"))
             {
                 // Log for debugging
-                Debug.Log($"[SwiftEnemy] Trigger entered by projectile: {other.gameObject.name} at position {transform.position}");
+                CZLogger.LogInfo($"[SwiftEnemy] Trigger entered by projectile: {other.gameObject.name} at position {transform.position}", LogCategory.Enemy);
 
-                // Use reflection to get Projectile component
-                var projectileComponent = other.gameObject.GetComponent(System.Type.GetType("CZ.Core.Player.Projectile, CZ.Core.Player"));
-                if (projectileComponent != null)
+                try
                 {
-                    // Use reflection to get the DamageValue property
-                    int damage = (int)projectileComponent.GetType().GetProperty("DamageValue").GetValue(projectileComponent);
-                    TakeDamage(damage);
+                    // Use reflection to get Projectile component type
+                    var projectileType = System.Type.GetType("CZ.Core.Player.Projectile, CZ.Core.Player");
+                    if (projectileType == null)
+                    {
+                        CZLogger.LogWarning("[SwiftEnemy] Could not find Projectile type.", LogCategory.Enemy);
+                        return;
+                    }
+
+                    var projectileComponent = other.gameObject.GetComponent(projectileType);
+                    if (projectileComponent != null)
+                    {
+                        // Use reflection to get the Damage property
+                        var damageProperty = projectileComponent.GetType().GetProperty("Damage");
+                        if (damageProperty == null)
+                        {
+                            CZLogger.LogWarning("[SwiftEnemy] Could not find Damage property on Projectile.", LogCategory.Enemy);
+                            return;
+                        }
+
+                        int damage = (int)damageProperty.GetValue(projectileComponent);
+                        TakeDamage(damage);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    CZLogger.LogError($"[SwiftEnemy] Error processing projectile trigger: {ex.Message}", LogCategory.Enemy);
                 }
             }
         }
